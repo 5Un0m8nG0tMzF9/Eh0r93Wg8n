@@ -1934,86 +1934,97 @@ function initTextDifferenceChecker() {
   // Compute Diff
   // -------------------------
   function computeDiff() {
-    clearHighlights();
+  clearHighlights();
 
-    const textA = inputA.value;
-    const textB = inputB.value;
-    if (!textA.trim() && !textB.trim()) return;
+  const textA = inputA.value;
+  const textB = inputB.value;
+  if (!textA.trim() && !textB.trim()) return;
 
-    const wordsA = splitWords(normalizeText(textA));
-    const wordsB = splitWords(normalizeText(textB));
+  const wordsA = splitWords(normalizeText(textA));
+  const wordsB = splitWords(normalizeText(textB));
 
-    let htmlA = "";
-    let htmlB = "";
+  let htmlA = "";
+  let htmlB = "";
 
-    differences = [];
+  differences = [];
 
-    // Simple sequential diff, grouping contiguous differences
-    let i = 0, j = 0;
-    while (i < wordsA.length || j < wordsB.length) {
-      const wordA = wordsA[i] || "";
-      const wordB = wordsB[j] || "";
+  let i = 0, j = 0;
+  while (i < wordsA.length || j < wordsB.length) {
+    const wordA = wordsA[i] || "";
+    const wordB = wordsB[j] || "";
 
-      if (wordA === wordB) {
-        htmlA += wordA ? wordA + " " : "";
-        htmlB += wordB ? wordB + " " : "";
-        i++; j++;
-        continue;
-      }
-
-      // Start grouping contiguous differences
-      let diffWordsA = [];
-      let diffWordsB = [];
-
-      while ((i < wordsA.length && wordsA[i] !== wordsB[j]) || (j < wordsB.length && wordsA[i] !== wordsB[j])) {
-        if (i < wordsA.length && (wordsA[i] !== wordsB[j] || j >= wordsB.length)) {
-          diffWordsA.push(wordsA[i]);
-          i++;
-        }
-        if (j < wordsB.length && (wordsA[i] !== wordsB[j] || i >= wordsA.length)) {
-          diffWordsB.push(wordsB[j]);
-          j++;
-        }
-      }
-
-      let type = "changed";
-      if (diffWordsA.length > 0 && diffWordsB.length === 0) type = "removed";
-      else if (diffWordsB.length > 0 && diffWordsA.length === 0) type = "added";
-
-      // Create span strings
-      const spanA = diffWordsA.map(w => `<span class="diff-${type}">${w}</span>`).join(" ");
-      const spanB = diffWordsB.map(w => `<span class="diff-${type}">${w}</span>`).join(" ");
-
-      htmlA += spanA + " ";
-      htmlB += spanB + " ";
-
-      // Save spans for navigation
-      differences.push({
-        type,
-        textA: diffWordsA.join(" "),
-        textB: diffWordsB.join(" "),
-        spansA: [], // will fill later
-        spansB: []
-      });
+    if (wordA === wordB) {
+      htmlA += wordA ? wordA + " " : "";
+      htmlB += wordB ? wordB + " " : "";
+      i++; j++;
+      continue;
     }
 
-    highlightA.innerHTML = htmlA;
-    highlightB.innerHTML = htmlB;
+    let diffWordsA = [];
+    let diffWordsB = [];
 
-    // Fill span references
-    differences.forEach(diff => {
-      diff.spansA = Array.from(highlightA.querySelectorAll(`.diff-${diff.type}`)).filter(span => !span.classList.contains("diff-active"));
-      diff.spansB = Array.from(highlightB.querySelectorAll(`.diff-${diff.type}`)).filter(span => !span.classList.contains("diff-active"));
+    while ((i < wordsA.length && wordsA[i] !== wordsB[j]) || (j < wordsB.length && wordsA[i] !== wordsB[j])) {
+      if (i < wordsA.length && (wordsA[i] !== wordsB[j] || j >= wordsB.length)) {
+        diffWordsA.push(wordsA[i]);
+        i++;
+      }
+      if (j < wordsB.length && (wordsA[i] !== wordsB[j] || i >= wordsA.length)) {
+        diffWordsB.push(wordsB[j]);
+        j++;
+      }
+    }
+
+    let type = "changed";
+    if (diffWordsA.length > 0 && diffWordsB.length === 0) type = "removed";
+    else if (diffWordsB.length > 0 && diffWordsA.length === 0) type = "added";
+
+    const spanA = diffWordsA.map(w => `<span class="diff-${type}">${w}</span>`).join(" ");
+    const spanB = diffWordsB.map(w => `<span class="diff-${type}">${w}</span>`).join(" ");
+
+    htmlA += spanA + " ";
+    htmlB += spanB + " ";
+
+    differences.push({
+      type,
+      textA: diffWordsA.join(" "),
+      textB: diffWordsB.join(" "),
+      spansA: [], 
+      spansB: []
     });
-
-    if (differences.length > 0) {
-      currentIndex = 0;
-      showCurrentDifference();
-    }
-
-    updateStatus();
   }
 
+  highlightA.innerHTML = htmlA;
+  highlightB.innerHTML = htmlB;
+
+  differences.forEach(diff => {
+    diff.spansA = Array.from(highlightA.querySelectorAll(`.diff-${diff.type}`));
+    diff.spansB = Array.from(highlightB.querySelectorAll(`.diff-${diff.type}`));
+  });
+
+  if (differences.length > 0) {
+    currentIndex = 0;
+    showCurrentDifference();
+  }
+
+  updateStatus();
+}
+
+function showCurrentDifference() {
+  wrapper.querySelectorAll(".diff-active").forEach(el => el.classList.remove("diff-active"));
+
+  if (currentIndex < 0 || currentIndex >= differences.length) return;
+
+  const diff = differences[currentIndex];
+
+  // Highlight only the first word of the group
+  if (diff.spansA.length) diff.spansA[0].classList.add("diff-active");
+  if (diff.spansB.length) diff.spansB[0].classList.add("diff-active");
+
+  // Output formatting with divs to preserve alignment
+  output.innerHTML = `<div><strong>Type:</strong> ${diff.type}</div>
+                      <div><strong>Text A:</strong> ${diff.textA || "(none)"}</div>
+                      <div><strong>Text B:</strong> ${diff.textB || "(none)"}</div>`;
+}
   // -------------------------
   // Navigation
   // -------------------------
