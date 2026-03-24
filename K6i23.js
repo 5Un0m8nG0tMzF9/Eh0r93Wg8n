@@ -2058,5 +2058,4 @@ function initTextDifferenceChecker() {
   updateCompareState();
   updateStatus();
   inputA.focus();
-
 }
