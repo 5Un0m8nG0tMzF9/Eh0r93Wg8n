@@ -1882,7 +1882,6 @@ function initTextDifferenceChecker() {
   // -------------------------
   // Utilities
   // -------------------------
-
   function normalize(text) {
     if (ignoreCase.checked) text = text.toLowerCase();
     if (ignoreWhitespace.checked) text = text.replace(/\s+/g, " ");
@@ -1913,87 +1912,87 @@ function initTextDifferenceChecker() {
   function scrollToCurrent() {
     if (currentIndex < 0 || currentIndex >= differences.length) return;
 
-    // Remove active class from all spans first
     differences.forEach(diff => {
       diff.spansA.forEach(s => s.classList.remove("diff-active"));
       diff.spansB.forEach(s => s.classList.remove("diff-active"));
     });
 
-    // Add active to current difference
     const diff = differences[currentIndex];
     diff.spansA.forEach(s => s.classList.add("diff-active"));
     diff.spansB.forEach(s => s.classList.add("diff-active"));
 
-    // Scroll overlay to current
-    if (diff.spansB.length) diff.spansB[0].scrollIntoView({behavior:"smooth", block:"center"});
-    else if (diff.spansA.length) diff.spansA[0].scrollIntoView({behavior:"smooth", block:"center"});
+    if (diff.spansB.length) diff.spansB[0].scrollIntoView({ behavior: "smooth", block: "center" });
+    else if (diff.spansA.length) diff.spansA[0].scrollIntoView({ behavior: "smooth", block: "center" });
 
-    // Update output box
     output.innerHTML = `<strong>Type:</strong> ${diff.type}<br><strong>Text A:</strong> ${diff.textA || "(none)"}<br><strong>Text B:</strong> ${diff.textB || "(none)"}`;
   }
 
   // -------------------------
-  // Diff Algorithm
+  // Diff Algorithm (group consecutive words)
   // -------------------------
   function computeDiff() {
     clearHighlights();
 
-    const textA = inputA.value;
-    const textB = inputB.value;
-    if (!textA.trim() && !textB.trim()) return;
+    const wordsA = splitWords(normalize(inputA.value));
+    const wordsB = splitWords(normalize(inputB.value));
 
-    const wordsA = splitWords(normalize(textA));
-    const wordsB = splitWords(normalize(textB));
-
-    const maxLen = Math.max(wordsA.length, wordsB.length);
-
-    let htmlA = "";
-    let htmlB = "";
-
+    let i = 0, j = 0;
+    let htmlA = "", htmlB = "";
     differences = [];
 
-    // Track spans per difference
-    let currentDiff = null;
-
-    for (let i = 0; i < maxLen; i++) {
-      const wordA = wordsA[i] || null;
-      const wordB = wordsB[i] || null;
-
-      if (wordA === wordB) {
-        htmlA += wordA ? wordA + " " : "";
-        htmlB += wordB ? wordB + " " : "";
-        currentDiff = null; // reset grouping
+    while (i < wordsA.length || j < wordsB.length) {
+      if (wordsA[i] === wordsB[j]) {
+        // same word
+        htmlA += wordsA[i] ? wordsA[i] + " " : "";
+        htmlB += wordsB[j] ? wordsB[j] + " " : "";
+        i++; j++;
         continue;
       }
 
-      let type, spanA = "", spanB = "";
+      // start grouping difference
+      let groupA = [];
+      let groupB = [];
+      let type;
 
-      if (wordA && !wordB) type = "removed";
-      else if (!wordA && wordB) type = "added";
+      // Collect consecutive removed words
+      let tempI = i, tempJ = j;
+      while (wordsA[tempI] !== wordsB[tempJ] && tempI < wordsA.length) {
+        groupA.push(wordsA[tempI]);
+        tempI++;
+      }
+
+      // Collect consecutive added words
+      tempI = i; tempJ = j;
+      while (wordsA[tempI] !== wordsB[tempJ] && tempJ < wordsB.length) {
+        groupB.push(wordsB[tempJ]);
+        tempJ++;
+      }
+
+      if (groupA.length && !groupB.length) type = "removed";
+      else if (!groupA.length && groupB.length) type = "added";
       else type = "changed";
 
-      // Wrap word(s) in span
-      if (wordA) {
-        const sA = `<span class="diff-${type}">${wordA}</span> `;
-        htmlA += sA;
-      }
-      if (wordB) {
-        const sB = `<span class="diff-${type}">${wordB}</span> `;
-        htmlB += sB;
-      }
+      // build html spans
+      const spanA = groupA.map(w => `<span class="diff-${type}">${w}</span>`).join(" ") + (groupA.length ? " " : "");
+      const spanB = groupB.map(w => `<span class="diff-${type}">${w}</span>`).join(" ") + (groupB.length ? " " : "");
 
-      // Build difference object
-      currentDiff = {type, spansA: [], spansB: [], textA: wordA || "", textB: wordB || ""};
-      differences.push(currentDiff);
+      htmlA += spanA;
+      htmlB += spanB;
+
+      // save difference object
+      differences.push({ type, spansA: [], spansB: [], textA: groupA.join(" "), textB: groupB.join(" ") });
+
+      i += groupA.length;
+      j += groupB.length;
     }
 
     highlightA.innerHTML = htmlA;
     highlightB.innerHTML = htmlB;
 
-    // Populate span references for navigation
+    // populate spans for navigation
     differences.forEach(diff => {
-      diff.spansA = Array.from(highlightA.querySelectorAll(`.diff-${diff.type}`)).filter(s => s.textContent === diff.textA);
-      diff.spansB = Array.from(highlightB.querySelectorAll(`.diff-${diff.type}`)).filter(s => s.textContent === diff.textB);
+      diff.spansA = Array.from(highlightA.querySelectorAll(`.diff-${diff.type}`)).filter(s => diff.textA.includes(s.textContent));
+      diff.spansB = Array.from(highlightB.querySelectorAll(`.diff-${diff.type}`)).filter(s => diff.textB.includes(s.textContent));
     });
 
     if (differences.length > 0) {
@@ -2069,9 +2068,6 @@ function initTextDifferenceChecker() {
   ignoreCase.addEventListener("change", computeDiff);
   ignoreWhitespace.addEventListener("change", computeDiff);
 
-  // -------------------------
-  // Initial state
-  // -------------------------
   updateCompareState();
   updateStatus();
   inputA.focus();
