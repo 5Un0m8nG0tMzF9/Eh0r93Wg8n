@@ -1904,14 +1904,20 @@ function initTextDifferenceChecker() {
   function scrollToCurrent() {
     if (currentIndex < 0 || currentIndex >= differences.length) return;
     const diff = differences[currentIndex];
-    diff.elA.scrollIntoView({ behavior: "smooth", block: "center" });
-    diff.elB.scrollIntoView({ behavior: "smooth", block: "center" });
 
-    differences.forEach(d => d.elA.classList.remove("diff-active"));
-    differences.forEach(d => d.elB.classList.remove("diff-active"));
+    // Remove old active
+    differences.forEach(d => {
+      d.elA.forEach(span => span.classList.remove("diff-active"));
+      d.elB.forEach(span => span.classList.remove("diff-active"));
+    });
 
-    diff.elA.classList.add("diff-active");
-    diff.elB.classList.add("diff-active");
+    // Add active to current
+    diff.elA.forEach(span => span.classList.add("diff-active"));
+    diff.elB.forEach(span => span.classList.add("diff-active"));
+
+    // Scroll overlays to current difference
+    if (diff.elA[0]) diff.elA[0].scrollIntoView({ behavior: "smooth", block: "center" });
+    if (diff.elB[0]) diff.elB[0].scrollIntoView({ behavior: "smooth", block: "center" });
 
     // Update output
     output.innerHTML = `Type: ${diff.type}<br>Text A: ${diff.textA}<br>Text B: ${diff.textB}`;
@@ -1923,17 +1929,12 @@ function initTextDifferenceChecker() {
   function computeDiff() {
     clearHighlights();
 
-    const textA = normalizeText(inputA.value);
-    const textB = normalizeText(inputB.value);
-    if (!textA.trim() && !textB.trim()) return;
-
-    const wordsA = textA.split(/\s+/);
-    const wordsB = textB.split(/\s+/);
+    const wordsA = normalizeText(inputA.value).split(/\s+/);
+    const wordsB = normalizeText(inputB.value).split(/\s+/);
     const maxLength = Math.max(wordsA.length, wordsB.length);
 
     let htmlA = "";
     let htmlB = "";
-
     differences = [];
 
     let i = 0;
@@ -1948,42 +1949,71 @@ function initTextDifferenceChecker() {
         continue;
       }
 
-      // Determine type
+      // Group multi-word additions/removals
+      let groupA = [];
+      let groupB = [];
       let type = "";
-      let textAGroup = "";
-      let textBGroup = "";
 
-      if (wordA && !wordB) {
-        type = "removed";
-        textAGroup = wordA;
-        textBGroup = "";
-        htmlA += `<span class="diff-removed">${wordA}</span> `;
-      } else if (!wordA && wordB) {
-        type = "added";
-        textAGroup = "";
-        textBGroup = wordB;
-        htmlB += `<span class="diff-added">${wordB}</span> `;
-      } else {
-        type = "changed";
-        textAGroup = wordA;
-        textBGroup = wordB;
-        htmlA += `<span class="diff-changed">${wordA}</span> `;
-        htmlB += `<span class="diff-changed">${wordB}</span> `;
+      // Detect removed words
+      let j = i;
+      while (j < wordsA.length && wordsB[i + groupB.length] !== wordsA[j]) {
+        groupA.push(wordsA[j]);
+        j++;
       }
 
+      // Detect added words
+      j = i;
+      while (j < wordsB.length && wordsA[i + groupA.length] !== wordsB[j]) {
+        groupB.push(wordsB[j]);
+        j++;
+      }
+
+      if (groupA.length && !groupB.length) type = "removed";
+      else if (!groupA.length && groupB.length) type = "added";
+      else type = "changed";
+
+      // Build HTML spans for overlays
+      const elA_spans = [];
+      const elB_spans = [];
+
+      if (groupA.length) {
+        const spanA = `<span class="diff-${type}">${groupA.join(" ")}</span> `;
+        htmlA += spanA;
+        elA_spans.push(spanA);
+      }
+      if (groupB.length) {
+        const spanB = `<span class="diff-${type}">${groupB.join(" ")}</span> `;
+        htmlB += spanB;
+        elB_spans.push(spanB);
+      }
+
+      // Append difference object
       differences.push({
-        elA: htmlA ? highlightA.querySelectorAll("span").item(highlightA.querySelectorAll("span").length) : null,
-        elB: htmlB ? highlightB.querySelectorAll("span").item(highlightB.querySelectorAll("span").length) : null,
+        elA: [], // will populate after inserting HTML
+        elB: [],
         type,
-        textA: textAGroup,
-        textB: textBGroup,
+        textA: groupA.join(" "),
+        textB: groupB.join(" ")
       });
 
-      i++;
+      i += Math.max(groupA.length, groupB.length);
     }
 
     highlightA.innerHTML = htmlA;
     highlightB.innerHTML = htmlB;
+
+    // Populate the actual span elements in the difference objects
+    const spansA = Array.from(highlightA.querySelectorAll("span"));
+    const spansB = Array.from(highlightB.querySelectorAll("span"));
+    let idxA = 0, idxB = 0;
+    differences.forEach(diff => {
+      const countA = diff.textA ? diff.textA.split(" ").length : 0;
+      const countB = diff.textB ? diff.textB.split(" ").length : 0;
+      diff.elA = spansA.slice(idxA, idxA + countA);
+      diff.elB = spansB.slice(idxB, idxB + countB);
+      idxA += countA;
+      idxB += countB;
+    });
 
     if (differences.length > 0) {
       currentIndex = 0;
