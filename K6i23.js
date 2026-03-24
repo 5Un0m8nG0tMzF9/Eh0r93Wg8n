@@ -1848,6 +1848,10 @@ function initTextDifferenceChecker() {
   const inputA = document.getElementById("text-diff-input-a");
   const inputB = document.getElementById("text-diff-input-b");
 
+  // Highlight overlays
+  const highlightA = document.getElementById("text-diff-highlight-a");
+  const highlightB = document.getElementById("text-diff-highlight-b");
+
   // Buttons
   const clearA = document.getElementById("text-diff-clear-a");
   const copyA = document.getElementById("text-diff-copy-a");
@@ -1864,9 +1868,6 @@ function initTextDifferenceChecker() {
   const counter = document.getElementById("text-diff-counter");
   const position = document.getElementById("text-diff-position");
 
-  // Output
-  const output = document.getElementById("text-diff-output");
-
   // Options
   const ignoreCase = document.getElementById("text-diff-ignore-case");
   const ignoreWhitespace = document.getElementById("text-diff-ignore-whitespace");
@@ -1880,14 +1881,8 @@ function initTextDifferenceChecker() {
   // -------------------------
 
   function normalizeText(text) {
-    if (ignoreCase.checked) {
-      text = text.toLowerCase();
-    }
-
-    if (ignoreWhitespace.checked) {
-      text = text.replace(/\s+/g, " ");
-    }
-
+    if (ignoreCase.checked) text = text.toLowerCase();
+    if (ignoreWhitespace.checked) text = text.replace(/\s+/g, " ");
     return text;
   }
 
@@ -1897,85 +1892,79 @@ function initTextDifferenceChecker() {
 
   function updateStatus() {
     counter.textContent = `Differences found: ${differences.length}`;
-
-    if (differences.length === 0) {
-      position.textContent = "Difference 0 of 0";
-    } else {
-      position.textContent =
-        `Difference ${currentIndex + 1} of ${differences.length}`;
-    }
+    position.textContent =
+      differences.length === 0
+        ? "Difference 0 of 0"
+        : `Difference ${currentIndex + 1} of ${differences.length}`;
   }
 
   function scrollToCurrent() {
     if (currentIndex < 0 || currentIndex >= differences.length) return;
-
     const el = differences[currentIndex];
-    el.scrollIntoView({
-      behavior: "smooth",
-      block: "center"
-    });
-
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
     differences.forEach(d => d.classList.remove("diff-active"));
     el.classList.add("diff-active");
   }
 
-  function clearOutput() {
-    output.innerHTML = "";
+  function clearHighlights() {
+    highlightA.innerHTML = "";
+    highlightB.innerHTML = "";
     differences = [];
     currentIndex = -1;
     updateStatus();
   }
 
   // -------------------------
-  // Diff Logic (Simple Word Diff)
+  // Diff Logic
   // -------------------------
 
   function computeDiff() {
-    clearOutput();
+    clearHighlights();
 
-    let textA = inputA.value;
-    let textB = inputB.value;
-
+    const textA = inputA.value;
+    const textB = inputB.value;
     if (!textA.trim() || !textB.trim()) return;
 
-    const normA = normalizeText(textA);
-    const normB = normalizeText(textB);
+    const normA = normalizeText(textA).split(/\s+/);
+    const normB = normalizeText(textB).split(/\s+/);
+    const maxLength = Math.max(normA.length, normB.length);
 
-    const wordsA = splitWords(normA);
-    const wordsB = splitWords(normB);
-
-    const maxLength = Math.max(wordsA.length, wordsB.length);
-
-    let html = "";
+    let htmlA = "";
+    let htmlB = "";
 
     for (let i = 0; i < maxLength; i++) {
-      const wordA = wordsA[i];
-      const wordB = wordsB[i];
+      const wordA = normA[i] || "";
+      const wordB = normB[i] || "";
 
       if (wordA === wordB) {
-        html += wordB ? wordB + " " : "";
+        htmlA += wordA ? wordA + " " : "";
+        htmlB += wordB ? wordB + " " : "";
         continue;
       }
 
       if (wordA && !wordB) {
-        html += `<span class="diff-removed">${wordA}</span> `;
+        htmlA += `<span class="diff-removed">${wordA}</span> `;
+        htmlB += "";
         continue;
       }
 
       if (!wordA && wordB) {
-        html += `<span class="diff-added">${wordB}</span> `;
+        htmlA += "";
+        htmlB += `<span class="diff-added">${wordB}</span> `;
         continue;
       }
 
       if (wordA !== wordB) {
-        html += `<span class="diff-changed">${wordB}</span> `;
+        htmlA += `<span class="diff-changed">${wordA}</span> `;
+        htmlB += `<span class="diff-changed">${wordB}</span> `;
       }
     }
 
-    output.innerHTML = html;
+    highlightA.innerHTML = htmlA;
+    highlightB.innerHTML = htmlB;
 
     differences = Array.from(
-      output.querySelectorAll(
+      wrapper.querySelectorAll(
         ".diff-added, .diff-removed, .diff-changed"
       )
     );
@@ -1993,27 +1982,15 @@ function initTextDifferenceChecker() {
   // -------------------------
 
   function nextDifference() {
-    if (differences.length === 0) return;
-
-    currentIndex++;
-
-    if (currentIndex >= differences.length) {
-      currentIndex = 0;
-    }
-
+    if (!differences.length) return;
+    currentIndex = (currentIndex + 1) % differences.length;
     scrollToCurrent();
     updateStatus();
   }
 
   function prevDifference() {
-    if (differences.length === 0) return;
-
-    currentIndex--;
-
-    if (currentIndex < 0) {
-      currentIndex = differences.length - 1;
-    }
-
+    if (!differences.length) return;
+    currentIndex = (currentIndex - 1 + differences.length) % differences.length;
     scrollToCurrent();
     updateStatus();
   }
@@ -2036,12 +2013,12 @@ function initTextDifferenceChecker() {
     inputB.value = "";
     ignoreCase.checked = false;
     ignoreWhitespace.checked = false;
-    clearOutput();
+    clearHighlights();
+    inputA.focus();
   }
 
   function updateCompareState() {
-    compareBtn.disabled =
-      !inputA.value.trim() || !inputB.value.trim();
+    compareBtn.disabled = !inputA.value.trim() || !inputB.value.trim();
   }
 
   // -------------------------
@@ -2056,11 +2033,13 @@ function initTextDifferenceChecker() {
   clearA.addEventListener("click", () => {
     clearInput(inputA);
     updateCompareState();
+    inputA.focus();
   });
 
   clearB.addEventListener("click", () => {
     clearInput(inputB);
     updateCompareState();
+    inputB.focus();
   });
 
   copyA.addEventListener("click", () => copyInput(inputA));
@@ -2080,8 +2059,6 @@ function initTextDifferenceChecker() {
 
   updateCompareState();
   updateStatus();
-
-  // Auto-focus Text A
   inputA.focus();
 
 }
