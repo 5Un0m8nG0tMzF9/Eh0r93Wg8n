@@ -1844,11 +1844,9 @@ function initTextDifferenceChecker() {
   const wrapper = document.getElementById("text-difference-checker");
   if (!wrapper) return;
 
-  // Inputs
+  // Inputs & Highlights
   const inputA = document.getElementById("text-diff-input-a");
   const inputB = document.getElementById("text-diff-input-b");
-
-  // Highlight overlays
   const highlightA = document.getElementById("text-diff-highlight-a");
   const highlightB = document.getElementById("text-diff-highlight-b");
 
@@ -1862,11 +1860,9 @@ function initTextDifferenceChecker() {
   const nextBtn = document.getElementById("text-diff-next-btn");
   const prevBtn = document.getElementById("text-diff-prev-btn");
 
-  // Status
+  // Status & output
   const counter = document.getElementById("text-diff-counter");
   const position = document.getElementById("text-diff-position");
-
-  // Output
   const output = document.getElementById("text-diff-output");
 
   // Options
@@ -1878,7 +1874,7 @@ function initTextDifferenceChecker() {
   let currentIndex = -1;
 
   // -------------------------
-  // Utilities
+  // Utility functions
   // -------------------------
   function normalizeText(text) {
     if (ignoreCase.checked) text = text.toLowerCase();
@@ -1887,7 +1883,7 @@ function initTextDifferenceChecker() {
   }
 
   function splitWords(text) {
-    return text.match(/\S+|\s+/g) || [];
+    return text.split(/\s+/);
   }
 
   function updateStatus() {
@@ -1900,122 +1896,107 @@ function initTextDifferenceChecker() {
 
   function scrollToCurrent() {
     if (currentIndex < 0 || currentIndex >= differences.length) return;
-    const diff = differences[currentIndex];
 
-    // Remove active class from all spans
-    differences.forEach(d => {
-      d.spansA.forEach(s => s.classList.remove("diff-active"));
-      d.spansB.forEach(s => s.classList.remove("diff-active"));
+    // Remove old active
+    differences.forEach(diff => {
+      diff.spansA.forEach(s => s.classList.remove("diff-active"));
+      diff.spansB.forEach(s => s.classList.remove("diff-active"));
     });
 
-    // Add active class to current group
+    // Set current active
+    const diff = differences[currentIndex];
     diff.spansA.forEach(s => s.classList.add("diff-active"));
     diff.spansB.forEach(s => s.classList.add("diff-active"));
 
-    // Scroll overlays to current difference
-    diff.spansA[0].scrollIntoView({ behavior: "smooth", block: "center" });
+    // Scroll first span of overlay into view
+    if (diff.spansA[0]) diff.spansA[0].scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
   function clearHighlights() {
     highlightA.innerHTML = "";
     highlightB.innerHTML = "";
-    output.innerHTML = "";
     differences = [];
     currentIndex = -1;
     updateStatus();
+    output.textContent = "";
   }
 
   // -------------------------
-  // Diff Logic (Grouped Word Diff)
+  // Diff algorithm (grouped)
   // -------------------------
   function computeDiff() {
     clearHighlights();
+
     const textA = inputA.value;
     const textB = inputB.value;
-    if (!textA.trim() || !textB.trim()) return;
+    if (!textA.trim() && !textB.trim()) return;
 
     const wordsA = splitWords(normalizeText(textA));
     const wordsB = splitWords(normalizeText(textB));
-    const maxLength = Math.max(wordsA.length, wordsB.length);
 
     let htmlA = "";
     let htmlB = "";
-    let tempGroup = null;
 
-    for (let i = 0; i < maxLength; i++) {
-      const wA = wordsA[i] || "";
-      const wB = wordsB[i] || "";
+    differences = [];
+    let i = 0, j = 0;
 
-      if (wA === wB) {
-        htmlA += wA;
-        htmlB += wB;
-        tempGroup = null;
-        continue;
+    while (i < wordsA.length || j < wordsB.length) {
+      if (wordsA[i] === wordsB[j]) {
+        htmlA += (wordsA[i] || "") + " ";
+        htmlB += (wordsB[j] || "") + " ";
+        i++; j++;
+      } else {
+        let groupA = [], groupB = [];
+
+        while ((i < wordsA.length && wordsA[i] !== wordsB[j]) || (j < wordsB.length && wordsA[i] !== wordsB[j])) {
+          if (i < wordsA.length && (j >= wordsB.length || wordsA[i] !== wordsB[j])) { groupA.push(wordsA[i]); i++; }
+          if (j < wordsB.length && (i >= wordsA.length || wordsA[i-1] !== wordsB[j])) { groupB.push(wordsB[j]); j++; }
+        }
+
+        let type = "";
+        if (groupA.length && !groupB.length) type = "removed";
+        else if (!groupA.length && groupB.length) type = "added";
+        else type = "changed";
+
+        htmlA += `<span class="diff">${groupA.join(" ")}</span> `;
+        htmlB += `<span class="diff">${groupB.join(" ")}</span> `;
+
+        differences.push({
+          type,
+          textA: groupA.join(" "),
+          textB: groupB.join(" "),
+          spansA: [],
+          spansB: []
+        });
       }
-
-      // Determine type
-      let type = "changed";
-      if (wA && !wB) type = "removed";
-      else if (!wA && wB) type = "added";
-
-      // Create span for both A and B
-      const spanA = wA ? `<span class="diff-${type}">${wA}</span>` : "";
-      const spanB = wB ? `<span class="diff-${type}">${wB}</span>` : "";
-
-      htmlA += spanA;
-      htmlB += spanB;
     }
 
     highlightA.innerHTML = htmlA;
     highlightB.innerHTML = htmlB;
 
-    // -------------------------
-    // Build differences array
-    // -------------------------
-    differences = [];
-    const spansA = Array.from(highlightA.querySelectorAll(".diff-added, .diff-removed, .diff-changed"));
-    const spansB = Array.from(highlightB.querySelectorAll(".diff-added, .diff-removed, .diff-changed"));
+    // Link spans to differences
+    const allSpansA = Array.from(highlightA.querySelectorAll("span"));
+    const allSpansB = Array.from(highlightB.querySelectorAll("span"));
+    let spanIndex = 0;
+    differences.forEach(diff => {
+      diff.spansA = allSpansA.slice(spanIndex, spanIndex + 1);
+      diff.spansB = allSpansB.slice(spanIndex, spanIndex + 1);
+      spanIndex++;
+    });
 
-    const maxDiffs = Math.max(spansA.length, spansB.length);
-    for (let i = 0; i < maxDiffs; i++) {
-      const sA = spansA[i] ? [spansA[i]] : [];
-      const sB = spansB[i] ? [spansB[i]] : [];
-      const typeClass = (sA[0] || sB[0])?.classList.contains("diff-added")
-        ? "added"
-        : (sA[0] || sB[0])?.classList.contains("diff-removed")
-        ? "removed"
-        : "changed";
-
-      differences.push({
-        spansA: sA,
-        spansB: sB,
-        type: typeClass,
-        textA: sA.map(e => e.textContent).join(""),
-        textB: sB.map(e => e.textContent).join("")
-      });
-    }
-
-    if (differences.length > 0) {
-      currentIndex = 0;
-      scrollToCurrent();
-      updateOutput();
-    }
-
+    if (differences.length > 0) currentIndex = 0;
+    renderOutput();
+    scrollToCurrent();
     updateStatus();
   }
 
-  function updateOutput() {
-    if (currentIndex < 0 || currentIndex >= differences.length) {
-      output.innerHTML = "";
-      return;
-    }
+  function renderOutput() {
+    if (differences.length === 0) { output.textContent = ""; return; }
     const diff = differences[currentIndex];
-    output.innerHTML = `
-Type: ${diff.type}
-Text A: ${diff.textA || "(none)"}
-Text B: ${diff.textB || "(none)"}
-    `;
-    updateStatus();
+    output.innerHTML =
+      `Type: ${diff.type}<br>` +
+      `Text A: ${diff.textA || "(none)"}<br>` +
+      `Text B: ${diff.textB || "(none)"}`;
   }
 
   // -------------------------
@@ -2025,21 +2006,24 @@ Text B: ${diff.textB || "(none)"}
     if (!differences.length) return;
     currentIndex = (currentIndex + 1) % differences.length;
     scrollToCurrent();
-    updateOutput();
+    renderOutput();
+    updateStatus();
   }
 
   function prevDifference() {
     if (!differences.length) return;
     currentIndex = (currentIndex - 1 + differences.length) % differences.length;
     scrollToCurrent();
-    updateOutput();
+    renderOutput();
+    updateStatus();
   }
 
   // -------------------------
-  // Button Actions
+  // Button actions
   // -------------------------
-  function clearInput(input) {
+  function clearInput(input, highlight) {
     input.value = "";
+    highlight.innerHTML = "";
   }
 
   function copyInput(input) {
@@ -2061,24 +2045,14 @@ Text B: ${diff.textB || "(none)"}
   }
 
   // -------------------------
-  // Event Listeners
+  // Event listeners
   // -------------------------
   compareBtn.addEventListener("click", computeDiff);
   nextBtn.addEventListener("click", nextDifference);
   prevBtn.addEventListener("click", prevDifference);
 
-  clearA.addEventListener("click", () => {
-    clearInput(inputA);
-    updateCompareState();
-    inputA.focus();
-    highlightA.innerHTML = "";
-  });
-  clearB.addEventListener("click", () => {
-    clearInput(inputB);
-    updateCompareState();
-    inputB.focus();
-    highlightB.innerHTML = "";
-  });
+  clearA.addEventListener("click", () => { clearInput(inputA, highlightA); updateCompareState(); inputA.focus(); });
+  clearB.addEventListener("click", () => { clearInput(inputB, highlightB); updateCompareState(); inputB.focus(); });
 
   copyA.addEventListener("click", () => copyInput(inputA));
   copyB.addEventListener("click", () => copyInput(inputB));
@@ -2086,11 +2060,12 @@ Text B: ${diff.textB || "(none)"}
 
   inputA.addEventListener("input", updateCompareState);
   inputB.addEventListener("input", updateCompareState);
+
   ignoreCase.addEventListener("change", computeDiff);
   ignoreWhitespace.addEventListener("change", computeDiff);
 
   // -------------------------
-  // Initial State
+  // Initial state
   // -------------------------
   updateCompareState();
   updateStatus();
