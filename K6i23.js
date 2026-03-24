@@ -1844,34 +1844,21 @@ function initTextDifferenceChecker() {
   const wrapper = document.getElementById("text-difference-checker");
   if (!wrapper) return;
 
-  // Inputs
+  // Elements
   const inputA = document.getElementById("text-diff-input-a");
   const inputB = document.getElementById("text-diff-input-b");
-
-  // Highlight overlays
   const highlightA = document.getElementById("text-diff-highlight-a");
   const highlightB = document.getElementById("text-diff-highlight-b");
 
-  // Buttons
-  const clearA = document.getElementById("text-diff-clear-a");
-  const copyA = document.getElementById("text-diff-copy-a");
-  const clearB = document.getElementById("text-diff-clear-b");
-  const copyB = document.getElementById("text-diff-copy-b");
-
   const compareBtn = document.getElementById("text-diff-compare-btn");
-  const clearAllBtn = document.getElementById("text-diff-clear-all");
-
   const nextBtn = document.getElementById("text-diff-next-btn");
   const prevBtn = document.getElementById("text-diff-prev-btn");
+  const clearAllBtn = document.getElementById("text-diff-clear-all");
 
-  // Status
   const counter = document.getElementById("text-diff-counter");
   const position = document.getElementById("text-diff-position");
-
-  // Output
   const output = document.getElementById("text-diff-output");
 
-  // Options
   const ignoreCase = document.getElementById("text-diff-ignore-case");
   const ignoreWhitespace = document.getElementById("text-diff-ignore-whitespace");
 
@@ -1879,48 +1866,29 @@ function initTextDifferenceChecker() {
   let differences = [];
   let currentIndex = -1;
 
-  // -------------------------
   // Utilities
-  // -------------------------
   function normalizeText(text) {
     if (ignoreCase.checked) text = text.toLowerCase();
     if (ignoreWhitespace.checked) text = text.replace(/\s+/g, " ");
-    return text;
+    return text.trim();
   }
 
   function splitWords(text) {
-    return text.split(/\s+/);
+    return text ? text.split(/\s+/) : [];
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
   function updateStatus() {
     counter.textContent = `Differences found: ${differences.length}`;
-    position.textContent =
-      differences.length === 0
-        ? "Difference 0 of 0"
-        : `Difference ${currentIndex + 1} of ${differences.length}`;
+    position.textContent = differences.length === 0 
+      ? "Difference 0 of 0" 
+      : `Difference ${currentIndex + 1} of ${differences.length}`;
   }
 
-  // -------------------------
-  // Highlighting and Output
-  // -------------------------
-  function showCurrentDifference() {
-    // Remove previous active highlights
-    wrapper.querySelectorAll(".diff-active").forEach(el => el.classList.remove("diff-active"));
-
-    if (currentIndex < 0 || currentIndex >= differences.length) return;
-
-    const diff = differences[currentIndex];
-
-    // Activate spans in overlays
-    diff.spansA.forEach(span => span.classList.add("diff-active"));
-    diff.spansB.forEach(span => span.classList.add("diff-active"));
-
-    // Show detailed output
-    output.innerHTML = `<strong>Type:</strong> ${diff.type}<br>
-                        <strong>Text A:</strong> ${diff.textA || "(none)"}<br>
-                        <strong>Text B:</strong> ${diff.textB || "(none)"}`;
-  }
-
+  // Clear everything
   function clearHighlights() {
     highlightA.innerHTML = "";
     highlightB.innerHTML = "";
@@ -1930,104 +1898,111 @@ function initTextDifferenceChecker() {
     updateStatus();
   }
 
-  // -------------------------
-  // Compute Diff
-  // -------------------------
+  // Show the currently selected difference
+  function showCurrentDifference() {
+    // Remove old active highlights
+    document.querySelectorAll(".diff-active").forEach(el => el.classList.remove("diff-active"));
+
+    if (currentIndex < 0 || currentIndex >= differences.length) return;
+
+    const diff = differences[currentIndex];
+
+    diff.spansA.forEach(span => span.classList.add("diff-active"));
+    diff.spansB.forEach(span => span.classList.add("diff-active"));
+
+    // Nice output
+    output.innerHTML = `
+      <strong>Type:</strong> ${diff.type.toUpperCase()}<br>
+      <strong>Text A (Original):</strong> <span style="color:#d32f2f;">${escapeHtml(diff.textA || "(none)")}</span><br>
+      <strong>Text B (New):</strong> <span style="color:#388e3c;">${escapeHtml(diff.textB || "(none)")}</span>
+    `;
+  }
+
+  // Main diff logic
   function computeDiff() {
-  clearHighlights();
+    clearHighlights();
 
-  const textA = inputA.value;
-  const textB = inputB.value;
-  if (!textA.trim() && !textB.trim()) return;
+    let textA = inputA.value;
+    let textB = inputB.value;
+    if (!textA.trim() && !textB.trim()) return;
 
-  const wordsA = splitWords(normalizeText(textA));
-  const wordsB = splitWords(normalizeText(textB));
+    const normA = normalizeText(textA);
+    const normB = normalizeText(textB);
 
-  let htmlA = "";
-  let htmlB = "";
+    const wordsA = splitWords(normA);
+    const wordsB = splitWords(normB);
 
-  differences = [];
+    let htmlA = "";
+    let htmlB = "";
+    differences = [];
 
-  let i = 0, j = 0;
-  while (i < wordsA.length || j < wordsB.length) {
-    const wordA = wordsA[i] || "";
-    const wordB = wordsB[j] || "";
+    let i = 0, j = 0;
 
-    if (wordA === wordB) {
-      htmlA += wordA ? wordA + " " : "";
-      htmlB += wordB ? wordB + " " : "";
-      i++; j++;
-      continue;
-    }
+    while (i < wordsA.length || j < wordsB.length) {
+      const wordA = wordsA[i] || "";
+      const wordB = wordsB[j] || "";
 
-    let diffWordsA = [];
-    let diffWordsB = [];
+      if (wordA === wordB && wordA !== "") {
+        htmlA += wordA + " ";
+        htmlB += wordB + " ";
+        i++;
+        j++;
+        continue;
+      }
 
-    while ((i < wordsA.length && wordsA[i] !== wordsB[j]) || (j < wordsB.length && wordsA[i] !== wordsB[j])) {
-      if (i < wordsA.length && (wordsA[i] !== wordsB[j] || j >= wordsB.length)) {
+      // Collect deletion streak from A
+      let diffWordsA = [];
+      while (i < wordsA.length && (j >= wordsB.length || wordsA[i] !== wordsB[j])) {
         diffWordsA.push(wordsA[i]);
         i++;
       }
-      if (j < wordsB.length && (wordsA[i] !== wordsB[j] || i >= wordsA.length)) {
+
+      // Collect insertion streak from B
+      let diffWordsB = [];
+      while (j < wordsB.length && (i >= wordsA.length || wordsA[i] !== wordsB[j])) {
         diffWordsB.push(wordsB[j]);
         j++;
       }
+
+      let type = "changed";
+      if (diffWordsA.length > 0 && diffWordsB.length === 0) type = "removed";
+      else if (diffWordsB.length > 0 && diffWordsA.length === 0) type = "added";
+
+      // Build highlighted spans
+      const spanA = diffWordsA.map(w => `<span class="diff-${type}">${w}</span>`).join(" ");
+      const spanB = diffWordsB.map(w => `<span class="diff-${type}">${w}</span>`).join(" ");
+
+      htmlA += (spanA ? spanA + " " : "");
+      htmlB += (spanB ? spanB + " " : "");
+
+      // Store difference
+      differences.push({
+        type,
+        textA: diffWordsA.join(" "),
+        textB: diffWordsB.join(" "),
+        spansA: [],
+        spansB: []
+      });
     }
 
-    let type = "changed";
-    if (diffWordsA.length > 0 && diffWordsB.length === 0) type = "removed";
-    else if (diffWordsB.length > 0 && diffWordsA.length === 0) type = "added";
+    highlightA.innerHTML = htmlA || "&nbsp;";
+    highlightB.innerHTML = htmlB || "&nbsp;";
 
-    const spanA = diffWordsA.map(w => `<span class="diff-${type}">${w}</span>`).join(" ");
-    const spanB = diffWordsB.map(w => `<span class="diff-${type}">${w}</span>`).join(" ");
-
-    htmlA += spanA + " ";
-    htmlB += spanB + " ";
-
-    differences.push({
-      type,
-      textA: diffWordsA.join(" "),
-      textB: diffWordsB.join(" "),
-      spansA: [], 
-      spansB: []
+    // Capture live span references (fresh query after innerHTML)
+    differences.forEach(diff => {
+      diff.spansA = Array.from(highlightA.querySelectorAll(`.diff-${diff.type}`));
+      diff.spansB = Array.from(highlightB.querySelectorAll(`.diff-${diff.type}`));
     });
+
+    if (differences.length > 0) {
+      currentIndex = 0;
+      showCurrentDifference();
+    }
+
+    updateStatus();
   }
 
-  highlightA.innerHTML = htmlA;
-  highlightB.innerHTML = htmlB;
-
-  differences.forEach(diff => {
-    diff.spansA = Array.from(highlightA.querySelectorAll(`.diff-${diff.type}`));
-    diff.spansB = Array.from(highlightB.querySelectorAll(`.diff-${diff.type}`));
-  });
-
-  if (differences.length > 0) {
-    currentIndex = 0;
-    showCurrentDifference();
-  }
-
-  updateStatus();
-}
-
-function showCurrentDifference() {
-  wrapper.querySelectorAll(".diff-active").forEach(el => el.classList.remove("diff-active"));
-
-  if (currentIndex < 0 || currentIndex >= differences.length) return;
-
-  const diff = differences[currentIndex];
-
-  // Highlight only the first word of the group
-  if (diff.spansA.length) diff.spansA[0].classList.add("diff-active");
-  if (diff.spansB.length) diff.spansB[0].classList.add("diff-active");
-
-  // Output formatting with divs to preserve alignment
-  output.innerHTML = `<div><strong>Type:</strong> ${diff.type}</div>
-                      <div><strong>Text A:</strong> ${diff.textA || "(none)"}</div>
-                      <div><strong>Text B:</strong> ${diff.textB || "(none)"}</div>`;
-}
-  // -------------------------
   // Navigation
-  // -------------------------
   function nextDifference() {
     if (!differences.length) return;
     currentIndex = (currentIndex + 1) % differences.length;
@@ -2042,18 +2017,7 @@ function showCurrentDifference() {
     updateStatus();
   }
 
-  // -------------------------
-  // Button Actions
-  // -------------------------
-  function clearInput(input) {
-    input.value = "";
-  }
-
-  function copyInput(input) {
-    input.select();
-    document.execCommand("copy");
-  }
-
+  // Button helpers
   function clearAll() {
     inputA.value = "";
     inputB.value = "";
@@ -2067,31 +2031,10 @@ function showCurrentDifference() {
     compareBtn.disabled = !inputA.value.trim() || !inputB.value.trim();
   }
 
-  // -------------------------
-  // Event Listeners
-  // -------------------------
+  // Event listeners
   compareBtn.addEventListener("click", computeDiff);
-
   nextBtn.addEventListener("click", nextDifference);
   prevBtn.addEventListener("click", prevDifference);
-
-  clearA.addEventListener("click", () => {
-    clearInput(inputA);
-    updateCompareState();
-    clearHighlights();
-    inputA.focus();
-  });
-
-  clearB.addEventListener("click", () => {
-    clearInput(inputB);
-    updateCompareState();
-    clearHighlights();
-    inputB.focus();
-  });
-
-  copyA.addEventListener("click", () => copyInput(inputA));
-  copyB.addEventListener("click", () => copyInput(inputB));
-
   clearAllBtn.addEventListener("click", clearAll);
 
   inputA.addEventListener("input", updateCompareState);
@@ -2100,11 +2043,11 @@ function showCurrentDifference() {
   ignoreCase.addEventListener("change", computeDiff);
   ignoreWhitespace.addEventListener("change", computeDiff);
 
-  // -------------------------
-  // Initial State
-  // -------------------------
+  // Initial state
   updateCompareState();
   updateStatus();
   inputA.focus();
-
 }
+
+// Initialize when page is ready
+document.addEventListener("DOMContentLoaded", initTextDifferenceChecker);
