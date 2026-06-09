@@ -1857,15 +1857,15 @@ function initDuplicateLineRemover() {
     const lines = input.value.split("\n");
     const uniqueLines = [...new Set(lines)];
 
-    output.value = uniqueLines.join("\n");
+    output.textContent = uniqueLines.join("\n");
   }
 
   removeBtn.addEventListener("click", removeDuplicates);
 
   copyBtn.addEventListener("click", async () => {
-    if (!output.value) return;
+    if (!output.textContent) return;
 
-    await navigator.clipboard.writeText(output.value);
+    await navigator.clipboard.writeText(output.textContent);
 
     const originalText = copyBtn.textContent;
     copyBtn.textContent = "Copied!";
@@ -1877,7 +1877,7 @@ function initDuplicateLineRemover() {
 
   clearBtn.addEventListener("click", () => {
     input.value = "";
-    output.value = "";
+    output.textContent = "";
     input.focus();
   });
 
