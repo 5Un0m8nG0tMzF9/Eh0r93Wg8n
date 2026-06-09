@@ -1838,3 +1838,48 @@ function updateStrength(length, typesCount) {
   generatePassword();
 
 }
+
+// ==============================
+// DUPLICATE LINE REMOVER
+// ==============================
+
+function initDuplicateLineRemover() {
+  const input = document.getElementById("dlr-input");
+  const output = document.getElementById("dlr-output");
+
+  const removeBtn = document.getElementById("dlr-remove");
+  const copyBtn = document.getElementById("dlr-copy");
+  const clearBtn = document.getElementById("dlr-clear");
+
+  if (!input || !output || !removeBtn || !copyBtn || !clearBtn) return;
+
+  function removeDuplicates() {
+    const lines = input.value.split("\n");
+    const uniqueLines = [...new Set(lines)];
+
+    output.value = uniqueLines.join("\n");
+  }
+
+  removeBtn.addEventListener("click", removeDuplicates);
+
+  copyBtn.addEventListener("click", async () => {
+    if (!output.value) return;
+
+    await navigator.clipboard.writeText(output.value);
+
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = "Copied!";
+
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+    }, 1500);
+  });
+
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    output.value = "";
+    input.focus();
+  });
+
+  input.focus();
+}
