@@ -547,6 +547,10 @@ function initCountdownTimer() {
   let remainingSeconds = 0;
   let interval = null;
   let isRunning = false;
+
+  let runningAnimation = null;
+  let flashAnimation = null;
+
   const MAX_SECONDS = 359999; // 99:59:59
 
   // -------------------------------
@@ -556,6 +560,7 @@ function initCountdownTimer() {
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
     const sec = s % 60;
+
     return String(h).padStart(2,'0') + ':' +
            String(m).padStart(2,'0') + ':' +
            String(sec).padStart(2,'0');
@@ -576,20 +581,55 @@ function initCountdownTimer() {
     display.textContent = formatSeconds(remainingSeconds);
   }
 
+  function startRunningAnimation() {
+    stopRunningAnimation();
+
+    let dots = 0;
+
+    runningAnimation = setInterval(() => {
+      dots = (dots + 1) % 4;
+      statusText.textContent = 'Running' + '.'.repeat(dots) + ' ';
+    }, 500);
+  }
+
+  function stopRunningAnimation() {
+    clearInterval(runningAnimation);
+  }
+
+  function startTimesUpFlash() {
+    stopTimesUpFlash();
+
+    let visible = true;
+
+    flashAnimation = setInterval(() => {
+      statusText.textContent = "Time's Up!";
+      statusText.style.opacity = visible ? 1 : 0.3;
+      visible = !visible;
+    }, 500);
+  }
+
+  function stopTimesUpFlash() {
+    clearInterval(flashAnimation);
+    statusText.style.opacity = 0.6;
+  }
+
   // -------------------------------
   // Preset Buttons
   // -------------------------------
   presets.forEach(btn => {
     btn.addEventListener('click', () => {
       const addSeconds = parseInt(btn.dataset.time, 10);
+
       remainingSeconds += addSeconds;
       originalSeconds += addSeconds;
+
       if (remainingSeconds > MAX_SECONDS) {
         remainingSeconds = MAX_SECONDS;
         originalSeconds = MAX_SECONDS;
       }
+
       updateDisplay(remainingSeconds);
-      setStatus('');
+      // Ready stays visible
     });
   });
 
@@ -598,15 +638,22 @@ function initCountdownTimer() {
   // -------------------------------
   startBtn.addEventListener('click', () => {
     if (isRunning || remainingSeconds <= 0) return;
+
+    stopTimesUpFlash();
+
     isRunning = true;
     setStatus('Running');
+    startRunningAnimation();
 
     interval = setInterval(() => {
       remainingSeconds--;
+
       updateDisplay(remainingSeconds);
+
       if (remainingSeconds <= 0){
         stopTimer();
-        setStatus("Time's Up");
+        stopRunningAnimation();
+        startTimesUpFlash();
       }
     }, 1000);
   });
@@ -616,7 +663,9 @@ function initCountdownTimer() {
   // -------------------------------
   stopBtn.addEventListener('click', () => {
     if (!isRunning) return;
+
     stopTimer();
+    stopRunningAnimation();
     setStatus('Paused');
   });
 
@@ -625,7 +674,11 @@ function initCountdownTimer() {
   // -------------------------------
   resetBtn.addEventListener('click', () => {
     stopTimer();
+    stopRunningAnimation();
+    stopTimesUpFlash();
+
     remainingSeconds = originalSeconds;
+
     updateDisplay(originalSeconds);
     setStatus('Ready');
   });
@@ -635,8 +688,12 @@ function initCountdownTimer() {
   // -------------------------------
   clearBtn.addEventListener('click', () => {
     stopTimer();
+    stopRunningAnimation();
+    stopTimesUpFlash();
+
     remainingSeconds = 0;
     originalSeconds = 0;
+
     updateDisplay(0);
     setStatus('Ready');
   });
