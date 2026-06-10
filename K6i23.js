@@ -54,7 +54,11 @@ if (document.getElementById("text-difference-checker")) {
 if (document.getElementById("duplicate-line-remover")) {
   initDuplicateLineRemover();
 }
-  
+
+if (document.getElementById("text-sorter")) {
+  initTextSorter();
+}
+
 });
 
 
@@ -1939,4 +1943,97 @@ function initDuplicateLineRemover() {
   });
 
   input.focus();
+
+}
+
+// ==============================
+// TEXT SORTER
+// ==============================
+function initTextSorter() {
+  const input = document.getElementById("ts-input");
+  const output = document.getElementById("ts-output");
+  const removeEmpty = document.getElementById("ts-remove-empty");
+  const removeDup = document.getElementById("ts-remove-dup");
+  const azBtn = document.getElementById("ts-az");
+  const zaBtn = document.getElementById("ts-za");
+  const sortBtn = document.getElementById("ts-sort");
+  const copyBtn = document.getElementById("ts-copy");
+  const clearBtn = document.getElementById("ts-clear");
+
+  if (!input) return;
+
+  let sortDirection = "asc";
+
+  // -------------------------------
+  // Sort Direction Buttons
+  // -------------------------------
+  azBtn.classList.add("active");
+
+  azBtn.addEventListener("click", () => {
+    sortDirection = "asc";
+    azBtn.classList.add("active");
+    zaBtn.classList.remove("active");
+  });
+
+  zaBtn.addEventListener("click", () => {
+    sortDirection = "desc";
+    zaBtn.classList.add("active");
+    azBtn.classList.remove("active");
+  });
+
+  // -------------------------------
+  // Sort
+  // -------------------------------
+  sortBtn.addEventListener("click", () => {
+    let lines = input.value.split("\n");
+
+    if (removeEmpty.checked) {
+      lines = lines.filter(line => line.trim() !== "");
+    }
+
+    if (removeDup.checked) {
+      lines = [...new Set(lines)];
+    }
+
+    lines.sort((a, b) => a.localeCompare(b));
+
+    if (sortDirection === "desc") {
+      lines.reverse();
+    }
+
+    output.textContent = lines.join("\n");
+  });
+
+  // -------------------------------
+  // Copy
+  // -------------------------------
+  copyBtn.addEventListener("click", () => {
+    const text = output.textContent.trim();
+
+    if (!text) return;
+
+    navigator.clipboard.writeText(text);
+
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = "Copied!";
+
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+    }, 1500);
+  });
+
+  // -------------------------------
+  // Clear
+  // -------------------------------
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    output.textContent = "";
+    removeEmpty.checked = false;
+    removeDup.checked = false;
+
+    sortDirection = "asc";
+    azBtn.classList.add("active");
+    zaBtn.classList.remove("active");
+  });
+
 }
