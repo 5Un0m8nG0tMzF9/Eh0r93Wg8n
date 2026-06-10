@@ -1998,7 +1998,16 @@ function initTextSorter() {
       lines = [...new Set(lines)];
     }
 
-    lines.sort((a, b) => a.localeCompare(b));
+    // Sort alphabetically while keeping empty lines at the bottom
+    lines.sort((a, b) => {
+      const aEmpty = a.trim() === "";
+      const bEmpty = b.trim() === "";
+
+      if (aEmpty && !bEmpty) return 1;
+      if (!aEmpty && bEmpty) return -1;
+
+      return a.localeCompare(b);
+    });
 
     if (sortDirection === "desc") {
       lines.reverse();
