@@ -805,6 +805,7 @@ const charCount = document.getElementById("char-count");
 const charNoSpaces = document.getElementById("char-no-spaces");
 const readingTime = document.getElementById("reading-time");
 const clearButton = document.getElementById("clear-text");
+const copyButton = document.getElementById("copy-text");
 
 if (!textInput) return;
 
@@ -844,6 +845,27 @@ textInput.addEventListener("paste", function () {
 setTimeout(updateCounts, 0);
 });
 
+// -------------------------------
+// Copy Text
+// -------------------------------
+copyButton.addEventListener("click", function () {
+
+if (!textInput.value.trim()) return;
+
+navigator.clipboard.writeText(textInput.value);
+
+const originalText = copyButton.textContent;
+copyButton.textContent = "Copied!";
+
+setTimeout(() => {
+copyButton.textContent = originalText;
+}, 1500);
+
+});
+
+// -------------------------------
+// Clear
+// -------------------------------
 clearButton.addEventListener("click", function () {
 textInput.value = "";
 updateCounts();
@@ -851,8 +873,8 @@ textInput.focus();
 });
 
 textInput.focus();
-}
 
+}
 
 // ==============================
 // RANDOM NUMBER GENERATOR
