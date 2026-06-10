@@ -1962,6 +1962,9 @@ function initTextSorter() {
 
   if (!input) return;
 
+  // Auto-focus
+  input.focus();
+
   let sortDirection = "asc";
 
   // -------------------------------
@@ -2034,6 +2037,8 @@ function initTextSorter() {
     sortDirection = "asc";
     azBtn.classList.add("active");
     zaBtn.classList.remove("active");
+
+    input.focus();
   });
 
 }
