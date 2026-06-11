@@ -2440,28 +2440,13 @@ copyBtn.addEventListener("click", async () => {
 // Clear
 // -------------------------------
 clearBtn.addEventListener("click", () => {
-
-  percentInput.value = "";
-  numberInput.value = "";
-
-  valueInput.value = "";
-  totalInput.value = "";
-
-  originalInput.value = "";
-  newInput.value = "";
-
-  result.textContent = "0";
-  commentary.textContent = "";
-  result.dataset.copyValue = "";
-
-  percentOfMode.checked = true;
-  percentTotalMode.checked = false;
-  percentChangeMode.checked = false;
-
-  updateMode();
-
-  percentInput.focus();
-
+percentInput.value = ""; numberInput.value = "";
+valueInput.value = ""; totalInput.value = "";
+originalInput.value = ""; newInput.value = "";
+result.textContent = "0"; commentary.textContent = ""; result.dataset.copyValue = "";
+// Focus first input of active mode if (percentOfMode.checked) { percentInput.focus(); }
+else if (percentTotalMode.checked) { valueInput.focus(); }
+else if (percentChangeMode.checked) { originalInput.focus(); }
 });
 
 // -------------------------------
