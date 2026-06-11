@@ -2811,14 +2811,37 @@ if (daysBetweenMode.checked) {
     );
 
   result.textContent =
-    diffDays.toLocaleString() +
-    (diffDays === 1 ? " Day" : " Days");
+  diffDays.toLocaleString() +
+  (diffDays === 1 ? " Day" : " Days");
 
-  result.dataset.copyValue =
-    diffDays.toString();
+result.dataset.copyValue =
+  diffDays.toString();
 
-  commentary.textContent =
-    `Between ${formatDate(start)} and ${formatDate(end)}`;
+const weeks = Math.floor(diffDays / 7);
+const remainingDays = diffDays % 7;
+const hours = diffDays * 24;
+
+let weekText = "";
+
+if (weeks > 0) {
+
+  weekText =
+    `${weeks.toLocaleString()} Week${weeks === 1 ? "" : "s"}`;
+
+  if (remainingDays > 0) {
+    weekText +=
+      `, ${remainingDays.toLocaleString()} Day${remainingDays === 1 ? "" : "s"}`;
+  }
+
+} else {
+
+  weekText =
+    `${remainingDays.toLocaleString()} Day${remainingDays === 1 ? "" : "s"}`;
+
+}
+
+commentary.textContent =
+  `${weekText} • ${hours.toLocaleString()} Hours`;
 
   return;
 
