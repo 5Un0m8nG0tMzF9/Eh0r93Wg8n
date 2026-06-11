@@ -59,6 +59,10 @@ if (document.getElementById("text-sorter")) {
   initTextSorter();
 }
 
+if (document.getElementById("uuid-generator")) {
+  initUUIDGenerator();
+}
+
 });
 
 
@@ -2071,5 +2075,102 @@ function initTextSorter() {
 
     input.focus();
   });
+
+}
+
+// ==============================
+// UUID GENERATOR
+// ==============================
+function initUUIDGenerator() {
+
+const wrapper = document.getElementById("uuid-generator");
+
+if (!wrapper) return;
+
+const quantityInput = document.getElementById("quantity-input");
+const generateBtn = document.getElementById("uuid-generate");
+const output = document.getElementById("uuid-output");
+const copyBtn = document.getElementById("uuid-copy");
+const clearBtn = document.getElementById("uuid-clear");
+
+// -------------------------------
+// Generate UUIDs
+// -------------------------------
+function generateUUIDs() {
+
+let quantity = parseInt(quantityInput.value, 10);
+
+if (isNaN(quantity)) quantity = 1;
+
+quantity = Math.max(1, Math.min(quantity, 1000));
+
+quantityInput.value = quantity;
+
+const uuids = [];
+
+for (let i = 0; i < quantity; i++) {
+  uuids.push(crypto.randomUUID());
+}
+
+output.value = uuids.join("\n");
+}
+
+// -------------------------------
+// Generate Button
+// -------------------------------
+generateBtn.addEventListener("click", generateUUIDs);
+
+// -------------------------------
+// Copy
+// -------------------------------
+copyBtn.addEventListener("click", async () => {
+
+if (!output.value.trim()) return;
+
+try {
+
+  await navigator.clipboard.writeText(output.value);
+
+  const originalText = copyBtn.textContent;
+  copyBtn.textContent = "Copied!";
+
+  setTimeout(() => {
+    copyBtn.textContent = originalText;
+  }, 1500);
+
+} catch (err) {
+  console.error("Copy failed:", err);
+}
+
+});
+
+// -------------------------------
+// Clear
+// -------------------------------
+clearBtn.addEventListener("click", () => {
+
+output.value = "";
+quantityInput.value = 10;
+quantityInput.focus();
+
+});
+
+// -------------------------------
+// Enter Key Generates
+// -------------------------------
+quantityInput.addEventListener("keydown", (e) => {
+
+if (e.key === "Enter") {
+  e.preventDefault();
+  generateUUIDs();
+}
+
+});
+
+// -------------------------------
+// Init
+// -------------------------------
+quantityInput.value = 10;
+quantityInput.focus();
 
 }
