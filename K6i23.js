@@ -2223,21 +2223,23 @@ const newInput = document.getElementById("new-input");
 const calculateBtn = document.getElementById("percent-calculate");
 const copyBtn = document.getElementById("percent-copy");
 const clearBtn = document.getElementById("percent-clear");
+
 const result = document.getElementById("percent-result");
+const commentary = document.getElementById("result-commentary");
 
 // -------------------------------
 // Show Active Mode
 // -------------------------------
 function updateMode() {
 
-percentOfFields.style.display =
-  percentOfMode.checked ? "grid" : "none";
+  percentOfFields.style.display =
+    percentOfMode.checked ? "grid" : "none";
 
-percentTotalFields.style.display =
-  percentTotalMode.checked ? "grid" : "none";
+  percentTotalFields.style.display =
+    percentTotalMode.checked ? "grid" : "none";
 
-percentChangeFields.style.display =
-  percentChangeMode.checked ? "grid" : "none";
+  percentChangeFields.style.display =
+    percentChangeMode.checked ? "grid" : "none";
 
 }
 
@@ -2250,86 +2252,148 @@ percentChangeMode.addEventListener("change", updateMode);
 // -------------------------------
 function calculatePercentage() {
 
-let output = "";
+  let output = "0";
+  let commentaryText = "";
+  let copyValue = "";
 
-if (percentOfMode.checked) {
+  // -----------------------------
+  // Mode 1
+  // -----------------------------
+  if (percentOfMode.checked) {
 
-  const percent = parseFloat(percentInput.value);
-  const number = parseFloat(numberInput.value);
+    const percent = parseFloat(percentInput.value);
+    const number = parseFloat(numberInput.value);
 
-  if (isNaN(percent) || isNaN(number)) {
-    result.textContent = "";
-    return;
+    if (isNaN(percent) || isNaN(number)) {
+
+      result.textContent = "0";
+      commentary.textContent = "";
+      result.dataset.copyValue = "";
+
+      return;
+
+    }
+
+    const calculated = (percent / 100) * number;
+
+    const rounded =
+      Number.isInteger(calculated)
+        ? calculated
+        : parseFloat(calculated.toFixed(2));
+
+    output = rounded.toLocaleString();
+    copyValue = rounded.toString();
+
   }
 
-  output = ((percent / 100) * number).toLocaleString();
+  // -----------------------------
+  // Mode 2
+  // -----------------------------
+  else if (percentTotalMode.checked) {
+
+    const value = parseFloat(valueInput.value);
+    const total = parseFloat(totalInput.value);
+
+    if (isNaN(value) || isNaN(total) || total === 0) {
+
+      result.textContent = "0";
+      commentary.textContent = "";
+      result.dataset.copyValue = "";
+
+      return;
+
+    }
+
+    const calculated = (value / total) * 100;
+
+    const formatted = parseFloat(
+      calculated.toFixed(2)
+    );
+
+    output = formatted + "%";
+    copyValue = formatted.toString();
+
+  }
+
+  // -----------------------------
+  // Mode 3
+  // -----------------------------
+  else if (percentChangeMode.checked) {
+
+    const original = parseFloat(originalInput.value);
+    const newer = parseFloat(newInput.value);
+
+    if (isNaN(original) || isNaN(newer) || original === 0) {
+
+      result.textContent = "0";
+      commentary.textContent = "";
+      result.dataset.copyValue = "";
+
+      return;
+
+    }
+
+    const change =
+      ((newer - original) / original) * 100;
+
+    const formatted = parseFloat(
+      Math.abs(change).toFixed(2)
+    );
+
+    output = formatted + "%";
+    copyValue = formatted.toString();
+
+    if (change > 0) {
+
+      commentaryText = "Increase";
+
+    } else if (change < 0) {
+
+      commentaryText = "Decrease";
+
+    } else {
+
+      commentaryText = "No Change";
+
+    }
+
+  }
+
+  result.textContent = output;
+  commentary.textContent = commentaryText;
+  result.dataset.copyValue = copyValue;
 
 }
 
-else if (percentTotalMode.checked) {
-
-  const value = parseFloat(valueInput.value);
-  const total = parseFloat(totalInput.value);
-
-  if (isNaN(value) || isNaN(total) || total === 0) {
-    result.textContent = "";
-    return;
-  }
-
-  output = ((value / total) * 100).toFixed(2) + "%";
-
-}
-
-else if (percentChangeMode.checked) {
-
-  const original = parseFloat(originalInput.value);
-  const newer = parseFloat(newInput.value);
-
-  if (isNaN(original) || isNaN(newer) || original === 0) {
-    result.textContent = "";
-    return;
-  }
-
-  const change = ((newer - original) / original) * 100;
-
-  if (change > 0) {
-    output = Math.abs(change).toFixed(2) + "% Increase";
-  } else if (change < 0) {
-    output = Math.abs(change).toFixed(2) + "% Decrease";
-  } else {
-    output = "0% Change";
-  }
-
-}
-
-result.textContent = output;
-
-}
-
-calculateBtn.addEventListener("click", calculatePercentage);
+calculateBtn.addEventListener(
+  "click",
+  calculatePercentage
+);
 
 // -------------------------------
 // Enter Key Calculates
 // -------------------------------
 [
-percentInput,
-numberInput,
-valueInput,
-totalInput,
-originalInput,
-newInput
+  percentInput,
+  numberInput,
+  valueInput,
+  totalInput,
+  originalInput,
+  newInput
 ].forEach(input => {
 
-if (!input) return;
+  if (!input) return;
 
-input.addEventListener("keydown", (e) => {
+  input.addEventListener("keydown", (e) => {
 
-  if (e.key === "Enter") {
-    e.preventDefault();
-    calculatePercentage();
-  }
+    if (e.key === "Enter") {
 
-});
+      e.preventDefault();
+      calculatePercentage();
+
+    }
+
+  });
 
 });
 
@@ -2338,23 +2402,37 @@ input.addEventListener("keydown", (e) => {
 // -------------------------------
 copyBtn.addEventListener("click", async () => {
 
-if (!result.textContent.trim()) return;
+  const valueToCopy =
+    result.dataset.copyValue;
 
-try {
+  if (!valueToCopy) return;
 
-  await navigator.clipboard.writeText(result.textContent);
+  try {
 
-  const originalText = copyBtn.textContent;
+    await navigator.clipboard.writeText(
+      valueToCopy
+    );
 
-  copyBtn.textContent = "Copied!";
+    const originalText =
+      copyBtn.textContent;
 
-  setTimeout(() => {
-    copyBtn.textContent = originalText;
-  }, 1500);
+    copyBtn.textContent = "Copied!";
 
-} catch (err) {
-  console.error("Copy failed:", err);
-}
+    setTimeout(() => {
+
+      copyBtn.textContent =
+        originalText;
+
+    }, 1500);
+
+  } catch (err) {
+
+    console.error(
+      "Copy failed:",
+      err
+    );
+
+  }
 
 });
 
@@ -2363,25 +2441,26 @@ try {
 // -------------------------------
 clearBtn.addEventListener("click", () => {
 
-percentInput.value = "";
-numberInput.value = "";
+  percentInput.value = "";
+  numberInput.value = "";
 
-valueInput.value = "";
-totalInput.value = "";
+  valueInput.value = "";
+  totalInput.value = "";
 
-originalInput.value = "";
-newInput.value = "";
+  originalInput.value = "";
+  newInput.value = "";
 
-result.textContent = "";
+  result.textContent = "0";
+  commentary.textContent = "";
+  result.dataset.copyValue = "";
 
-// Reset to default mode
-percentOfMode.checked = true;
-percentTotalMode.checked = false;
-percentChangeMode.checked = false;
+  percentOfMode.checked = true;
+  percentTotalMode.checked = false;
+  percentChangeMode.checked = false;
 
-updateMode();
+  updateMode();
 
-percentInput.focus();
+  percentInput.focus();
 
 });
 
@@ -2393,6 +2472,10 @@ percentTotalMode.checked = false;
 percentChangeMode.checked = false;
 
 updateMode();
+
+result.textContent = "0";
+commentary.textContent = "";
+result.dataset.copyValue = "";
 
 percentInput.focus();
 
