@@ -71,7 +71,7 @@ if (document.getElementById("age-calculator")) {
   initAgeCalculator(); 
 }
 
-if (document.getElementById(“date-calculator”)) { 
+if (document.getElementById("date-calculator")) { 
   initDateCalculator(); 
 }
 
