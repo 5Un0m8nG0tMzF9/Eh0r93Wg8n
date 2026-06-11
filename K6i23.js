@@ -71,6 +71,10 @@ if (document.getElementById("age-calculator")) {
   initAgeCalculator(); 
 }
 
+if (document.getElementById(“date-calculator”)) { 
+  initDateCalculator(); 
+}
+
 });
 
 
@@ -2673,4 +2677,375 @@ result.textContent = "0 Years";
 result.dataset.copyValue = "";
 
 }
+
+// ==============================
+// DATE CALCULATOR
+// ==============================
+function initDateCalculator() {
+
+const wrapper = document.getElementById("date-calculator");
+
+if (!wrapper) return;
+
+// -------------------------------
+// Radio Modes
+// -------------------------------
+const daysBetweenMode =
+  document.getElementById("days-between-mode");
+
+const dateFromMode =
+  document.getElementById("date-from-mode");
+
+// -------------------------------
+// Field Wrappers
+// -------------------------------
+const daysBetweenFields =
+  document.getElementById("days-between-fields");
+
+const dateFromFields =
+  document.getElementById("date-from-fields");
+
+// -------------------------------
+// Inputs
+// -------------------------------
+const startDate =
+  document.getElementById("start-date");
+
+const endDate =
+  document.getElementById("end-date");
+
+const baseDate =
+  document.getElementById("base-date");
+
+const dateAmount =
+  document.getElementById("date-amount");
+
+const dateUnit =
+  document.getElementById("date-unit");
+
+// -------------------------------
+// Controls
+// -------------------------------
+const calculateBtn =
+  document.getElementById("date-calculate");
+
+const copyBtn =
+  document.getElementById("date-copy");
+
+const clearBtn =
+  document.getElementById("date-clear");
+
+const result =
+  document.getElementById("date-result");
+
+const commentary =
+  document.getElementById("date-commentary");
+
+// -------------------------------
+// Helpers
+// -------------------------------
+function formatDate(date) {
+
+return date.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric"
+});
+
+}
+
+function updateMode() {
+
+daysBetweenFields.style.display =
+  daysBetweenMode.checked ? "grid" : "none";
+
+dateFromFields.style.display =
+  dateFromMode.checked ? "grid" : "none";
+
+}
+
+// -------------------------------
+// Radio Events
+// -------------------------------
+daysBetweenMode?.addEventListener(
+  "change",
+  updateMode
+);
+
+dateFromMode?.addEventListener(
+  "change",
+  updateMode
+);
+
+// -------------------------------
+// Calculate
+// -------------------------------
+function calculateDate() {
+
+result.dataset.copyValue = "";
+
+//
+// MODE 1
+// HOW MANY DAYS APART?
+//
+if (daysBetweenMode.checked) {
+
+  if (!startDate.value || !endDate.value) {
+    result.textContent = "0";
+    commentary.textContent = "";
+    return;
+  }
+
+  const start =
+    new Date(startDate.value);
+
+  const end =
+    new Date(endDate.value);
+
+  const diffMs =
+    Math.abs(end - start);
+
+  const diffDays =
+    Math.round(
+      diffMs / (1000 * 60 * 60 * 24)
+    );
+
+  result.textContent =
+    diffDays.toLocaleString() +
+    (diffDays === 1 ? " Day" : " Days");
+
+  result.dataset.copyValue =
+    diffDays.toString();
+
+  commentary.textContent =
+    `Between ${formatDate(start)} and ${formatDate(end)}`;
+
+  return;
+
+}
+
+//
+// MODE 2
+// WHAT DATE WILL IT BE?
+//
+if (dateFromMode.checked) {
+
+  if (
+    !baseDate.value ||
+    dateAmount.value === "" ||
+    !dateUnit.value
+  ) {
+
+    result.textContent = "0";
+    commentary.textContent = "";
+    return;
+
+  }
+
+  const date =
+    new Date(baseDate.value);
+
+  const amount =
+    parseInt(dateAmount.value, 10);
+
+  if (isNaN(amount)) {
+
+    result.textContent = "0";
+    commentary.textContent = "";
+    return;
+
+  }
+
+  const unit =
+    dateUnit.value;
+
+  const newDate =
+    new Date(date);
+
+  switch (unit) {
+
+    case "days":
+      newDate.setDate(
+        newDate.getDate() + amount
+      );
+      break;
+
+    case "weeks":
+      newDate.setDate(
+        newDate.getDate() + (amount * 7)
+      );
+      break;
+
+    case "months":
+      newDate.setMonth(
+        newDate.getMonth() + amount
+      );
+      break;
+
+    case "years":
+      newDate.setFullYear(
+        newDate.getFullYear() + amount
+      );
+      break;
+
+  }
+
+  const formattedDate =
+    formatDate(newDate);
+
+  result.textContent =
+    formattedDate;
+
+  result.dataset.copyValue =
+    formattedDate;
+
+  const absAmount =
+    Math.abs(amount);
+
+  const direction =
+    amount >= 0
+      ? "After"
+      : "Before";
+
+  commentary.textContent =
+    `${absAmount} ${unit.charAt(0).toUpperCase() + unit.slice(1)} ${direction} ${formatDate(date)}`;
+
+}
+
+}
+
+// -------------------------------
+// Calculate Button
+// -------------------------------
+calculateBtn?.addEventListener(
+  "click",
+  calculateDate
+);
+
+// -------------------------------
+// Enter Key Support
+// -------------------------------
+[
+  startDate,
+  endDate,
+  baseDate,
+  dateAmount
+].forEach(input => {
+
+  if (!input) return;
+
+  input.addEventListener(
+    "keydown",
+    (e) => {
+
+      if (e.key === "Enter") {
+
+        e.preventDefault();
+        calculateDate();
+
+      }
+
+    }
+  );
+
+});
+
+// -------------------------------
+// Copy
+// -------------------------------
+copyBtn?.addEventListener(
+  "click",
+  async () => {
+
+    const value =
+      result.dataset.copyValue;
+
+    if (!value) return;
+
+    try {
+
+      await navigator.clipboard.writeText(
+        value
+      );
+
+      const originalText =
+        copyBtn.textContent;
+
+      copyBtn.textContent =
+        "Copied!";
+
+      setTimeout(() => {
+
+        copyBtn.textContent =
+          originalText;
+
+      }, 1500);
+
+    } catch (err) {
+
+      console.error(
+        "Copy failed:",
+        err
+      );
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Clear
+// -------------------------------
+clearBtn?.addEventListener(
+  "click",
+  () => {
+
+    startDate.value = "";
+    endDate.value = "";
+
+    baseDate.value = "";
+    dateAmount.value = "";
+
+    if (dateUnit) {
+      dateUnit.selectedIndex = 0;
+    }
+
+    result.textContent = "0";
+    commentary.textContent = "";
+    result.dataset.copyValue = "";
+
+    if (daysBetweenMode.checked) {
+
+      startDate.focus();
+
+    } else if (
+      dateFromMode.checked
+    ) {
+
+      baseDate.focus();
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Init
+// -------------------------------
+if (daysBetweenMode) {
+  daysBetweenMode.checked = true;
+}
+
+if (dateFromMode) {
+  dateFromMode.checked = false;
+}
+
+updateMode();
+
+result.textContent = "0";
+commentary.textContent = "";
+result.dataset.copyValue = "";
+
+}
+
 
