@@ -67,6 +67,10 @@ if (document.getElementById("percentage-calculator")) {
   initPercentageCalculator();
 }
 
+if (document.getElementById("age-calculator")) { 
+  initAgeCalculator(); 
+}
+
 });
 
 
@@ -2465,3 +2469,208 @@ result.dataset.copyValue = "";
 percentInput.focus();
 
 }
+
+// ==============================
+// AGE CALCULATOR
+// ==============================
+function initAgeCalculator() {
+
+const wrapper = document.getElementById("age-calculator");
+
+if (!wrapper) return;
+
+const birthDateInput = document.getElementById("birth-date");
+
+const calculateBtn = document.getElementById("age-calculate");
+const copyBtn = document.getElementById("age-copy");
+const clearBtn = document.getElementById("age-clear");
+
+const result = document.getElementById("age-result");
+
+// -------------------------------
+// Calculate Age
+// -------------------------------
+function calculateAge() {
+
+const birthDateValue = birthDateInput.value;
+
+if (!birthDateValue) {
+
+  result.textContent = "0 Years";
+  result.dataset.copyValue = "";
+
+  return;
+
+}
+
+const birthDate = new Date(birthDateValue);
+const today = new Date();
+
+let years =
+  today.getFullYear() -
+  birthDate.getFullYear();
+
+let months =
+  today.getMonth() -
+  birthDate.getMonth();
+
+let days =
+  today.getDate() -
+  birthDate.getDate();
+
+// -------------------------------
+// Borrow Days
+// -------------------------------
+if (days < 0) {
+
+  const previousMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    0
+  );
+
+  days += previousMonth.getDate();
+  months--;
+
+}
+
+// -------------------------------
+// Borrow Months
+// -------------------------------
+if (months < 0) {
+
+  months += 12;
+  years--;
+
+}
+
+// -------------------------------
+// Build Display Text
+// -------------------------------
+const parts = [];
+
+if (years > 0) {
+  parts.push(
+    `${years} Year${years === 1 ? "" : "s"}`
+  );
+}
+
+if (months > 0) {
+  parts.push(
+    `${months} Month${months === 1 ? "" : "s"}`
+  );
+}
+
+if (days > 0) {
+  parts.push(
+    `${days} Day${days === 1 ? "" : "s"}`
+  );
+}
+
+// If age is exactly zero
+if (parts.length === 0) {
+  parts.push("0 Years");
+}
+
+const displayText = parts.join(", ");
+
+result.textContent = displayText;
+result.dataset.copyValue = displayText;
+
+}
+
+// -------------------------------
+// Calculate Button
+// -------------------------------
+calculateBtn.addEventListener(
+  "click",
+  calculateAge
+);
+
+// -------------------------------
+// Enter Key
+// -------------------------------
+birthDateInput.addEventListener(
+  "keydown",
+  (e) => {
+
+    if (e.key === "Enter") {
+
+      e.preventDefault();
+      calculateAge();
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Copy
+// -------------------------------
+copyBtn.addEventListener(
+  "click",
+  async () => {
+
+    const valueToCopy =
+      result.dataset.copyValue;
+
+    if (!valueToCopy) return;
+
+    try {
+
+      await navigator.clipboard.writeText(
+        valueToCopy
+      );
+
+      const originalText =
+        copyBtn.textContent;
+
+      copyBtn.textContent =
+        "Copied!";
+
+      setTimeout(() => {
+
+        copyBtn.textContent =
+          originalText;
+
+      }, 1500);
+
+    } catch (err) {
+
+      console.error(
+        "Copy failed:",
+        err
+      );
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Clear
+// -------------------------------
+clearBtn.addEventListener(
+  "click",
+  () => {
+
+    birthDateInput.value = "";
+
+    result.textContent =
+      "0 Years";
+
+    result.dataset.copyValue = "";
+
+    birthDateInput.focus();
+
+  }
+);
+
+// -------------------------------
+// Init
+// -------------------------------
+result.textContent = "0 Years";
+result.dataset.copyValue = "";
+
+}
+
