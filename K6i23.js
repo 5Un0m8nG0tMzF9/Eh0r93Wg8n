@@ -2098,7 +2098,7 @@ const clearBtn = document.getElementById("uuid-clear");
 // -------------------------------
 function generateUUIDs() {
 
-let quantity = parseInt(quantityInput.value, 10);
+let quantity = parseInt(quantityInput.value, 1);
 
 if (isNaN(quantity)) quantity = 1;
 
@@ -2151,7 +2151,7 @@ try {
 clearBtn.addEventListener("click", () => {
 
 output.textContent = "";
-quantityInput.value = 10;
+quantityInput.value = 1;
 quantityInput.focus();
 
 });
@@ -2171,7 +2171,7 @@ if (e.key === "Enter") {
 // -------------------------------
 // Init
 // -------------------------------
-quantityInput.value = 10;
+quantityInput.value = 1;
 quantityInput.focus();
 
 }
