@@ -63,6 +63,10 @@ if (document.getElementById("uuid-generator")) {
   initUUIDGenerator();
 }
 
+if (document.getElementById("percentage-calculator")) {
+  initPercentageCalculator();
+}
+
 });
 
 
@@ -2175,5 +2179,197 @@ if (e.key === "Enter") {
 quantityInput.value = 1;
 quantityInput.focus();
 quantityInput.select();
+
+}
+
+// ==============================
+// PERCENTAGE CALCULATOR
+// ==============================
+function initPercentageCalculator() {
+
+const wrapper = document.getElementById("percentage-calculator");
+
+if (!wrapper) return;
+
+// -------------------------------
+// Radio Modes
+// -------------------------------
+const percentOfMode = document.getElementById("percent-of-mode");
+const percentTotalMode = document.getElementById("percent-total-mode");
+const percentChangeMode = document.getElementById("percent-change-mode");
+
+// -------------------------------
+// Field Wrappers
+// -------------------------------
+const percentOfFields = document.getElementById("percent-of-fields");
+const percentTotalFields = document.getElementById("percent-total-fields");
+const percentChangeFields = document.getElementById("percent-change-fields");
+
+// -------------------------------
+// Inputs
+// -------------------------------
+const percentInput = document.getElementById("percent-input");
+const numberInput = document.getElementById("number-input");
+
+const valueInput = document.getElementById("value-input");
+const totalInput = document.getElementById("total-input");
+
+const originalInput = document.getElementById("original-input");
+const newInput = document.getElementById("new-input");
+
+// -------------------------------
+// Controls
+// -------------------------------
+const calculateBtn = document.getElementById("percent-calculate");
+const copyBtn = document.getElementById("percent-copy");
+const clearBtn = document.getElementById("percent-clear");
+const result = document.getElementById("percent-result");
+
+// -------------------------------
+// Show Active Mode
+// -------------------------------
+function updateMode() {
+
+percentOfFields.style.display =
+  percentOfMode.checked ? "block" : "none";
+
+percentTotalFields.style.display =
+  percentTotalMode.checked ? "block" : "none";
+
+percentChangeFields.style.display =
+  percentChangeMode.checked ? "block" : "none";
+
+}
+
+percentOfMode.addEventListener("change", updateMode);
+percentTotalMode.addEventListener("change", updateMode);
+percentChangeMode.addEventListener("change", updateMode);
+
+// -------------------------------
+// Calculate
+// -------------------------------
+function calculatePercentage() {
+
+let output = "";
+
+if (percentOfMode.checked) {
+
+  const percent = parseFloat(percentInput.value);
+  const number = parseFloat(numberInput.value);
+
+  if (isNaN(percent) || isNaN(number)) {
+    result.textContent = "";
+    return;
+  }
+
+  output = ((percent / 100) * number).toLocaleString();
+
+}
+
+else if (percentTotalMode.checked) {
+
+  const value = parseFloat(valueInput.value);
+  const total = parseFloat(totalInput.value);
+
+  if (isNaN(value) || isNaN(total) || total === 0) {
+    result.textContent = "";
+    return;
+  }
+
+  output = ((value / total) * 100).toFixed(2) + "%";
+
+}
+
+else if (percentChangeMode.checked) {
+
+  const original = parseFloat(originalInput.value);
+  const newer = parseFloat(newInput.value);
+
+  if (isNaN(original) || isNaN(newer) || original === 0) {
+    result.textContent = "";
+    return;
+  }
+
+  const change = ((newer - original) / original) * 100;
+
+  if (change > 0) {
+    output = Math.abs(change).toFixed(2) + "% Increase";
+  } else if (change < 0) {
+    output = Math.abs(change).toFixed(2) + "% Decrease";
+  } else {
+    output = "0% Change";
+  }
+
+}
+
+result.textContent = output;
+
+}
+
+calculateBtn.addEventListener("click", calculatePercentage);
+
+// -------------------------------
+// Copy
+// -------------------------------
+copyBtn.addEventListener("click", async () => {
+
+if (!result.textContent.trim()) return;
+
+try {
+
+  await navigator.clipboard.writeText(result.textContent);
+
+  const originalText = copyBtn.textContent;
+
+  copyBtn.textContent = "Copied!";
+
+  setTimeout(() => {
+    copyBtn.textContent = originalText;
+  }, 1500);
+
+} catch (err) {
+  console.error("Copy failed:", err);
+}
+
+});
+
+// -------------------------------
+// Clear
+// -------------------------------
+clearBtn.addEventListener("click", () => {
+
+percentInput.value = "";
+numberInput.value = "";
+
+valueInput.value = "";
+totalInput.value = "";
+
+originalInput.value = "";
+newInput.value = "";
+
+result.textContent = "";
+
+if (percentOfMode.checked) {
+  percentInput.focus();
+}
+
+if (percentTotalMode.checked) {
+  valueInput.focus();
+}
+
+if (percentChangeMode.checked) {
+  originalInput.focus();
+}
+
+});
+
+// -------------------------------
+// Init
+// -------------------------------
+updateMode();
+
+if (percentOfMode.checked) {
+percentInput.focus();
+}
 
 }
