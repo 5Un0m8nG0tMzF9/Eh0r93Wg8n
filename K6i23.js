@@ -2231,13 +2231,13 @@ const result = document.getElementById("percent-result");
 function updateMode() {
 
 percentOfFields.style.display =
-  percentOfMode.checked ? "" : "none";
+  percentOfMode.checked ? "flex" : "none";
 
 percentTotalFields.style.display =
-  percentTotalMode.checked ? "" : "none";
+  percentTotalMode.checked ? "flex" : "none";
 
 percentChangeFields.style.display =
-  percentChangeMode.checked ? "" : "none";
+  percentChangeMode.checked ? "flex" : "none";
 
 }
 
@@ -2307,6 +2307,31 @@ result.textContent = output;
 }
 
 calculateBtn.addEventListener("click", calculatePercentage);
+
+// -------------------------------
+// Enter Key Calculates
+// -------------------------------
+[
+percentInput,
+numberInput,
+valueInput,
+totalInput,
+originalInput,
+newInput
+].forEach(input => {
+
+if (!input) return;
+
+input.addEventListener("keydown", (e) => {
+
+  if (e.key === "Enter") {
+    e.preventDefault();
+    calculatePercentage();
+  }
+
+});
+
+});
 
 // -------------------------------
 // Copy
