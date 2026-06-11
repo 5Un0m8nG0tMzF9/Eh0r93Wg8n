@@ -2231,13 +2231,13 @@ const result = document.getElementById("percent-result");
 function updateMode() {
 
 percentOfFields.style.display =
-  percentOfMode.checked ? "block" : "none";
+  percentOfMode.checked ? "" : "none";
 
 percentTotalFields.style.display =
-  percentTotalMode.checked ? "block" : "none";
+  percentTotalMode.checked ? "" : "none";
 
 percentChangeFields.style.display =
-  percentChangeMode.checked ? "block" : "none";
+  percentChangeMode.checked ? "" : "none";
 
 }
 
@@ -2349,27 +2349,26 @@ newInput.value = "";
 
 result.textContent = "";
 
-if (percentOfMode.checked) {
-  percentInput.focus();
-}
+// Reset to default mode
+percentOfMode.checked = true;
+percentTotalMode.checked = false;
+percentChangeMode.checked = false;
 
-if (percentTotalMode.checked) {
-  valueInput.focus();
-}
+updateMode();
 
-if (percentChangeMode.checked) {
-  originalInput.focus();
-}
+percentInput.focus();
 
 });
 
 // -------------------------------
 // Init
 // -------------------------------
+percentOfMode.checked = true;
+percentTotalMode.checked = false;
+percentChangeMode.checked = false;
+
 updateMode();
 
-if (percentOfMode.checked) {
 percentInput.focus();
-}
 
 }
