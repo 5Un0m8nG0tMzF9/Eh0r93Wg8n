@@ -2230,14 +2230,20 @@ const result = document.getElementById("percent-result");
 // -------------------------------
 function updateMode() {
 
-percentOfFields.style.display =
-  percentOfMode.checked ? "flex" : "none";
+percentOfFields.classList.toggle(
+  "is-hidden",
+  !percentOfMode.checked
+);
 
-percentTotalFields.style.display =
-  percentTotalMode.checked ? "flex" : "none";
+percentTotalFields.classList.toggle(
+  "is-hidden",
+  !percentTotalMode.checked
+);
 
-percentChangeFields.style.display =
-  percentChangeMode.checked ? "flex" : "none";
+percentChangeFields.classList.toggle(
+  "is-hidden",
+  !percentChangeMode.checked
+);
 
 }
 
