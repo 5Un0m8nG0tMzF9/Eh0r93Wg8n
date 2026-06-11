@@ -2112,7 +2112,8 @@ for (let i = 0; i < quantity; i++) {
   uuids.push(crypto.randomUUID());
 }
 
-output.value = uuids.join("\n");
+output.textContent = uuids.join("\n");
+
 }
 
 // -------------------------------
@@ -2125,11 +2126,11 @@ generateBtn.addEventListener("click", generateUUIDs);
 // -------------------------------
 copyBtn.addEventListener("click", async () => {
 
-if (!output.value.trim()) return;
+if (!output.textContent.trim()) return;
 
 try {
 
-  await navigator.clipboard.writeText(output.value);
+  await navigator.clipboard.writeText(output.textContent);
 
   const originalText = copyBtn.textContent;
   copyBtn.textContent = "Copied!";
@@ -2149,7 +2150,7 @@ try {
 // -------------------------------
 clearBtn.addEventListener("click", () => {
 
-output.value = "";
+output.textContent = "";
 quantityInput.value = 10;
 quantityInput.focus();
 
