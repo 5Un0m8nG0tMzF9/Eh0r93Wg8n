@@ -3602,10 +3602,10 @@ const commentary =
 function updateMode() {
 
 imperialFields.style.display =
-  imperialMode.checked ? "" : "none";
+  imperialMode.checked ? "flex" : "none";
 
 metricFields.style.display =
-  metricMode.checked ? "" : "none";
+  metricMode.checked ? "flex" : "none";
 
 }
 
