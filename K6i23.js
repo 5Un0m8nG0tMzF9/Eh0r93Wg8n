@@ -75,8 +75,8 @@ if (document.getElementById("date-calculator")) {
   initDateCalculator(); 
 }
 
-if (document.getElementById("base64-tool")) { 
-  initBase64Tool(); 
+if (document.getElementById("base64-tool")) {
+  initBase64Tool();
 }
 
 });
@@ -3140,7 +3140,7 @@ const value = input.value.trim();
 
 if (!value) {
 
-  output.value = "";
+  output.textcontent = "";
   output.dataset.copyValue = "";
   return;
 
@@ -3168,12 +3168,12 @@ try {
 
   }
 
-  output.value = result;
+  output.textcontent = result;
   output.dataset.copyValue = result;
 
 } catch (err) {
 
-  output.value = "Invalid Base64 input";
+  output.textcontent = "Invalid Base64 input";
   output.dataset.copyValue = "";
 
 }
@@ -3217,7 +3217,7 @@ copyBtn?.addEventListener(
 
     const value =
       output.dataset.copyValue ||
-      output.value;
+      output.textcontent;
 
     if (!value) return;
 
@@ -3260,7 +3260,7 @@ clearBtn?.addEventListener(
   () => {
 
     input.value = "";
-    output.value = "";
+    output.textcontent = "";
     output.dataset.copyValue = "";
 
     encodeMode.checked = true;
@@ -3278,7 +3278,7 @@ encodeMode?.addEventListener(
   "change",
   () => {
 
-    output.value = "";
+    output.textcontent = "";
     output.dataset.copyValue = "";
 
   }
@@ -3288,7 +3288,7 @@ decodeMode?.addEventListener(
   "change",
   () => {
 
-    output.value = "";
+    output.textcontent = "";
     output.dataset.copyValue = "";
 
   }
