@@ -2673,7 +2673,7 @@ clearBtn.addEventListener(
     birthDateInput.value = "";
 
     result.textContent =
-      "0 Years";
+      "-";
 
     result.dataset.copyValue = "";
 
@@ -2685,8 +2685,10 @@ clearBtn.addEventListener(
 // -------------------------------
 // Init
 // -------------------------------
-result.textContent = "0 Years";
+result.textContent = "-";
 result.dataset.copyValue = "";
+
+birthDateInput.focus();
 
 }
 
