@@ -79,6 +79,10 @@ if (document.getElementById("base64-tool")) {
   initBase64Tool();
 }
 
+if (document.getElementById("url-tool")) {
+  initUrlTool();
+}
+
 });
 
 
@@ -3279,6 +3283,221 @@ encodeMode?.addEventListener(
   () => {
 
     output.textcontent = "";
+    output.dataset.copyValue = "";
+
+  }
+);
+
+decodeMode?.addEventListener(
+  "change",
+  () => {
+
+    output.textContent = "";
+    output.dataset.copyValue = "";
+
+  }
+);
+
+// -------------------------------
+// Init
+// -------------------------------
+encodeMode.checked = true;
+decodeMode.checked = false;
+
+output.dataset.copyValue = "";
+
+input.focus();
+
+}
+
+// ==============================
+// URL ENCODER / DECODER
+// ==============================
+function initUrlTool() {
+
+const wrapper =
+  document.getElementById("url-tool");
+
+if (!wrapper) return;
+
+// -------------------------------
+// Elements
+// -------------------------------
+const input =
+  document.getElementById("url-input");
+
+const output =
+  document.getElementById("url-output");
+
+const encodeMode =
+  document.getElementById("encode-url");
+
+const decodeMode =
+  document.getElementById("decode-url");
+
+const convertBtn =
+  document.getElementById("convert-url");
+
+const copyBtn =
+  document.getElementById("url-copy");
+
+const clearBtn =
+  document.getElementById("url-clear");
+
+if (
+  !input ||
+  !output ||
+  !encodeMode ||
+  !decodeMode
+) return;
+
+// -------------------------------
+// Convert
+// -------------------------------
+function convertUrl() {
+
+const value = input.value.trim();
+
+if (!value) {
+
+  output.textContent = "";
+  output.dataset.copyValue = "";
+  return;
+
+}
+
+try {
+
+  let result = "";
+
+  if (encodeMode.checked) {
+
+    result = encodeURIComponent(
+      value
+    );
+
+  } else {
+
+    result = decodeURIComponent(
+      value
+    );
+
+  }
+
+  output.textContent = result;
+  output.dataset.copyValue = result;
+
+} catch (err) {
+
+  output.textContent =
+    "Invalid URL input";
+
+  output.dataset.copyValue = "";
+
+}
+
+}
+
+// -------------------------------
+// Convert Button
+// -------------------------------
+convertBtn?.addEventListener(
+  "click",
+  convertUrl
+);
+
+// -------------------------------
+// Enter Key
+// -------------------------------
+input.addEventListener(
+  "keydown",
+  (e) => {
+
+    if (
+      e.key === "Enter" &&
+      !e.shiftKey
+    ) {
+
+      e.preventDefault();
+      convertUrl();
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Copy
+// -------------------------------
+copyBtn?.addEventListener(
+  "click",
+  async () => {
+
+    const value =
+      output.dataset.copyValue ||
+      output.textContent;
+
+    if (!value) return;
+
+    try {
+
+      await navigator.clipboard.writeText(
+        value
+      );
+
+      const originalText =
+        copyBtn.textContent;
+
+      copyBtn.textContent =
+        "Copied!";
+
+      setTimeout(() => {
+
+        copyBtn.textContent =
+          originalText;
+
+      }, 1500);
+
+    } catch (err) {
+
+      console.error(
+        "Copy failed:",
+        err
+      );
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Clear
+// -------------------------------
+clearBtn?.addEventListener(
+  "click",
+  () => {
+
+    input.value = "";
+
+    output.textContent = "";
+    output.dataset.copyValue = "";
+
+    encodeMode.checked = true;
+    decodeMode.checked = false;
+
+    input.focus();
+
+  }
+);
+
+// -------------------------------
+// Mode Change
+// -------------------------------
+encodeMode?.addEventListener(
+  "change",
+  () => {
+
+    output.textContent = "";
     output.dataset.copyValue = "";
 
   }
