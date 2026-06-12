@@ -2723,6 +2723,9 @@ const dateAmount =
 const dateUnit =
   document.getElementById("date-unit");
 
+const dateDirection =
+  document.getElementById("date-direction");
+
 // -------------------------------
 // Controls
 // -------------------------------
@@ -2811,37 +2814,37 @@ if (daysBetweenMode.checked) {
     );
 
   result.textContent =
-  diffDays.toLocaleString() +
-  (diffDays === 1 ? " Day" : " Days");
+    diffDays.toLocaleString() +
+    (diffDays === 1 ? " Day" : " Days");
 
-result.dataset.copyValue =
-  diffDays.toString();
+  result.dataset.copyValue =
+    diffDays.toString();
 
-const weeks = Math.floor(diffDays / 7);
-const remainingDays = diffDays % 7;
-const hours = diffDays * 24;
+  const weeks = Math.floor(diffDays / 7);
+  const remainingDays = diffDays % 7;
+  const hours = diffDays * 24;
 
-let weekText = "";
+  let weekText = "";
 
-if (weeks > 0) {
+  if (weeks > 0) {
 
-  weekText =
-    `${weeks.toLocaleString()} Week${weeks === 1 ? "" : "s"}`;
+    weekText =
+      `${weeks.toLocaleString()} Week${weeks === 1 ? "" : "s"}`;
 
-  if (remainingDays > 0) {
-    weekText +=
-      `, ${remainingDays.toLocaleString()} Day${remainingDays === 1 ? "" : "s"}`;
+    if (remainingDays > 0) {
+      weekText +=
+        `, ${remainingDays.toLocaleString()} Day${remainingDays === 1 ? "" : "s"}`;
+    }
+
+  } else {
+
+    weekText =
+      `${remainingDays.toLocaleString()} Day${remainingDays === 1 ? "" : "s"}`;
+
   }
 
-} else {
-
-  weekText =
-    `${remainingDays.toLocaleString()} Day${remainingDays === 1 ? "" : "s"}`;
-
-}
-
-commentary.textContent =
-  `${weekText} • ${hours.toLocaleString()} Hours`;
+  commentary.textContent =
+    `${weekText} • ${hours.toLocaleString()} Hours`;
 
   return;
 
@@ -2868,7 +2871,7 @@ if (dateFromMode.checked) {
   const date =
     new Date(baseDate.value);
 
-  const amount =
+  let amount =
     parseInt(dateAmount.value, 10);
 
   if (isNaN(amount)) {
@@ -2877,6 +2880,13 @@ if (dateFromMode.checked) {
     commentary.textContent = "";
     return;
 
+  }
+
+  if (
+    dateDirection &&
+    dateDirection.value === "before"
+  ) {
+    amount = -amount;
   }
 
   const unit =
@@ -2930,8 +2940,12 @@ if (dateFromMode.checked) {
       ? "After"
       : "Before";
 
+  const unitLabel =
+    unit.charAt(0).toUpperCase() +
+    unit.slice(1);
+
   commentary.textContent =
-    `${absAmount} ${unit.charAt(0).toUpperCase() + unit.slice(1)} ${direction} ${formatDate(date)}`;
+    `${absAmount} ${unitLabel} ${direction} ${formatDate(date)}`;
 
 }
 
@@ -3033,6 +3047,10 @@ clearBtn?.addEventListener(
       dateUnit.selectedIndex = 0;
     }
 
+    if (dateDirection) {
+      dateDirection.selectedIndex = 0;
+    }
+
     result.textContent = "0";
     commentary.textContent = "";
     result.dataset.copyValue = "";
@@ -3070,5 +3088,3 @@ commentary.textContent = "";
 result.dataset.copyValue = "";
 
 }
-
-
