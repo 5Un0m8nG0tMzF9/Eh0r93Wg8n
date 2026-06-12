@@ -83,6 +83,10 @@ if (document.getElementById("url-tool")) {
   initUrlTool();
 }
 
+if (document.getElementById("bmi-calculator")) {
+  initBmiCalculator();
+}
+
 });
 
 
@@ -3522,5 +3526,340 @@ decodeMode.checked = false;
 output.dataset.copyValue = "";
 
 input.focus();
+
+}
+
+// ==============================
+// BMI CALCULATOR
+// ==============================
+function initBmiCalculator() {
+
+const wrapper =
+  document.getElementById("bmi-calculator");
+
+if (!wrapper) return;
+
+// -------------------------------
+// Unit Modes
+// -------------------------------
+const imperialMode =
+  document.getElementById("imperial-mode");
+
+const metricMode =
+  document.getElementById("metric-mode");
+
+// -------------------------------
+// Field Wrappers
+// -------------------------------
+const imperialFields =
+  document.getElementById("imperial-fields");
+
+const metricFields =
+  document.getElementById("metric-fields");
+
+// -------------------------------
+// Imperial Inputs
+// -------------------------------
+const heightFeet =
+  document.getElementById("height-feet");
+
+const heightInches =
+  document.getElementById("height-inches");
+
+const weightLbs =
+  document.getElementById("weight-lbs");
+
+// -------------------------------
+// Metric Inputs
+// -------------------------------
+const heightCm =
+  document.getElementById("height-cm");
+
+const weightKg =
+  document.getElementById("weight-kg");
+
+// -------------------------------
+// Controls
+// -------------------------------
+const calculateBtn =
+  document.getElementById("bmi-calculate");
+
+const copyBtn =
+  document.getElementById("bmi-copy");
+
+const clearBtn =
+  document.getElementById("bmi-clear");
+
+const result =
+  document.getElementById("bmi-result");
+
+const commentary =
+  document.getElementById("bmi-commentary");
+
+// -------------------------------
+// Helpers
+// -------------------------------
+function updateMode() {
+
+imperialFields.style.display =
+  imperialMode.checked ? "grid" : "none";
+
+metricFields.style.display =
+  metricMode.checked ? "grid" : "none";
+
+}
+
+function getCategory(bmi) {
+
+if (bmi < 18.5) {
+  return "Underweight";
+}
+
+if (bmi < 25) {
+  return "Normal Weight";
+}
+
+if (bmi < 30) {
+  return "Overweight";
+}
+
+return "Obesity";
+
+}
+
+// -------------------------------
+// Mode Events
+// -------------------------------
+imperialMode?.addEventListener(
+  "change",
+  updateMode
+);
+
+metricMode?.addEventListener(
+  "change",
+  updateMode
+);
+
+// -------------------------------
+// Calculate
+// -------------------------------
+function calculateBMI() {
+
+let bmi = 0;
+
+// -------------------------------
+// Imperial
+// -------------------------------
+if (imperialMode.checked) {
+
+  const feet =
+    parseFloat(heightFeet.value);
+
+  const inches =
+    parseFloat(
+      heightInches.value || 0
+    );
+
+  const pounds =
+    parseFloat(weightLbs.value);
+
+  if (
+    isNaN(feet) ||
+    isNaN(pounds) ||
+    feet <= 0 ||
+    pounds <= 0
+  ) {
+
+    result.textContent = "0";
+    commentary.textContent = "";
+    result.dataset.copyValue = "";
+    return;
+
+  }
+
+  const totalInches =
+    (feet * 12) + inches;
+
+  bmi =
+    (pounds * 703) /
+    (totalInches * totalInches);
+
+}
+
+// -------------------------------
+// Metric
+// -------------------------------
+else {
+
+  const cm =
+    parseFloat(heightCm.value);
+
+  const kg =
+    parseFloat(weightKg.value);
+
+  if (
+    isNaN(cm) ||
+    isNaN(kg) ||
+    cm <= 0 ||
+    kg <= 0
+  ) {
+
+    result.textContent = "0";
+    commentary.textContent = "";
+    result.dataset.copyValue = "";
+    return;
+
+  }
+
+  const meters =
+    cm / 100;
+
+  bmi =
+    kg /
+    (meters * meters);
+
+}
+
+// -------------------------------
+// Output
+// -------------------------------
+const bmiRounded =
+  bmi.toFixed(1);
+
+const category =
+  getCategory(bmi);
+
+result.textContent =
+  bmiRounded;
+
+result.dataset.copyValue =
+  bmiRounded;
+
+commentary.textContent =
+  category;
+
+}
+
+// -------------------------------
+// Calculate Button
+// -------------------------------
+calculateBtn?.addEventListener(
+  "click",
+  calculateBMI
+);
+
+// -------------------------------
+// Enter Key Support
+// -------------------------------
+[
+  heightFeet,
+  heightInches,
+  weightLbs,
+  heightCm,
+  weightKg
+].forEach(input => {
+
+  if (!input) return;
+
+  input.addEventListener(
+    "keydown",
+    (e) => {
+
+      if (e.key === "Enter") {
+
+        e.preventDefault();
+        calculateBMI();
+
+      }
+
+    }
+  );
+
+});
+
+// -------------------------------
+// Copy
+// -------------------------------
+copyBtn?.addEventListener(
+  "click",
+  async () => {
+
+    const value =
+      result.dataset.copyValue;
+
+    if (!value) return;
+
+    try {
+
+      await navigator.clipboard.writeText(
+        value
+      );
+
+      const originalText =
+        copyBtn.textContent;
+
+      copyBtn.textContent =
+        "Copied!";
+
+      setTimeout(() => {
+
+        copyBtn.textContent =
+          originalText;
+
+      }, 1500);
+
+    } catch (err) {
+
+      console.error(
+        "Copy failed:",
+        err
+      );
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Clear
+// -------------------------------
+clearBtn?.addEventListener(
+  "click",
+  () => {
+
+    heightFeet.value = "";
+    heightInches.value = "";
+    weightLbs.value = "";
+
+    heightCm.value = "";
+    weightKg.value = "";
+
+    result.textContent = "0";
+    commentary.textContent = "";
+    result.dataset.copyValue = "";
+
+    imperialMode.checked = true;
+    metricMode.checked = false;
+
+    updateMode();
+
+    heightFeet.focus();
+
+  }
+);
+
+// -------------------------------
+// Init
+// -------------------------------
+imperialMode.checked = true;
+metricMode.checked = false;
+
+updateMode();
+
+result.textContent = "0";
+commentary.textContent = "";
+result.dataset.copyValue = "";
+
+heightFeet.focus();
 
 }
