@@ -3857,7 +3857,7 @@ metricMode.checked = false;
 updateMode();
 
 result.textContent = "0";
-commentary.textContent = "";
+commentary.textContent = "-";
 result.dataset.copyValue = "";
 
 heightFeet.focus();
