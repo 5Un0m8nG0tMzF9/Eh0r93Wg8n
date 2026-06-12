@@ -2463,7 +2463,7 @@ clearBtn.addEventListener("click", () => {
 percentInput.value = ""; numberInput.value = "";
 valueInput.value = ""; totalInput.value = "";
 originalInput.value = ""; newInput.value = "";
-result.textContent = "0"; commentary.textContent = ""; result.dataset.copyValue = "";
+result.textContent = "0"; commentary.textContent = "-"; result.dataset.copyValue = "";
 // Focus first input of active mode if (percentOfMode.checked) { percentInput.focus(); }
 else if (percentTotalMode.checked) { valueInput.focus(); }
 else if (percentChangeMode.checked) { originalInput.focus(); }
@@ -2479,7 +2479,7 @@ percentChangeMode.checked = false;
 updateMode();
 
 result.textContent = "0";
-commentary.textContent = "";
+commentary.textContent = "-";
 result.dataset.copyValue = "";
 
 percentInput.focus();
@@ -3064,7 +3064,7 @@ clearBtn?.addEventListener(
     }
 
     result.textContent = "0";
-    commentary.textContent = "";
+    commentary.textContent = "-";
     result.dataset.copyValue = "";
 
     if (daysBetweenMode.checked) {
@@ -3096,7 +3096,7 @@ if (dateFromMode) {
 updateMode();
 
 result.textContent = "0";
-commentary.textContent = "";
+commentary.textContent = "-";
 result.dataset.copyValue = "";
 
 }
@@ -3835,7 +3835,7 @@ clearBtn?.addEventListener(
     weightKg.value = "";
 
     result.textContent = "0";
-    commentary.textContent = "";
+    commentary.textContent = "-";
     result.dataset.copyValue = "";
 
     imperialMode.checked = true;
