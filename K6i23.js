@@ -1129,8 +1129,8 @@ convert();
 function convert(){
 const value=parseFloat(inputValue.value);
 if(isNaN(value)){
-resultFrom.textContent="Result";
-resultDisplay.textContent="0";
+resultFrom.textContent="-";
+resultDisplay.textContent=“-“;
 return;
 }
 
@@ -1182,8 +1182,8 @@ convert();
 resetBtn?.addEventListener("click",function(e){
 e.preventDefault();
 inputValue.value="";
-resultDisplay.textContent="0";
-resultFrom.textContent="Result";
+resultDisplay.textContent="-";
+resultFrom.textContent="-";
 categorySelect.value="length";
 populateUnits("length");
 inputValue.focus();
