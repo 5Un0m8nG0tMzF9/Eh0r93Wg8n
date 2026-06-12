@@ -3140,7 +3140,7 @@ const value = input.value.trim();
 
 if (!value) {
 
-  output.textcontent = "";
+  output.textContent = "";
   output.dataset.copyValue = "";
   return;
 
@@ -3168,12 +3168,12 @@ try {
 
   }
 
-  output.textcontent = result;
+  output.textContent = result;
   output.dataset.copyValue = result;
 
 } catch (err) {
 
-  output.textcontent = "Invalid Base64 input";
+  output.textContent = "Invalid Base64 input";
   output.dataset.copyValue = "";
 
 }
@@ -3217,7 +3217,7 @@ copyBtn?.addEventListener(
 
     const value =
       output.dataset.copyValue ||
-      output.textcontent;
+      output.textContent;
 
     if (!value) return;
 
@@ -3260,7 +3260,7 @@ clearBtn?.addEventListener(
   () => {
 
     input.value = "";
-    output.textcontent = "";
+    output.textContent = "";
     output.dataset.copyValue = "";
 
     encodeMode.checked = true;
@@ -3288,7 +3288,7 @@ decodeMode?.addEventListener(
   "change",
   () => {
 
-    output.textcontent = "";
+    output.textContent = "";
     output.dataset.copyValue = "";
 
   }
@@ -3301,5 +3301,7 @@ encodeMode.checked = true;
 decodeMode.checked = false;
 
 output.dataset.copyValue = "";
+
+input.focus();
 
 }
