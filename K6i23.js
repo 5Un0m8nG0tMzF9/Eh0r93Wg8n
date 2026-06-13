@@ -1,401 +1,5 @@
 
 
-function initAgeCalculator() {
-
-  const wrapper = document.getElementById("age-calculator");
-
-  if (!wrapper) return;
-
-  const birthDateInput = document.getElementById("birth-date");
-
-  const calculateBtn = document.getElementById("age-calculate");
-  const copyBtn = document.getElementById("age-copy");
-  const clearBtn = document.getElementById("age-clear");
-
-  const result = document.getElementById("age-result");
-
-  // -------------------------------
-  // Calculate Age
-  // -------------------------------
-  function calculateAge() {
-
-    const birthDateValue = birthDateInput.value;
-
-    if (!birthDateValue) {
-
-      result.textContent = "0 Years";
-      result.dataset.copyValue = "";
-
-      return;
-
-    }
-
-    const birthDate = new Date(birthDateValue);
-    const today = new Date();
-
-    let years = today.getFullYear() -
-      birthDate.getFullYear();
-
-    let months = today.getMonth() -
-      birthDate.getMonth();
-
-    let days = today.getDate() -
-      birthDate.getDate();
-
-    // -------------------------------
-    // Borrow Days
-    // -------------------------------
-    if (days < 0) {
-
-      const previousMonth = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        0
-      );
-
-      days += previousMonth.getDate();
-      months--;
-
-    }
-
-    // -------------------------------
-    // Borrow Months
-    // -------------------------------
-    if (months < 0) {
-
-      months += 12;
-      years--;
-
-    }
-
-    // -------------------------------
-    // Build Display Text
-    // -------------------------------
-    const parts = [];
-
-    if (years > 0) {
-      parts.push(
-        `${years} Year${years === 1 ? "" : "s"}`
-      );
-    }
-
-    if (months > 0) {
-      parts.push(
-        `${months} Month${months === 1 ? "" : "s"}`
-      );
-    }
-
-    if (days > 0) {
-      parts.push(
-        `${days} Day${days === 1 ? "" : "s"}`
-      );
-    }
-
-    // If age is exactly zero
-    if (parts.length === 0) {
-      parts.push("0 Years");
-    }
-
-    const displayText = parts.join(", ");
-
-    result.textContent = displayText;
-    result.dataset.copyValue = displayText;
-
-  }
-
-  // -------------------------------
-  // Calculate Button
-  // -------------------------------
-  calculateBtn.addEventListener(
-    "click",
-    calculateAge
-  );
-
-  // -------------------------------
-  // Enter Key
-  // -------------------------------
-  birthDateInput.addEventListener(
-    "keydown",
-    (e) => {
-
-      if (e.key === "Enter") {
-
-        e.preventDefault();
-        calculateAge();
-
-      }
-
-    }
-  );
-
-  // -------------------------------
-  // Copy
-  // -------------------------------
-  copyBtn.addEventListener(
-    "click",
-    async () => {
-
-      const valueToCopy = result.dataset.copyValue;
-
-      if (!valueToCopy) return;
-
-      try {
-
-        await navigator.clipboard.writeText(
-          valueToCopy
-        );
-
-        const originalText = copyBtn.textContent;
-
-        copyBtn.textContent =
-          "Copied!";
-
-        setTimeout(() => {
-
-          copyBtn.textContent =
-            originalText;
-
-        }, 1500);
-
-      } catch (err) {
-
-        console.error(
-          "Copy failed:",
-          err
-        );
-
-      }
-
-    }
-  );
-
-  // -------------------------------
-  // Clear
-  // -------------------------------
-  clearBtn.addEventListener(
-    "click",
-    () => {
-
-      birthDateInput.value = "";
-
-      result.textContent =
-        "0 Years";
-
-      result.dataset.copyValue = "";
-
-      birthDateInput.focus();
-
-    }
-  );
-
-  // -------------------------------
-  // Init
-  // -------------------------------
-  result.textContent = "-";
-  result.dataset.copyValue = "";
-
-  birthDateInput.focus();
-
-}
-
-
-function initBase64Tool() {
-
-  const wrapper = document.getElementById("base64-tool");
-
-  if (!wrapper) return;
-
-  const input = document.getElementById("base-input");
-
-  const output = document.getElementById("base-output");
-
-  const encodeMode = document.getElementById("encode-mode");
-
-  const decodeMode = document.getElementById("decode-mode");
-
-  const convertBtn = document.getElementById("base-convert");
-
-  const copyBtn = document.getElementById("base-copy");
-
-  const clearBtn = document.getElementById("base-clear");
-
-  if (!input ||
-    !output ||
-    !encodeMode ||
-    !decodeMode) return;
-
-  // -------------------------------
-  // Convert
-  // -------------------------------
-  function convertBase64() {
-
-    const value = input.value.trim();
-
-    if (!value) {
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-      return;
-
-    }
-
-    try {
-
-      let result = "";
-
-      if (encodeMode.checked) {
-
-        result = btoa(
-          unescape(
-            encodeURIComponent(value)
-          )
-        );
-
-      } else {
-
-        result = decodeURIComponent(
-          escape(
-            atob(value)
-          )
-        );
-
-      }
-
-      output.textContent = result;
-      output.dataset.copyValue = result;
-
-    } catch (err) {
-
-      output.textContent = "Invalid Base64 input";
-      output.dataset.copyValue = "";
-
-    }
-
-  }
-
-  // -------------------------------
-  // Convert Button
-  // -------------------------------
-  convertBtn?.addEventListener(
-    "click",
-    convertBase64
-  );
-
-  // -------------------------------
-  // Enter Key
-  // -------------------------------
-  input.addEventListener(
-    "keydown",
-    (e) => {
-
-      if (e.key === "Enter" &&
-        !e.shiftKey) {
-
-        e.preventDefault();
-        convertBase64();
-
-      }
-
-    }
-  );
-
-  // -------------------------------
-  // Copy
-  // -------------------------------
-  copyBtn?.addEventListener(
-    "click",
-    async () => {
-
-      const value = output.dataset.copyValue ||
-        output.textContent;
-
-      if (!value) return;
-
-      try {
-
-        await navigator.clipboard.writeText(
-          value
-        );
-
-        const originalText = copyBtn.textContent;
-
-        copyBtn.textContent =
-          "Copied!";
-
-        setTimeout(() => {
-
-          copyBtn.textContent =
-            originalText;
-
-        }, 1500);
-
-      } catch (err) {
-
-        console.error(
-          "Copy failed:",
-          err
-        );
-
-      }
-
-    }
-  );
-
-  // -------------------------------
-  // Clear
-  // -------------------------------
-  clearBtn?.addEventListener(
-    "click",
-    () => {
-
-      input.value = "";
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-      encodeMode.checked = true;
-      decodeMode.checked = false;
-
-      input.focus();
-
-    }
-  );
-
-  // -------------------------------
-  // Mode Change
-  // -------------------------------
-  encodeMode?.addEventListener(
-    "change",
-    () => {
-
-      output.textcontent = "";
-      output.dataset.copyValue = "";
-
-    }
-  );
-
-  decodeMode?.addEventListener(
-    "change",
-    () => {
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-    }
-  );
-
-  // -------------------------------
-  // Init
-  // -------------------------------
-  encodeMode.checked = true;
-  decodeMode.checked = false;
-
-  output.dataset.copyValue = "";
-
-  input.focus();
-
-}
-
-
 function initBmiCalculator() {
 
   const wrapper = document.getElementById("bmi-calculator");
@@ -1350,6 +954,2576 @@ function initCalculator() {
 
 }
 
+function initPercentageCalculator() {
+
+  const wrapper = document.getElementById("percentage-calculator");
+
+  if (!wrapper) return;
+
+  // -------------------------------
+  // Radio Modes
+  // -------------------------------
+  const percentOfMode = document.getElementById("percent-of-mode");
+
+  const percentTotalMode = document.getElementById("percent-total-mode");
+
+  const percentChangeMode = document.getElementById("percent-change-mode");
+
+  // -------------------------------
+  // Field Wrappers
+  // -------------------------------
+  const percentOfFields = document.getElementById("percent-of-fields");
+
+  const percentTotalFields = document.getElementById("percent-total-fields");
+
+  const percentChangeFields = document.getElementById("percent-change-fields");
+
+  // -------------------------------
+  // Inputs
+  // -------------------------------
+  const percentInput = document.getElementById("percent-input");
+
+  const numberInput = document.getElementById("number-input");
+
+  const valueInput = document.getElementById("value-input");
+
+  const totalInput = document.getElementById("total-input");
+
+  const originalInput = document.getElementById("original-input");
+
+  const newInput = document.getElementById("new-input");
+
+  // -------------------------------
+  // Controls
+  // -------------------------------
+  const calculateBtn = document.getElementById("percent-calculate");
+
+  const copyBtn = document.getElementById("percent-copy");
+
+  const clearBtn = document.getElementById("percent-clear");
+
+  // -------------------------------
+  // Outputs
+  // -------------------------------
+  const result = document.getElementById("percent-result");
+
+  const commentary = document.getElementById("result-commentary");
+
+  // -------------------------------
+  // Show Active Mode
+  // -------------------------------
+  function updateMode() {
+
+    percentOfFields.style.display =
+      percentOfMode.checked
+        ? "grid"
+        : "none";
+
+    percentTotalFields.style.display =
+      percentTotalMode.checked
+        ? "grid"
+        : "none";
+
+    percentChangeFields.style.display =
+      percentChangeMode.checked
+        ? "grid"
+        : "none";
+
+    commentary.style.color = "";
+
+    if (percentChangeMode.checked) {
+
+      commentary.textContent = "-";
+
+    } else {
+
+      commentary.textContent = "";
+
+    }
+
+    // Auto Focus
+    if (percentOfMode.checked) {
+
+      percentInput.focus();
+
+    } else if (percentTotalMode.checked) {
+
+      valueInput.focus();
+
+    } else if (percentChangeMode.checked) {
+
+      originalInput.focus();
+
+    }
+
+  }
+
+  percentOfMode?.addEventListener(
+    "change",
+    updateMode
+  );
+
+  percentTotalMode?.addEventListener(
+    "change",
+    updateMode
+  );
+
+  percentChangeMode?.addEventListener(
+    "change",
+    updateMode
+  );
+
+  // -------------------------------
+  // Calculate
+  // -------------------------------
+  function calculatePercentage() {
+
+    let output = "0";
+    let commentaryText = "";
+    let copyValue = "";
+
+    // -----------------------------
+    // Mode 1
+    // -----------------------------
+    if (percentOfMode.checked) {
+
+      const percent = parseFloat(percentInput.value);
+
+      const number = parseFloat(numberInput.value);
+
+      if (isNaN(percent) ||
+        isNaN(number)) {
+
+        result.textContent = "0";
+        commentary.textContent = "";
+        commentary.style.color = "";
+        result.dataset.copyValue = "";
+
+        return;
+
+      }
+
+      const calculated = (percent / 100) * number;
+
+      const rounded = Number.isInteger(calculated)
+        ? calculated
+        : parseFloat(
+          calculated.toFixed(2)
+        );
+
+      output =
+        rounded.toLocaleString();
+
+      copyValue =
+        rounded.toString();
+
+    }
+
+
+
+
+    // -----------------------------
+    // Mode 2
+    // -----------------------------
+    else if (percentTotalMode.checked) {
+
+      const value = parseFloat(valueInput.value);
+
+      const total = parseFloat(totalInput.value);
+
+      if (isNaN(value) ||
+        isNaN(total) ||
+        total === 0) {
+
+        result.textContent = "0";
+        commentary.textContent = "";
+        commentary.style.color = "";
+        result.dataset.copyValue = "";
+
+        return;
+
+      }
+
+      const calculated = (value / total) * 100;
+
+      const formatted = parseFloat(
+        calculated.toFixed(2)
+      );
+
+      output =
+        formatted + "%";
+
+      copyValue =
+        formatted.toString();
+
+    }
+
+
+
+
+    // -----------------------------
+    // Mode 3
+    // -----------------------------
+    else if (percentChangeMode.checked) {
+
+      const original = parseFloat(originalInput.value);
+
+      const newer = parseFloat(newInput.value);
+
+      if (isNaN(original) ||
+        isNaN(newer) ||
+        original === 0) {
+
+        result.textContent = "0";
+        commentary.textContent = "-";
+        commentary.style.color = "";
+        result.dataset.copyValue = "";
+
+        return;
+
+      }
+
+      const change = ((newer - original) / original) * 100;
+
+      const formatted = parseFloat(
+        Math.abs(change).toFixed(2)
+      );
+
+      output =
+        formatted + "%";
+
+      copyValue =
+        formatted.toString();
+
+      if (change > 0) {
+
+        commentaryText = "Increase";
+        commentary.style.color = "green";
+
+      } else if (change < 0) {
+
+        commentaryText = "Decrease";
+        commentary.style.color = "red";
+
+      } else {
+
+        commentaryText = "No Change";
+        commentary.style.color = "";
+
+      }
+
+    }
+
+    if (!percentChangeMode.checked) {
+
+      commentary.style.color = "";
+
+    }
+
+    result.textContent =
+      output;
+
+    commentary.textContent =
+      commentaryText;
+
+    result.dataset.copyValue =
+      copyValue;
+
+  }
+
+  calculateBtn?.addEventListener(
+    "click",
+    calculatePercentage
+  );
+
+  // -------------------------------
+  // Enter Key Calculates
+  // -------------------------------
+  [
+    percentInput,
+    numberInput,
+    valueInput,
+    totalInput,
+    originalInput,
+    newInput
+  ].forEach(input => {
+
+    if (!input) return;
+
+    input.addEventListener(
+      "keydown",
+      (e) => {
+
+        if (e.key === "Enter") {
+
+          e.preventDefault();
+          calculatePercentage();
+
+        }
+
+      }
+    );
+
+  });
+
+  // -------------------------------
+  // Copy
+  // -------------------------------
+  copyBtn?.addEventListener(
+    "click",
+    async () => {
+
+      const valueToCopy = result.dataset.copyValue;
+
+      if (!valueToCopy) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          valueToCopy
+        );
+
+        const originalText = copyBtn.textContent;
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalText;
+
+        }, 1500);
+
+      } catch (err) {
+
+        console.error(
+          "Copy failed:",
+          err
+        );
+
+      }
+
+    }
+  );
+
+  // -------------------------------
+  // Clear
+  // -------------------------------
+  clearBtn?.addEventListener(
+    "click",
+    () => {
+
+      percentInput.value = "";
+      numberInput.value = "";
+
+      valueInput.value = "";
+      totalInput.value = "";
+
+      originalInput.value = "";
+      newInput.value = "";
+
+      result.textContent = "0";
+
+      commentary.textContent =
+        percentChangeMode.checked
+          ? "-"
+          : "";
+
+      commentary.style.color = "";
+
+      result.dataset.copyValue = "";
+
+      if (percentOfMode.checked) {
+
+        percentInput.focus();
+
+      } else if (percentTotalMode.checked) {
+
+        valueInput.focus();
+
+      } else if (percentChangeMode.checked) {
+
+        originalInput.focus();
+
+      }
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  percentOfMode.checked = true;
+  percentTotalMode.checked = false;
+  percentChangeMode.checked = false;
+
+  updateMode();
+
+  result.textContent = "0";
+  commentary.textContent = "";
+  commentary.style.color = "";
+
+  result.dataset.copyValue = "";
+
+  percentInput.focus();
+
+}
+
+
+function initUnitConverter() {
+
+  const categorySelect = document.getElementById("category-select");
+  const fromUnit = document.getElementById("from-unit");
+  const toUnit = document.getElementById("to-unit");
+  const inputValue = document.getElementById("input-value");
+
+  const resultFrom = document.getElementById("result-from");
+  const resultDisplay = document.getElementById("result-value");
+
+  const resetBtn = document.getElementById("reset-btn");
+  const copyBtn = document.getElementById("copy-result");
+  const swapBtn = document.getElementById("swap-btn");
+
+  if (!categorySelect || !fromUnit || !toUnit || !inputValue) return;
+
+  const unitLabels = {
+    m: { singular: "meter", plural: "meters" },
+    km: { singular: "kilometer", plural: "kilometers" },
+    cm: { singular: "centimeter", plural: "centimeters" },
+    mi: { singular: "mile", plural: "miles" },
+    ft: { singular: "foot", plural: "feet" },
+    in: { singular: "inch", plural: "inches" },
+    g: { singular: "gram", plural: "grams" },
+    kg: { singular: "kilogram", plural: "kilograms" },
+    lb: { singular: "pound", plural: "pounds" },
+    oz: { singular: "ounce", plural: "ounces" },
+    c: { singular: "°C", plural: "°C" },
+    f: { singular: "°F", plural: "°F" },
+    k: { singular: "K", plural: "K" },
+    s: { singular: "second", plural: "seconds" },
+    min: { singular: "minute", plural: "minutes" },
+    hr: { singular: "hour", plural: "hours" },
+    day: { singular: "day", plural: "days" },
+    l: { singular: "liter", plural: "liters" },
+    ml: { singular: "milliliter", plural: "milliliters" },
+    cup: { singular: "cup", plural: "cups" },
+    gal: { singular: "gallon", plural: "gallons" },
+    floz: { singular: "fluid ounce", plural: "fluid ounces" },
+    mps: { singular: "m/s", plural: "m/s" },
+    kmh: { singular: "km/h", plural: "km/h" },
+    mph: { singular: "mph", plural: "mph" },
+    knot: { singular: "knot", plural: "knots" }
+  };
+
+  const units = {
+    length: { units: { m: { name: "Meters", factor: 1 }, km: { name: "Kilometers", factor: 1000 }, cm: { name: "Centimeters", factor: 0.01 }, mi: { name: "Miles", factor: 1609.34 }, ft: { name: "Feet", factor: 0.3048 }, in: { name: "Inches", factor: 0.0254 } } },
+    weight: { units: { g: { name: "Grams", factor: 1 }, kg: { name: "Kilograms", factor: 1000 }, lb: { name: "Pounds", factor: 453.592 }, oz: { name: "Ounces", factor: 28.3495 } } },
+    temperature: { units: { c: { name: "Celsius" }, f: { name: "Fahrenheit" }, k: { name: "Kelvin" } } },
+    time: { units: { s: { name: "Seconds", factor: 1 }, min: { name: "Minutes", factor: 60 }, hr: { name: "Hours", factor: 3600 }, day: { name: "Days", factor: 86400 } } },
+    volume: { units: { l: { name: "Liters", factor: 1 }, ml: { name: "Milliliters", factor: 0.001 }, cup: { name: "Cups", factor: 0.236588 }, gal: { name: "Gallons", factor: 3.78541 }, floz: { name: "Fluid Ounces", factor: 0.0295735 } } },
+    speed: { units: { mps: { name: "Meters/sec", factor: 1 }, kmh: { name: "Kilometers/hour", factor: 0.277778 }, mph: { name: "Miles/hour", factor: 0.44704 }, knot: { name: "Knots", factor: 0.514444 } } }
+  };
+
+  function formatUnit(value, unit) {
+    const abs = Math.abs(value);
+    const label = unitLabels[unit];
+    if (!label) return "";
+    return abs === 1 ? label.singular : label.plural;
+  }
+
+  function populateUnits(category) {
+    fromUnit.innerHTML = "";
+    toUnit.innerHTML = "";
+    const unitSet = units[category].units;
+    for (let key in unitSet) {
+      const option1 = document.createElement("option");
+      option1.value = key;
+      option1.textContent = unitSet[key].name;
+      fromUnit.appendChild(option1);
+
+      const option2 = document.createElement("option");
+      option2.value = key;
+      option2.textContent = unitSet[key].name;
+      toUnit.appendChild(option2);
+    }
+    toUnit.selectedIndex = 1;
+    convert();
+  }
+
+  function convert() {
+    const value = parseFloat(inputValue.value);
+    if (isNaN(value)) {
+      resultFrom.textContent = "-";
+      resultDisplay.textContent = "-";
+      return;
+    }
+
+    const category = categorySelect.value;
+    const from = fromUnit.value;
+    const to = toUnit.value;
+    let result;
+
+    if (category === "temperature") {
+      if (from === "c" && to === "f") result = (value * 9 / 5) + 32;
+      else if (from === "f" && to === "c") result = (value - 32) * 5 / 9;
+      else if (from === "c" && to === "k") result = value + 273.15;
+      else if (from === "k" && to === "c") result = value - 273.15;
+      else if (from === "f" && to === "k") result = (value - 32) * 5 / 9 + 273.15;
+      else if (from === "k" && to === "f") result = (value - 273.15) * 9 / 5 + 32;
+      else result = value;
+    } else {
+      const fromFactor = units[category].units[from].factor;
+      const toFactor = units[category].units[to].factor;
+      const base = value * fromFactor;
+      result = base / toFactor;
+    }
+
+    const formatted = result.toFixed(6).replace(/\.?0+$/, "");
+    const fromLabel = formatUnit(value, from);
+    const toLabel = formatUnit(result, to);
+
+    resultFrom.textContent = value + " " + fromLabel;
+    resultDisplay.textContent = formatted + " " + toLabel;
+  }
+
+  // -------------------------------
+  // Event listeners
+  // -------------------------------
+  categorySelect.addEventListener("change", function () {
+    populateUnits(this.value);
+  });
+  fromUnit.addEventListener("change", convert);
+  toUnit.addEventListener("change", convert);
+  inputValue.addEventListener("input", convert);
+
+  swapBtn?.addEventListener("click", function () {
+    const temp = fromUnit.value;
+    fromUnit.value = toUnit.value;
+    toUnit.value = temp;
+    convert();
+  });
+
+  resetBtn?.addEventListener("click", function (e) {
+    e.preventDefault();
+    inputValue.value = "";
+    resultDisplay.textContent = "-";
+    resultFrom.textContent = "-";
+    categorySelect.value = "length";
+    populateUnits("length");
+    inputValue.focus();
+  });
+
+  copyBtn?.addEventListener("click", function () {
+    navigator.clipboard.writeText(resultDisplay.textContent);
+    copyBtn.textContent = "Copied!";
+    setTimeout(function () {
+      copyBtn.textContent = "Copy Result";
+    }, 1500);
+  });
+
+  // --- PAGE LOAD DEFAULT ---
+  categorySelect.value = "length";
+  populateUnits("length");
+
+  inputValue.focus();
+
+}
+
+
+function initBase64Tool() {
+
+  const wrapper = document.getElementById("base64-tool");
+
+  if (!wrapper) return;
+
+  const input = document.getElementById("base-input");
+
+  const output = document.getElementById("base-output");
+
+  const encodeMode = document.getElementById("encode-mode");
+
+  const decodeMode = document.getElementById("decode-mode");
+
+  const convertBtn = document.getElementById("base-convert");
+
+  const copyBtn = document.getElementById("base-copy");
+
+  const clearBtn = document.getElementById("base-clear");
+
+  if (!input ||
+    !output ||
+    !encodeMode ||
+    !decodeMode) return;
+
+  // -------------------------------
+  // Convert
+  // -------------------------------
+  function convertBase64() {
+
+    const value = input.value.trim();
+
+    if (!value) {
+
+      output.textContent = "";
+      output.dataset.copyValue = "";
+      return;
+
+    }
+
+    try {
+
+      let result = "";
+
+      if (encodeMode.checked) {
+
+        result = btoa(
+          unescape(
+            encodeURIComponent(value)
+          )
+        );
+
+      } else {
+
+        result = decodeURIComponent(
+          escape(
+            atob(value)
+          )
+        );
+
+      }
+
+      output.textContent = result;
+      output.dataset.copyValue = result;
+
+    } catch (err) {
+
+      output.textContent = "Invalid Base64 input";
+      output.dataset.copyValue = "";
+
+    }
+
+  }
+
+  // -------------------------------
+  // Convert Button
+  // -------------------------------
+  convertBtn?.addEventListener(
+    "click",
+    convertBase64
+  );
+
+  // -------------------------------
+  // Enter Key
+  // -------------------------------
+  input.addEventListener(
+    "keydown",
+    (e) => {
+
+      if (e.key === "Enter" &&
+        !e.shiftKey) {
+
+        e.preventDefault();
+        convertBase64();
+
+      }
+
+    }
+  );
+
+  // -------------------------------
+  // Copy
+  // -------------------------------
+  copyBtn?.addEventListener(
+    "click",
+    async () => {
+
+      const value = output.dataset.copyValue ||
+        output.textContent;
+
+      if (!value) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          value
+        );
+
+        const originalText = copyBtn.textContent;
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalText;
+
+        }, 1500);
+
+      } catch (err) {
+
+        console.error(
+          "Copy failed:",
+          err
+        );
+
+      }
+
+    }
+  );
+
+  // -------------------------------
+  // Clear
+  // -------------------------------
+  clearBtn?.addEventListener(
+    "click",
+    () => {
+
+      input.value = "";
+      output.textContent = "";
+      output.dataset.copyValue = "";
+
+      encodeMode.checked = true;
+      decodeMode.checked = false;
+
+      input.focus();
+
+    }
+  );
+
+  // -------------------------------
+  // Mode Change
+  // -------------------------------
+  encodeMode?.addEventListener(
+    "change",
+    () => {
+
+      output.textcontent = "";
+      output.dataset.copyValue = "";
+
+    }
+  );
+
+  decodeMode?.addEventListener(
+    "change",
+    () => {
+
+      output.textContent = "";
+      output.dataset.copyValue = "";
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  encodeMode.checked = true;
+  decodeMode.checked = false;
+
+  output.dataset.copyValue = "";
+
+  input.focus();
+
+}
+
+
+function initJsonFormatter() {
+
+  const input = document.getElementById("paste-json");
+  const output = document.getElementById("output-json");
+
+  const formatBtn = document.getElementById("format-json");
+  const clearBtn = document.getElementById("clear-json");
+  const downloadBtn = document.getElementById("download-json");
+  const copyBtn = document.getElementById("copy-json");
+
+  if (!input || !output) return;
+
+  // -------------------------
+  // Helpers
+  // -------------------------
+  function updateOutput(text) {
+    output.textContent = text;
+  }
+
+  function getInput() {
+    return input.value || "";
+  }
+
+  // -------------------------
+  // Format JSON
+  // -------------------------
+  function formatJSON(e) {
+    if (e) e.preventDefault();
+
+    const raw = getInput().trim();
+
+    if (!raw) {
+      updateOutput("");
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      const formatted = JSON.stringify(parsed, null, 2);
+
+      updateOutput(formatted);
+
+    } catch (error) {
+      updateOutput("Invalid JSON");
+    }
+  }
+
+  // -------------------------
+  // Copy Result (Nogstack Standard)
+  // -------------------------
+  function copyJSON(e) {
+    e.preventDefault();
+
+    const value = output.textContent;
+
+    if (!value) return;
+
+    navigator.clipboard.writeText(value);
+
+    const originalText = copyBtn.textContent;
+
+    copyBtn.textContent = "Copied!";
+
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+    }, 1500);
+  }
+
+  // -------------------------
+  // Download JSON
+  // -------------------------
+  function downloadJSON(e) {
+    e.preventDefault();
+
+    const text = output.textContent;
+
+    if (!text) return;
+
+    const blob = new Blob([text], {
+      type: "application/json"
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "formatted.json";
+
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // -------------------------
+  // Clear
+  // -------------------------
+  function clearJSON(e) {
+    e.preventDefault();
+
+    input.value = "";
+    updateOutput("");
+
+    input.focus();
+  }
+
+  // -------------------------
+  // Keyboard Shortcut
+  // -------------------------
+  input.addEventListener("keydown", function (e) {
+    if (e.ctrlKey && e.key === "Enter") {
+      e.preventDefault();
+      formatJSON();
+    }
+  });
+
+  // -------------------------
+  // Button Events
+  // -------------------------
+  formatBtn?.addEventListener("click", formatJSON);
+  clearBtn?.addEventListener("click", clearJSON);
+  copyBtn?.addEventListener("click", copyJSON);
+  downloadBtn?.addEventListener("click", downloadJSON);
+
+  // -------------------------
+  // Auto-focus
+  // -------------------------
+  input.focus();
+
+}
+
+
+function initUrlTool() {
+
+  const wrapper = document.getElementById("url-tool");
+
+  if (!wrapper) return;
+
+  // -------------------------------
+  // Elements
+  // -------------------------------
+  const input = document.getElementById("url-input");
+
+  const output = document.getElementById("url-output");
+
+  const encodeMode = document.getElementById("encode-url");
+
+  const decodeMode = document.getElementById("decode-url");
+
+  const convertBtn = document.getElementById("convert-url");
+
+  const copyBtn = document.getElementById("url-copy");
+
+  const clearBtn = document.getElementById("url-clear");
+
+  if (!input ||
+    !output ||
+    !encodeMode ||
+    !decodeMode) return;
+
+  // -------------------------------
+  // Convert
+  // -------------------------------
+  function convertUrl() {
+
+    const value = input.value.trim();
+
+    if (!value) {
+
+      output.textContent = "";
+      output.dataset.copyValue = "";
+      return;
+
+    }
+
+    try {
+
+      let result = "";
+
+      if (encodeMode.checked) {
+
+        result = encodeURIComponent(
+          value
+        );
+
+      } else {
+
+        result = decodeURIComponent(
+          value
+        );
+
+      }
+
+      output.textContent = result;
+      output.dataset.copyValue = result;
+
+    } catch (err) {
+
+      output.textContent =
+        "Invalid URL input";
+
+      output.dataset.copyValue = "";
+
+    }
+
+  }
+
+  // -------------------------------
+  // Convert Button
+  // -------------------------------
+  convertBtn?.addEventListener(
+    "click",
+    convertUrl
+  );
+
+  // -------------------------------
+  // Enter Key
+  // -------------------------------
+  input.addEventListener(
+    "keydown",
+    (e) => {
+
+      if (e.key === "Enter" &&
+        !e.shiftKey) {
+
+        e.preventDefault();
+        convertUrl();
+
+      }
+
+    }
+  );
+
+  // -------------------------------
+  // Copy
+  // -------------------------------
+  copyBtn?.addEventListener(
+    "click",
+    async () => {
+
+      const value = output.dataset.copyValue ||
+        output.textContent;
+
+      if (!value) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          value
+        );
+
+        const originalText = copyBtn.textContent;
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalText;
+
+        }, 1500);
+
+      } catch (err) {
+
+        console.error(
+          "Copy failed:",
+          err
+        );
+
+      }
+
+    }
+  );
+
+  // -------------------------------
+  // Clear
+  // -------------------------------
+  clearBtn?.addEventListener(
+    "click",
+    () => {
+
+      input.value = "";
+
+      output.textContent = "";
+      output.dataset.copyValue = "";
+
+      encodeMode.checked = true;
+      decodeMode.checked = false;
+
+      input.focus();
+
+    }
+  );
+
+  // -------------------------------
+  // Mode Change
+  // -------------------------------
+  encodeMode?.addEventListener(
+    "change",
+    () => {
+
+      output.textContent = "";
+      output.dataset.copyValue = "";
+
+    }
+  );
+
+  decodeMode?.addEventListener(
+    "change",
+    () => {
+
+      output.textContent = "";
+      output.dataset.copyValue = "";
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  encodeMode.checked = true;
+  decodeMode.checked = false;
+
+  output.dataset.copyValue = "";
+
+  input.focus();
+
+}
+
+
+function initUUIDGenerator() {
+
+  const wrapper = document.getElementById("uuid-generator");
+
+  if (!wrapper) return;
+
+  const quantityInput = document.getElementById("quantity-input");
+  const generateBtn = document.getElementById("uuid-generate");
+  const output = document.getElementById("uuid-output");
+  const copyBtn = document.getElementById("uuid-copy");
+  const clearBtn = document.getElementById("uuid-clear");
+
+  // -------------------------------
+  // Generate UUIDs
+  // -------------------------------
+  function generateUUIDs() {
+
+    let quantity = parseInt(quantityInput.value, 10);
+
+    if (isNaN(quantity)) quantity = 1;
+
+    quantity = Math.max(1, Math.min(quantity, 1000));
+
+    quantityInput.value = quantity;
+
+    const uuids = [];
+
+    for (let i = 0; i < quantity; i++) {
+      uuids.push(crypto.randomUUID());
+    }
+
+    output.textContent = uuids.join("\n");
+
+  }
+
+  // -------------------------------
+  // Generate Button
+  // -------------------------------
+  generateBtn.addEventListener("click", generateUUIDs);
+
+  // -------------------------------
+  // Copy
+  // -------------------------------
+  copyBtn.addEventListener("click", async () => {
+
+    if (!output.textContent.trim()) return;
+
+    try {
+
+      await navigator.clipboard.writeText(output.textContent);
+
+      const originalText = copyBtn.textContent;
+      copyBtn.textContent = "Copied!";
+
+      setTimeout(() => {
+        copyBtn.textContent = originalText;
+      }, 1500);
+
+    } catch (err) {
+      console.error("Copy failed:", err);
+    }
+
+  });
+
+  // -------------------------------
+  // Clear
+  // -------------------------------
+  clearBtn.addEventListener("click", () => {
+
+    output.textContent = "";
+    quantityInput.value = 1;
+    quantityInput.focus();
+    quantityInput.select();
+
+  });
+
+  // -------------------------------
+  // Enter Key Generates
+  // -------------------------------
+  quantityInput.addEventListener("keydown", (e) => {
+
+    if (e.key === "Enter") {
+      e.preventDefault();
+      generateUUIDs();
+    }
+
+  });
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  quantityInput.value = 1;
+  quantityInput.focus();
+  quantityInput.select();
+
+}
+
+
+function initPasswordGenerator() {
+
+  const output = document.getElementById("password-output");
+  const regenerateBtn = document.getElementById("regenerate-password-btn");
+  const copyBtn = document.getElementById("copy-password-btn");
+  const clearBtn = document.getElementById("clear-password-generator");
+
+  const lengthInput = document.getElementById("password-length-input");
+
+  const uppercaseCheckbox = document.getElementById("include-uppercase-checkbox");
+  const lowercaseCheckbox = document.getElementById("include-lowercase-checkbox");
+  const numbersCheckbox = document.getElementById("include-numbers-checkbox");
+  const symbolsCheckbox = document.getElementById("include-symbols-checkbox");
+
+  const minNumbersInput = document.getElementById("min-numbers-input");
+  const minSymbolsInput = document.getElementById("min-symbols-input");
+
+  const strengthText = document.getElementById("password-strength-text");
+
+  if (!output) return;
+
+  // Character sets
+  const UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
+  const NUMBERS = "0123456789";
+  const SYMBOLS = "!@#$%^&*";
+
+  // Utilities
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function ensureAtLeastOneChecked(changedBox) {
+    const boxes = [
+      uppercaseCheckbox,
+      lowercaseCheckbox,
+      numbersCheckbox,
+      symbolsCheckbox
+    ];
+
+    const anyChecked = boxes.some(box => box.checked);
+
+    if (!anyChecked) {
+      changedBox.checked = true;
+    }
+  }
+
+  function updateStrength(length, typesCount) {
+
+    let strength = "Weak";
+    let className = "strength-weak";
+
+    if (length >= 12 && typesCount >= 2) {
+      strength = "Medium";
+      className = "strength-medium";
+    }
+
+    if (length >= 16 && typesCount >= 3) {
+      strength = "Strong";
+      className = "strength-strong";
+    }
+
+    if (length >= 24 && typesCount === 4) {
+      strength = "Very Strong";
+      className = "strength-very-strong";
+    }
+
+    if (!strengthText) return;
+
+    strengthText.textContent = "Strength: " + strength;
+
+    // Remove old strength classes
+    strengthText.classList.remove(
+      "strength-weak",
+      "strength-medium",
+      "strength-strong",
+      "strength-very-strong"
+    );
+
+    // Add the new one
+    strengthText.classList.add(className);
+
+  }
+
+  function generatePassword() {
+
+    let length = parseInt(lengthInput.value, 10);
+    let minNumbers = parseInt(minNumbersInput.value, 10);
+    let minSymbols = parseInt(minSymbolsInput.value, 10);
+
+    // Allow empty while typing
+    if (isNaN(length) || isNaN(minNumbers) || isNaN(minSymbols)) {
+      return;
+    }
+
+    // Clamp values
+    length = clamp(length, 1, 128);
+    minNumbers = clamp(minNumbers, 0, 5);
+    minSymbols = clamp(minSymbols, 0, 5);
+
+    // Normalize inputs
+    lengthInput.value = length;
+    minNumbersInput.value = minNumbers;
+    minSymbolsInput.value = minSymbols;
+
+    let charset = "";
+    let passwordArray = [];
+    let typesCount = 0;
+
+    if (uppercaseCheckbox.checked) {
+      charset += UPPERCASE;
+      typesCount++;
+    }
+
+    if (lowercaseCheckbox.checked) {
+      charset += LOWERCASE;
+      typesCount++;
+    }
+
+    if (numbersCheckbox.checked) {
+      charset += NUMBERS;
+      typesCount++;
+    }
+
+    if (symbolsCheckbox.checked) {
+      charset += SYMBOLS;
+      typesCount++;
+    }
+
+    if (!charset) return;
+
+    // Minimum numbers
+    if (numbersCheckbox.checked) {
+      for (let i = 0; i < minNumbers; i++) {
+        passwordArray.push(
+          NUMBERS[Math.floor(Math.random() * NUMBERS.length)]
+        );
+      }
+    }
+
+    // Minimum symbols
+    if (symbolsCheckbox.checked) {
+      for (let i = 0; i < minSymbols; i++) {
+        passwordArray.push(
+          SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]
+        );
+      }
+    }
+
+    // Fill remaining characters
+    while (passwordArray.length < length) {
+      passwordArray.push(
+        charset[Math.floor(Math.random() * charset.length)]
+      );
+    }
+
+    // Shuffle and trim
+    passwordArray = shuffle(passwordArray).slice(0, length);
+
+    const password = passwordArray.join("");
+
+    output.textContent = password;
+
+    updateStrength(length, typesCount);
+  }
+
+  // Copy logic
+  const originalCopyText = copyBtn?.textContent || "Copy Password";
+
+  function copyPassword() {
+
+    if (!output.textContent) return;
+
+    navigator.clipboard.writeText(output.textContent);
+
+    if (!copyBtn) return;
+
+    copyBtn.textContent = "Copied!";
+
+    setTimeout(() => {
+      copyBtn.textContent = originalCopyText;
+    }, 1500);
+  }
+
+  // Reset logic
+  function resetGenerator() {
+
+    if (lengthInput) lengthInput.value = 30;
+
+    if (uppercaseCheckbox) uppercaseCheckbox.checked = true;
+    if (lowercaseCheckbox) lowercaseCheckbox.checked = true;
+    if (numbersCheckbox) numbersCheckbox.checked = true;
+    if (symbolsCheckbox) symbolsCheckbox.checked = true;
+
+    if (minNumbersInput) minNumbersInput.value = 1;
+    if (minSymbolsInput) minSymbolsInput.value = 1;
+
+    generatePassword();
+  }
+
+  // Event listeners
+  regenerateBtn?.addEventListener("click", generatePassword);
+  copyBtn?.addEventListener("click", copyPassword);
+  clearBtn?.addEventListener("click", resetGenerator);
+
+  lengthInput?.addEventListener("input", generatePassword);
+  minNumbersInput?.addEventListener("input", generatePassword);
+  minSymbolsInput?.addEventListener("input", generatePassword);
+
+  uppercaseCheckbox?.addEventListener("change", function () {
+    ensureAtLeastOneChecked(this);
+    generatePassword();
+  });
+
+  lowercaseCheckbox?.addEventListener("change", function () {
+    ensureAtLeastOneChecked(this);
+    generatePassword();
+  });
+
+  numbersCheckbox?.addEventListener("change", function () {
+    ensureAtLeastOneChecked(this);
+    generatePassword();
+  });
+
+  symbolsCheckbox?.addEventListener("change", function () {
+    ensureAtLeastOneChecked(this);
+    generatePassword();
+  });
+
+  // Initial generation
+  generatePassword();
+
+}
+
+
+function initRandomNumberGenerator() {
+
+  const minInput = document.getElementById("min-number");
+  const maxInput = document.getElementById("max-number");
+  const generateBtn = document.getElementById("generate-btn");
+  const resultDisplay = document.getElementById("result-number");
+  const copyBtn = document.getElementById("copy-result");
+  const historyList = document.getElementById("history-list");
+  const clearBtn = document.getElementById("clear-btn");
+
+  if (!minInput || !maxInput || !generateBtn || !resultDisplay) return;
+
+  let lastGeneratedNumber = 0; // store last generated number for copy button
+
+
+  // Default values
+  if (minInput.value === "") minInput.value = 1;
+  if (maxInput.value === "") maxInput.value = 100;
+
+  // -------------------------------
+  // Enforce input digit limit
+  // -------------------------------
+  const maxDigits = 10; // supports numbers up to 1,000,000,000
+
+  [minInput, maxInput].forEach(input => {
+    input.addEventListener("input", () => {
+      if (input.value.length > maxDigits) {
+        input.value = input.value.slice(0, maxDigits);
+      }
+    });
+  });
+
+  // -------------------------------
+  // Generate number
+  // -------------------------------
+  function generateNumber() {
+    let min = parseInt(minInput.value, 10);
+    let max = parseInt(maxInput.value, 10);
+
+    if (isNaN(min) || isNaN(max)) return;
+
+    // Clamp to safe range
+    min = Math.max(-1000000000, Math.min(min, 1000000000));
+    max = Math.max(-1000000000, Math.min(max, 1000000000));
+
+    // Swap if min > max
+    if (min > max) [min, max] = [max, min];
+
+    // Update inputs with clamped values
+    minInput.value = min;
+    maxInput.value = max;
+
+    const finalNumber = Math.floor(Math.random() * (max - min + 1)) + min;
+    animateNumber(finalNumber);
+  }
+
+  // -------------------------------
+  // Animate number
+  // -------------------------------
+  function animateNumber(finalNumber) {
+    lastGeneratedNumber = finalNumber;
+
+    let cycles = 10;
+
+    const interval = setInterval(() => {
+      let min = parseInt(minInput.value, 10);
+      let max = parseInt(maxInput.value, 10);
+
+      const temp = Math.floor(Math.random() * (max - min + 1)) + min;
+
+      resultDisplay.textContent = temp.toLocaleString();
+
+      cycles--;
+      if (cycles <= 0) {
+        clearInterval(interval);
+        resultDisplay.textContent = finalNumber.toLocaleString();
+        updateHistory(finalNumber);
+      }
+    }, 40);
+  }
+
+  // -------------------------------
+  // Update history
+  // -------------------------------
+  function updateHistory(num) {
+    if (!historyList) return;
+
+    const item = document.createElement("div");
+    item.textContent = num.toLocaleString();
+
+    historyList.prepend(item);
+  }
+
+  // -------------------------------
+  // Event listeners
+  // -------------------------------
+  generateBtn.addEventListener("click", e => {
+    e.preventDefault();
+    generateNumber();
+  });
+
+  minInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") generateNumber();
+  });
+
+  maxInput.addEventListener("keydown", e => {
+    if (e.key === "Enter") generateNumber();
+  });
+
+  // Copy button
+  copyBtn?.addEventListener("click", e => {
+    e.preventDefault();
+    if (lastGeneratedNumber !== null) {
+      navigator.clipboard.writeText(lastGeneratedNumber.toString());
+      copyBtn.textContent = "Copied!";
+      setTimeout(() => {
+        copyBtn.textContent = "Copy Result";
+      }, 1500);
+    }
+  });
+
+  // Clear button
+  clearBtn?.addEventListener("click", e => {
+    e.preventDefault();
+
+    if (historyList) historyList.innerHTML = "";
+    if (resultDisplay) resultDisplay.textContent = "0";
+    lastGeneratedNumber = 0;
+
+    // Reset inputs to default
+    if (minInput) minInput.value = 1;
+    if (maxInput) maxInput.value = 100;
+  });
+
+}
+
+
+function initDuplicateLineRemover() {
+  
+  const input = document.getElementById("dlr-input");
+  const output = document.getElementById("dlr-output");
+
+  const removeBtn = document.getElementById("dlr-remove");
+  const copyBtn = document.getElementById("dlr-copy");
+  const clearBtn = document.getElementById("dlr-clear");
+
+  if (!input || !output || !removeBtn || !copyBtn || !clearBtn) return;
+
+  function removeDuplicates() {
+    const lines = input.value.split("\n");
+    const uniqueLines = [...new Set(lines)];
+
+    output.textContent = uniqueLines.join("\n");
+  }
+
+  removeBtn.addEventListener("click", removeDuplicates);
+
+  copyBtn.addEventListener("click", async () => {
+    if (!output.textContent) return;
+
+    await navigator.clipboard.writeText(output.textContent);
+
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = "Copied!";
+
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+    }, 1500);
+  });
+
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    output.textContent = "";
+    input.focus();
+  });
+
+  input.focus();
+
+}
+
+
+function initLoremGenerator() {
+
+  const paragraphsRadio = document.getElementById("type-paragraphs");
+  const sentencesRadio = document.getElementById("type-sentences");
+  const wordsRadio = document.getElementById("type-words");
+
+  const amountInput = document.getElementById("lorem-amount");
+  const startCheckbox = document.getElementById("lorem-start");
+  const startWrap = document.getElementById("lorem-start-wrap");
+
+  const generateBtn = document.getElementById("lorem-generate");
+  const copyBtn = document.getElementById("lorem-copy");
+  const clearBtn = document.getElementById("lorem-clear");
+
+  const output = document.getElementById("lorem-output");
+
+  if (!amountInput || !output) return;
+
+  // -------------------------
+  // Base Lorem Word Bank
+  // -------------------------
+  const loremWords = ("lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua").split(" ");
+
+  // -------------------------
+  // Helpers
+  // -------------------------
+  function getType() {
+    if (paragraphsRadio?.checked) return "paragraphs";
+    if (sentencesRadio?.checked) return "sentences";
+    if (wordsRadio?.checked) return "words";
+    return "paragraphs";
+  }
+
+  function getAmount() {
+    let val = parseInt(amountInput.value, 10);
+    if (isNaN(val)) return null;
+    // Clamp to allowed range
+    val = Math.max(1, Math.min(100, val));
+    return val;
+  }
+
+  function randomWord() {
+    return loremWords[Math.floor(Math.random() * loremWords.length)];
+  }
+
+  function generateWords(count) {
+    let words = [];
+    for (let i = 0; i < count; i++) {
+      words.push(randomWord());
+    }
+    return words.join(" ");
+  }
+
+  function generateSentence() {
+    let length = Math.floor(Math.random() * 8) + 8;
+    let sentence = generateWords(length);
+    return sentence.charAt(0).toUpperCase() + sentence.slice(1) + ".";
+  }
+
+  function generateParagraph() {
+    let sentenceCount = Math.floor(Math.random() * 3) + 3;
+    let sentences = [];
+    for (let i = 0; i < sentenceCount; i++) {
+      sentences.push(generateSentence());
+    }
+    return sentences.join(" ");
+  }
+
+  // -------------------------
+  // Start Toggle Logic
+  // -------------------------
+  function updateStartToggle() {
+    if (!startCheckbox || !startWrap) return;
+
+    if (getType() === "paragraphs") {
+      startCheckbox.disabled = false;
+      startWrap.classList.remove("disabled");
+    } else {
+      startCheckbox.checked = false;
+      startCheckbox.disabled = true;
+      startWrap.classList.add("disabled");
+    }
+
+    amountInput.focus();
+
+  }
+
+  // -------------------------
+  // Generate
+  // -------------------------
+  function generate() {
+    const type = getType();
+    const amount = getAmount();
+
+    if (!amount) {
+      output.innerHTML = "";
+      return;
+    }
+
+    const startWithLorem = startCheckbox?.checked;
+    let result = "";
+
+    if (type === "words") result = generateWords(amount);
+
+    if (type === "sentences") {
+      let arr = [];
+      for (let i = 0; i < amount; i++) arr.push(generateSentence());
+      result = arr.join(" ");
+    }
+
+    if (type === "paragraphs") {
+      let arr = [];
+      for (let i = 0; i < amount; i++) arr.push(generateParagraph());
+      result = arr.join("<br><br>");
+    }
+
+    if (startWithLorem && type === "paragraphs" && result.length > 0) {
+      const base = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+      let parts = result.split("<br><br>");
+      parts[0] = base + " " + parts[0];
+      result = parts.join("<br><br>");
+    }
+
+    output.innerHTML = result;
+  }
+
+  // -------------------------
+  // Real-time input clamping
+  // -------------------------
+  amountInput.addEventListener("input", () => {
+    let val = parseInt(amountInput.value, 10);
+    if (isNaN(val)) return;
+    if (val < 1) amountInput.value = 1;
+    if (val > 100) amountInput.value = 100;
+  });
+
+  // -------------------------
+  // Events
+  // -------------------------
+  generateBtn?.addEventListener("click", function (e) {
+    e.preventDefault();
+    generate();
+  });
+
+  paragraphsRadio?.addEventListener("change", updateStartToggle);
+  sentencesRadio?.addEventListener("change", updateStartToggle);
+  wordsRadio?.addEventListener("change", updateStartToggle);
+
+  // -------------------------
+  // Copy
+  // -------------------------
+  copyBtn?.addEventListener("click", function (e) {
+    e.preventDefault();
+    const value = output.innerText;
+    if (!value) return;
+
+    navigator.clipboard.writeText(value);
+
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = "Copied!";
+
+    setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
+  });
+
+  // -------------------------
+  // Clear
+  // -------------------------
+  clearBtn?.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    amountInput.value = "";
+    output.innerHTML = "";
+
+    if (startCheckbox) startCheckbox.checked = false;
+
+    updateStartToggle();
+
+    amountInput.focus();
+  });
+
+  // -------------------------
+  // Init State
+  // -------------------------
+  output.innerHTML = "";
+  amountInput.value = "";
+
+  if (paragraphsRadio) paragraphsRadio.checked = true;
+  if (sentencesRadio) sentencesRadio.checked = false;
+  if (wordsRadio) wordsRadio.checked = false;
+
+  if (startCheckbox) startCheckbox.checked = false;
+
+  updateStartToggle();
+
+  amountInput.focus();
+
+}
+
+
+function initNotepad() {
+
+  const notepad = document.getElementById("notepad");
+  const wordCount = document.getElementById("word-count");
+  const charCount = document.getElementById("char-count");
+  const STORAGE_KEY = "notepad-content";
+  const TIME_KEY = "notepad-last-saved";
+  const CURSOR_KEY = "notepad-cursor";
+  const saveStatus = document.getElementById("save-status");
+
+  if (!notepad) return;
+
+  // -------------------------------
+  // Load saved content
+  // -------------------------------
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) notepad.value = saved;
+
+  // -------------------------------
+  // Restore cursor position
+  // -------------------------------
+  const savedCursor = localStorage.getItem(CURSOR_KEY);
+  if (savedCursor !== null) {
+    const pos = Math.min(parseInt(savedCursor, 10), notepad.value.length);
+    notepad.selectionStart = notepad.selectionEnd = pos;
+  }
+
+  // -------------------------------
+  // Format saved timestamp
+  // -------------------------------
+  function formatSavedTime(date) {
+    const now = new Date();
+    const sameDay = date.toDateString() === now.toDateString();
+
+    const yesterday = new Date();
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday = date.toDateString() === yesterday.toDateString();
+
+    const time = date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+
+    if (sameDay) return `Saved today at ${time}`;
+    if (isYesterday) return `Saved yesterday at ${time}`;
+
+    const datePart = date.toLocaleDateString([], { month: "short", day: "numeric" });
+    return `Saved ${datePart} at ${time}`;
+  }
+
+  const lastSaved = localStorage.getItem(TIME_KEY);
+  if (lastSaved && saveStatus) {
+    saveStatus.innerText = formatSavedTime(new Date(lastSaved));
+  }
+
+  // -------------------------------
+  // Word & character counters
+  // -------------------------------
+  function updateCount() {
+    const text = notepad.value.trim();
+    const words = text === "" ? 0 : text.split(/\s+/).length;
+    const chars = text.length;
+
+    if (wordCount) wordCount.innerText = words;
+    if (charCount) charCount.innerText = chars;
+  }
+
+  // -------------------------------
+  // Auto-grow
+  // -------------------------------
+  function autogrow() {
+    notepad.style.height = 'auto';
+    const minHeight = window.innerHeight * 0.8;
+    notepad.style.height = Math.max(notepad.scrollHeight, minHeight) + 'px';
+  }
+
+  // -------------------------------
+  // Plain-text paste
+  // -------------------------------
+  notepad.addEventListener("paste", function (e) {
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData("text/plain");
+    const start = notepad.selectionStart;
+    const end = notepad.selectionEnd;
+    notepad.value = notepad.value.slice(0, start) + text + notepad.value.slice(end);
+    notepad.selectionStart = notepad.selectionEnd = start + text.length;
+    updateCount();
+    autogrow();
+  });
+
+  // -------------------------------
+  // Tab key support
+  // -------------------------------
+  notepad.addEventListener("keydown", function (e) {
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const start = notepad.selectionStart;
+      const end = notepad.selectionEnd;
+
+      // Insert 4 spaces at the cursor position
+      const tabSpaces = "    ";
+      notepad.value = notepad.value.slice(0, start) + tabSpaces + notepad.value.slice(end);
+      notepad.selectionStart = notepad.selectionEnd = start + tabSpaces.length;
+
+      // Trigger updateCount and autogrow just like input
+      updateCount();
+      autogrow();
+    }
+  });
+
+  // -------------------------------
+  // Auto-save
+  // -------------------------------
+  notepad.addEventListener("input", function () {
+    updateCount();
+    autogrow();
+    if (saveStatus) saveStatus.innerText = "Saving...";
+
+    localStorage.setItem(STORAGE_KEY, notepad.value);
+
+    const now = new Date();
+    localStorage.setItem(TIME_KEY, now.toISOString());
+    localStorage.setItem(CURSOR_KEY, notepad.selectionStart);
+
+    if (saveStatus) {
+      setTimeout(() => { saveStatus.innerText = formatSavedTime(now); }, 500);
+    }
+  });
+
+  // -------------------------------
+  // Initial setup
+  // -------------------------------
+  updateCount();
+  autogrow();
+  notepad.focus();
+
+  // -------------------------------
+  // Buttons
+  // -------------------------------
+  document.getElementById("copy-btn")?.addEventListener("click", function (e) {
+    e.preventDefault();
+    navigator.clipboard.writeText(notepad.value);
+    const btn = document.getElementById("copy-btn");
+    const original = btn.textContent;
+    btn.textContent = "Copied!";
+    setTimeout(() => { btn.textContent = original; }, 1500);
+    notepad.focus();
+  });
+
+  const clearBtn = document.getElementById("clear-btn");
+  if (clearBtn) {
+    clearBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      if (!confirm("Are you sure you want to clear everything?")) return;
+      notepad.value = "";
+      localStorage.removeItem(STORAGE_KEY);
+      if (wordCount) wordCount.innerText = 0;
+      if (charCount) charCount.innerText = 0;
+      autogrow();
+      notepad.focus();
+    });
+  }
+
+  function downloadTXT() {
+    const blob = new Blob([notepad.value], { type: "text/plain" });
+    const link = document.createElement("a");
+    const firstLine = notepad.value.split("\n")[0].trim();
+    link.download = (firstLine ? firstLine.substring(0, 30) : "note") + ".txt";
+    link.href = URL.createObjectURL(blob);
+    link.click();
+    notepad.focus();
+  }
+
+  document.getElementById("download-txt")?.addEventListener("click", function (e) {
+    e.preventDefault();
+    downloadTXT();
+  });
+
+  document.getElementById("download-pdf")?.addEventListener("click", function (e) {
+    e.preventDefault();
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' });
+
+    const margin = 72;
+    const topMargin = 80;
+    const bottomMargin = 80;
+    const lineHeight = 16;
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const usableWidth = pageWidth - margin * 2;
+
+    pdf.setFont("helvetica");
+    pdf.setFontSize(11.6);
+
+    const wrappedText = pdf.splitTextToSize(notepad.value, usableWidth);
+    let y = topMargin;
+    wrappedText.forEach(line => {
+      if (y + lineHeight > pageHeight - bottomMargin) {
+        pdf.addPage();
+        y = topMargin;
+      }
+      pdf.text(margin, y, line);
+      y += lineHeight;
+    });
+
+    pdf.save("note.pdf");
+    notepad.focus();
+  });
+
+  // -------------------------------
+  // Ctrl/Cmd + S shortcut
+  // -------------------------------
+  document.addEventListener("keydown", function (e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+      e.preventDefault();
+      downloadTXT();
+    }
+  });
+}
+
+function initTextCaseConverter() {
+
+  const input = document.getElementById("text-input");
+  const output = document.getElementById("text-output");
+
+  const upperBtn = document.getElementById("uppercase-btn");
+  const lowerBtn = document.getElementById("lowercase-btn");
+  const capitalizeBtn = document.getElementById("capitalize-btn");
+  const sentenceBtn = document.getElementById("sentencecase-btn");
+  const alternateBtn = document.getElementById("alternate-btn");
+  const spacesBtn = document.getElementById("spaces-btn");
+
+  const copyBtn = document.getElementById("copy-result");
+  const clearBtn = document.getElementById("clear-btn");
+
+  if (!input || !output) return;
+
+  let currentMode = null;
+
+  function updateOutput(text) {
+    output.textContent = text;
+  }
+
+  function getInput() {
+    return input.value || "";
+  }
+
+  // -------------------------
+  // Conversions
+  // -------------------------
+  function toUpper(text) {
+    return text.replace(/[a-z]/g, c => c.toUpperCase());
+  }
+
+  function toLower(text) {
+    return text.replace(/[A-Z]/g, c => c.toLowerCase());
+  }
+
+  function capitalizeWords(text) {
+    return text.replace(/\b[a-zA-Z][a-zA-Z']*/g, word => word[0].toUpperCase() + word.slice(1)
+    );
+  }
+
+  function sentenceCase(text) {
+    let result = "";
+    let capitalizeNext = true;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (capitalizeNext && /[a-zA-Z]/.test(char)) {
+        result += char.toUpperCase();
+        capitalizeNext = false;
+      } else {
+        result += char;
+      }
+      if (/[.!?]/.test(char)) capitalizeNext = true;
+    }
+    return result;
+  }
+
+  function alternatingCase(text) {
+    let result = "";
+    let useUpper = false;
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (/[a-zA-Z]/.test(char)) {
+        result += useUpper ? char.toUpperCase() : char.toLowerCase();
+        useUpper = !useUpper;
+      } else {
+        result += char;
+      }
+    }
+    return result;
+  }
+
+  function trimSpaces(text) {
+    return text.replace(/\s+/g, " ").trim();
+  }
+
+  // -------------------------
+  // Apply Mode
+  // -------------------------
+  function applyMode() {
+    if (!currentMode) return;
+
+    const text = getInput();
+    let result = text;
+
+    switch (currentMode) {
+      case "upper": result = toUpper(text); break;
+      case "lower": result = toLower(text); break;
+      case "capitalize": result = capitalizeWords(text); break;
+      case "sentence": result = sentenceCase(text); break;
+      case "alternate": result = alternatingCase(text); break;
+      case "spaces": result = trimSpaces(text); break;
+    }
+
+    updateOutput(result);
+  }
+
+  // -------------------------
+  // Button Events
+  // -------------------------
+  upperBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "upper"; applyMode(); });
+  lowerBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "lower"; applyMode(); });
+  capitalizeBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "capitalize"; applyMode(); });
+  sentenceBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "sentence"; applyMode(); });
+  alternateBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "alternate"; applyMode(); });
+  spacesBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "spaces"; applyMode(); });
+
+  input.addEventListener("input", applyMode);
+
+  // -------------------------
+  // Copy Result
+  // -------------------------
+  copyBtn?.addEventListener("click", function (e) {
+    e.preventDefault();
+    const value = output.textContent;
+    if (!value) return;
+
+    navigator.clipboard.writeText(value);
+
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = "Copied!";
+
+    setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
+  });
+
+  // -------------------------
+  // Clear
+  // -------------------------
+  clearBtn?.addEventListener("click", function (e) {
+    e.preventDefault();
+    input.value = "";
+    output.textContent = "";
+    currentMode = null;
+    input.focus();
+  });
+
+  input.focus();
+
+}
+
+
+function initTextSorter() {
+  const input = document.getElementById("ts-input");
+  const output = document.getElementById("ts-output");
+  const removeEmpty = document.getElementById("ts-remove-empty");
+  const removeDup = document.getElementById("ts-remove-dup");
+  const azBtn = document.getElementById("ts-az");
+  const zaBtn = document.getElementById("ts-za");
+  const sortBtn = document.getElementById("ts-sort");
+  const copyBtn = document.getElementById("ts-copy");
+  const clearBtn = document.getElementById("ts-clear");
+
+  if (!input) return;
+
+  // Auto-focus
+  input.focus();
+
+  let sortDirection = "asc";
+
+  // -------------------------------
+  // Sort Direction Buttons
+  // -------------------------------
+  azBtn.classList.add("active");
+
+  azBtn.addEventListener("click", () => {
+    sortDirection = "asc";
+    azBtn.classList.add("active");
+    zaBtn.classList.remove("active");
+  });
+
+  zaBtn.addEventListener("click", () => {
+    sortDirection = "desc";
+    zaBtn.classList.add("active");
+    azBtn.classList.remove("active");
+  });
+
+  // -------------------------------
+  // Sort
+  // -------------------------------
+  sortBtn.addEventListener("click", () => {
+    let lines = input.value.split("\n");
+
+    if (removeEmpty.checked) {
+      lines = lines.filter(line => line.trim() !== "");
+    }
+
+    if (removeDup.checked) {
+      lines = [...new Set(lines)];
+    }
+
+    // Sort alphabetically while keeping empty lines at the bottom
+    lines.sort((a, b) => {
+      const aEmpty = a.trim() === "";
+      const bEmpty = b.trim() === "";
+
+      if (aEmpty && !bEmpty) return 1;
+      if (!aEmpty && bEmpty) return -1;
+
+      return a.localeCompare(b);
+    });
+
+    if (sortDirection === "desc") {
+      lines.reverse();
+    }
+
+    output.textContent = lines.join("\n");
+  });
+
+  // -------------------------------
+  // Copy
+  // -------------------------------
+  copyBtn.addEventListener("click", () => {
+    const text = output.textContent.trim();
+
+    if (!text) return;
+
+    navigator.clipboard.writeText(text);
+
+    const originalText = copyBtn.textContent;
+    copyBtn.textContent = "Copied!";
+
+    setTimeout(() => {
+      copyBtn.textContent = originalText;
+    }, 1500);
+  });
+
+  // -------------------------------
+  // Clear
+  // -------------------------------
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    output.textContent = "";
+    removeEmpty.checked = false;
+    removeDup.checked = false;
+
+    sortDirection = "asc";
+    azBtn.classList.add("active");
+    zaBtn.classList.remove("active");
+
+    input.focus();
+  });
+
+}
+
+
+function initWordCharCounter() {
+
+  const textInput = document.getElementById("text-input");
+  const wordCount = document.getElementById("word-count");
+  const charCount = document.getElementById("char-count");
+  const charNoSpaces = document.getElementById("char-no-spaces");
+  const readingTime = document.getElementById("reading-time");
+  const clearButton = document.getElementById("clear-text");
+  const copyButton = document.getElementById("copy-text");
+
+  if (!textInput) return;
+
+  let timeout;
+
+  // -------------------------------
+  // Update word, character, reading time counts
+  // -------------------------------
+  function updateCounts() {
+    const text = textInput.value;
+
+    const characters = text.length;
+    const charactersNoSpaces = text.replace(/\s/g, "").length;
+
+    const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+    const wordTotal = text.trim() === "" ? 0 : words.length;
+
+    const readTime = wordTotal === 0 ? 0 : Math.max(1, Math.ceil(wordTotal / 200));
+
+    wordCount.textContent = wordTotal;
+    charCount.textContent = characters;
+    charNoSpaces.textContent = charactersNoSpaces;
+    readingTime.textContent = readTime === 0 ? 0 : readTime + " min";
+  }
+
+  // -------------------------------
+  // Debounce for smooth typing
+  // -------------------------------
+  function debounceUpdate() {
+    clearTimeout(timeout);
+    timeout = setTimeout(updateCounts, 40);
+  }
+
+  textInput.addEventListener("input", debounceUpdate);
+
+  textInput.addEventListener("paste", function () {
+    setTimeout(updateCounts, 0);
+  });
+
+  // -------------------------------
+  // Copy Text
+  // -------------------------------
+  copyButton.addEventListener("click", function () {
+
+    if (!textInput.value.trim()) return;
+
+    navigator.clipboard.writeText(textInput.value);
+
+    const originalText = copyButton.textContent;
+    copyButton.textContent = "Copied!";
+
+    setTimeout(() => {
+      copyButton.textContent = originalText;
+    }, 1500);
+
+  });
+
+  // -------------------------------
+  // Clear
+  // -------------------------------
+  clearButton.addEventListener("click", function () {
+    textInput.value = "";
+    updateCounts();
+    textInput.focus();
+  });
+
+  textInput.focus();
+
+}
+
+
+function initAgeCalculator() {
+
+  const wrapper = document.getElementById("age-calculator");
+
+  if (!wrapper) return;
+
+  const birthDateInput = document.getElementById("birth-date");
+
+  const calculateBtn = document.getElementById("age-calculate");
+  const copyBtn = document.getElementById("age-copy");
+  const clearBtn = document.getElementById("age-clear");
+
+  const result = document.getElementById("age-result");
+
+  // -------------------------------
+  // Calculate Age
+  // -------------------------------
+  function calculateAge() {
+
+    const birthDateValue = birthDateInput.value;
+
+    if (!birthDateValue) {
+
+      result.textContent = "0 Years";
+      result.dataset.copyValue = "";
+
+      return;
+
+    }
+
+    const birthDate = new Date(birthDateValue);
+    const today = new Date();
+
+    let years = today.getFullYear() -
+      birthDate.getFullYear();
+
+    let months = today.getMonth() -
+      birthDate.getMonth();
+
+    let days = today.getDate() -
+      birthDate.getDate();
+
+    // -------------------------------
+    // Borrow Days
+    // -------------------------------
+    if (days < 0) {
+
+      const previousMonth = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        0
+      );
+
+      days += previousMonth.getDate();
+      months--;
+
+    }
+
+    // -------------------------------
+    // Borrow Months
+    // -------------------------------
+    if (months < 0) {
+
+      months += 12;
+      years--;
+
+    }
+
+    // -------------------------------
+    // Build Display Text
+    // -------------------------------
+    const parts = [];
+
+    if (years > 0) {
+      parts.push(
+        `${years} Year${years === 1 ? "" : "s"}`
+      );
+    }
+
+    if (months > 0) {
+      parts.push(
+        `${months} Month${months === 1 ? "" : "s"}`
+      );
+    }
+
+    if (days > 0) {
+      parts.push(
+        `${days} Day${days === 1 ? "" : "s"}`
+      );
+    }
+
+    // If age is exactly zero
+    if (parts.length === 0) {
+      parts.push("0 Years");
+    }
+
+    const displayText = parts.join(", ");
+
+    result.textContent = displayText;
+    result.dataset.copyValue = displayText;
+
+  }
+
+  // -------------------------------
+  // Calculate Button
+  // -------------------------------
+  calculateBtn.addEventListener(
+    "click",
+    calculateAge
+  );
+
+  // -------------------------------
+  // Enter Key
+  // -------------------------------
+  birthDateInput.addEventListener(
+    "keydown",
+    (e) => {
+
+      if (e.key === "Enter") {
+
+        e.preventDefault();
+        calculateAge();
+
+      }
+
+    }
+  );
+
+  // -------------------------------
+  // Copy
+  // -------------------------------
+  copyBtn.addEventListener(
+    "click",
+    async () => {
+
+      const valueToCopy = result.dataset.copyValue;
+
+      if (!valueToCopy) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          valueToCopy
+        );
+
+        const originalText = copyBtn.textContent;
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalText;
+
+        }, 1500);
+
+      } catch (err) {
+
+        console.error(
+          "Copy failed:",
+          err
+        );
+
+      }
+
+    }
+  );
+
+  // -------------------------------
+  // Clear
+  // -------------------------------
+  clearBtn.addEventListener(
+    "click",
+    () => {
+
+      birthDateInput.value = "";
+
+      result.textContent =
+        "0 Years";
+
+      result.dataset.copyValue = "";
+
+      birthDateInput.focus();
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  result.textContent = "-";
+  result.dataset.copyValue = "";
+
+  birthDateInput.focus();
+
+}
+
+
 function initCountdownTimer() {
   
   const display = document.getElementById("timer-display");
@@ -1902,1396 +4076,6 @@ function initDateCalculator() {
 }
 
 
-function initDuplicateLineRemover() {
-  
-  const input = document.getElementById("dlr-input");
-  const output = document.getElementById("dlr-output");
-
-  const removeBtn = document.getElementById("dlr-remove");
-  const copyBtn = document.getElementById("dlr-copy");
-  const clearBtn = document.getElementById("dlr-clear");
-
-  if (!input || !output || !removeBtn || !copyBtn || !clearBtn) return;
-
-  function removeDuplicates() {
-    const lines = input.value.split("\n");
-    const uniqueLines = [...new Set(lines)];
-
-    output.textContent = uniqueLines.join("\n");
-  }
-
-  removeBtn.addEventListener("click", removeDuplicates);
-
-  copyBtn.addEventListener("click", async () => {
-    if (!output.textContent) return;
-
-    await navigator.clipboard.writeText(output.textContent);
-
-    const originalText = copyBtn.textContent;
-    copyBtn.textContent = "Copied!";
-
-    setTimeout(() => {
-      copyBtn.textContent = originalText;
-    }, 1500);
-  });
-
-  clearBtn.addEventListener("click", () => {
-    input.value = "";
-    output.textContent = "";
-    input.focus();
-  });
-
-  input.focus();
-
-}
-
-
-function initJsonFormatter() {
-
-  const input = document.getElementById("paste-json");
-  const output = document.getElementById("output-json");
-
-  const formatBtn = document.getElementById("format-json");
-  const clearBtn = document.getElementById("clear-json");
-  const downloadBtn = document.getElementById("download-json");
-  const copyBtn = document.getElementById("copy-json");
-
-  if (!input || !output) return;
-
-  // -------------------------
-  // Helpers
-  // -------------------------
-  function updateOutput(text) {
-    output.textContent = text;
-  }
-
-  function getInput() {
-    return input.value || "";
-  }
-
-  // -------------------------
-  // Format JSON
-  // -------------------------
-  function formatJSON(e) {
-    if (e) e.preventDefault();
-
-    const raw = getInput().trim();
-
-    if (!raw) {
-      updateOutput("");
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(raw);
-      const formatted = JSON.stringify(parsed, null, 2);
-
-      updateOutput(formatted);
-
-    } catch (error) {
-      updateOutput("Invalid JSON");
-    }
-  }
-
-  // -------------------------
-  // Copy Result (Nogstack Standard)
-  // -------------------------
-  function copyJSON(e) {
-    e.preventDefault();
-
-    const value = output.textContent;
-
-    if (!value) return;
-
-    navigator.clipboard.writeText(value);
-
-    const originalText = copyBtn.textContent;
-
-    copyBtn.textContent = "Copied!";
-
-    setTimeout(() => {
-      copyBtn.textContent = originalText;
-    }, 1500);
-  }
-
-  // -------------------------
-  // Download JSON
-  // -------------------------
-  function downloadJSON(e) {
-    e.preventDefault();
-
-    const text = output.textContent;
-
-    if (!text) return;
-
-    const blob = new Blob([text], {
-      type: "application/json"
-    });
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "formatted.json";
-
-    document.body.appendChild(a);
-    a.click();
-
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
-
-  // -------------------------
-  // Clear
-  // -------------------------
-  function clearJSON(e) {
-    e.preventDefault();
-
-    input.value = "";
-    updateOutput("");
-
-    input.focus();
-  }
-
-  // -------------------------
-  // Keyboard Shortcut
-  // -------------------------
-  input.addEventListener("keydown", function (e) {
-    if (e.ctrlKey && e.key === "Enter") {
-      e.preventDefault();
-      formatJSON();
-    }
-  });
-
-  // -------------------------
-  // Button Events
-  // -------------------------
-  formatBtn?.addEventListener("click", formatJSON);
-  clearBtn?.addEventListener("click", clearJSON);
-  copyBtn?.addEventListener("click", copyJSON);
-  downloadBtn?.addEventListener("click", downloadJSON);
-
-  // -------------------------
-  // Auto-focus
-  // -------------------------
-  input.focus();
-
-}
-
-
-function initLoremGenerator() {
-
-  const paragraphsRadio = document.getElementById("type-paragraphs");
-  const sentencesRadio = document.getElementById("type-sentences");
-  const wordsRadio = document.getElementById("type-words");
-
-  const amountInput = document.getElementById("lorem-amount");
-  const startCheckbox = document.getElementById("lorem-start");
-  const startWrap = document.getElementById("lorem-start-wrap");
-
-  const generateBtn = document.getElementById("lorem-generate");
-  const copyBtn = document.getElementById("lorem-copy");
-  const clearBtn = document.getElementById("lorem-clear");
-
-  const output = document.getElementById("lorem-output");
-
-  if (!amountInput || !output) return;
-
-  // -------------------------
-  // Base Lorem Word Bank
-  // -------------------------
-  const loremWords = ("lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua").split(" ");
-
-  // -------------------------
-  // Helpers
-  // -------------------------
-  function getType() {
-    if (paragraphsRadio?.checked) return "paragraphs";
-    if (sentencesRadio?.checked) return "sentences";
-    if (wordsRadio?.checked) return "words";
-    return "paragraphs";
-  }
-
-  function getAmount() {
-    let val = parseInt(amountInput.value, 10);
-    if (isNaN(val)) return null;
-    // Clamp to allowed range
-    val = Math.max(1, Math.min(100, val));
-    return val;
-  }
-
-  function randomWord() {
-    return loremWords[Math.floor(Math.random() * loremWords.length)];
-  }
-
-  function generateWords(count) {
-    let words = [];
-    for (let i = 0; i < count; i++) {
-      words.push(randomWord());
-    }
-    return words.join(" ");
-  }
-
-  function generateSentence() {
-    let length = Math.floor(Math.random() * 8) + 8;
-    let sentence = generateWords(length);
-    return sentence.charAt(0).toUpperCase() + sentence.slice(1) + ".";
-  }
-
-  function generateParagraph() {
-    let sentenceCount = Math.floor(Math.random() * 3) + 3;
-    let sentences = [];
-    for (let i = 0; i < sentenceCount; i++) {
-      sentences.push(generateSentence());
-    }
-    return sentences.join(" ");
-  }
-
-  // -------------------------
-  // Start Toggle Logic
-  // -------------------------
-  function updateStartToggle() {
-    if (!startCheckbox || !startWrap) return;
-
-    if (getType() === "paragraphs") {
-      startCheckbox.disabled = false;
-      startWrap.classList.remove("disabled");
-    } else {
-      startCheckbox.checked = false;
-      startCheckbox.disabled = true;
-      startWrap.classList.add("disabled");
-    }
-
-    amountInput.focus();
-
-  }
-
-  // -------------------------
-  // Generate
-  // -------------------------
-  function generate() {
-    const type = getType();
-    const amount = getAmount();
-
-    if (!amount) {
-      output.innerHTML = "";
-      return;
-    }
-
-    const startWithLorem = startCheckbox?.checked;
-    let result = "";
-
-    if (type === "words") result = generateWords(amount);
-
-    if (type === "sentences") {
-      let arr = [];
-      for (let i = 0; i < amount; i++) arr.push(generateSentence());
-      result = arr.join(" ");
-    }
-
-    if (type === "paragraphs") {
-      let arr = [];
-      for (let i = 0; i < amount; i++) arr.push(generateParagraph());
-      result = arr.join("<br><br>");
-    }
-
-    if (startWithLorem && type === "paragraphs" && result.length > 0) {
-      const base = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
-      let parts = result.split("<br><br>");
-      parts[0] = base + " " + parts[0];
-      result = parts.join("<br><br>");
-    }
-
-    output.innerHTML = result;
-  }
-
-  // -------------------------
-  // Real-time input clamping
-  // -------------------------
-  amountInput.addEventListener("input", () => {
-    let val = parseInt(amountInput.value, 10);
-    if (isNaN(val)) return;
-    if (val < 1) amountInput.value = 1;
-    if (val > 100) amountInput.value = 100;
-  });
-
-  // -------------------------
-  // Events
-  // -------------------------
-  generateBtn?.addEventListener("click", function (e) {
-    e.preventDefault();
-    generate();
-  });
-
-  paragraphsRadio?.addEventListener("change", updateStartToggle);
-  sentencesRadio?.addEventListener("change", updateStartToggle);
-  wordsRadio?.addEventListener("change", updateStartToggle);
-
-  // -------------------------
-  // Copy
-  // -------------------------
-  copyBtn?.addEventListener("click", function (e) {
-    e.preventDefault();
-    const value = output.innerText;
-    if (!value) return;
-
-    navigator.clipboard.writeText(value);
-
-    const originalText = copyBtn.textContent;
-    copyBtn.textContent = "Copied!";
-
-    setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
-  });
-
-  // -------------------------
-  // Clear
-  // -------------------------
-  clearBtn?.addEventListener("click", function (e) {
-    e.preventDefault();
-
-    amountInput.value = "";
-    output.innerHTML = "";
-
-    if (startCheckbox) startCheckbox.checked = false;
-
-    updateStartToggle();
-
-    amountInput.focus();
-  });
-
-  // -------------------------
-  // Init State
-  // -------------------------
-  output.innerHTML = "";
-  amountInput.value = "";
-
-  if (paragraphsRadio) paragraphsRadio.checked = true;
-  if (sentencesRadio) sentencesRadio.checked = false;
-  if (wordsRadio) wordsRadio.checked = false;
-
-  if (startCheckbox) startCheckbox.checked = false;
-
-  updateStartToggle();
-
-  amountInput.focus();
-
-}
-
-
-function initNotepad() {
-
-  const notepad = document.getElementById("notepad");
-  const wordCount = document.getElementById("word-count");
-  const charCount = document.getElementById("char-count");
-  const STORAGE_KEY = "notepad-content";
-  const TIME_KEY = "notepad-last-saved";
-  const CURSOR_KEY = "notepad-cursor";
-  const saveStatus = document.getElementById("save-status");
-
-  if (!notepad) return;
-
-  // -------------------------------
-  // Load saved content
-  // -------------------------------
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved) notepad.value = saved;
-
-  // -------------------------------
-  // Restore cursor position
-  // -------------------------------
-  const savedCursor = localStorage.getItem(CURSOR_KEY);
-  if (savedCursor !== null) {
-    const pos = Math.min(parseInt(savedCursor, 10), notepad.value.length);
-    notepad.selectionStart = notepad.selectionEnd = pos;
-  }
-
-  // -------------------------------
-  // Format saved timestamp
-  // -------------------------------
-  function formatSavedTime(date) {
-    const now = new Date();
-    const sameDay = date.toDateString() === now.toDateString();
-
-    const yesterday = new Date();
-    yesterday.setDate(now.getDate() - 1);
-    const isYesterday = date.toDateString() === yesterday.toDateString();
-
-    const time = date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-
-    if (sameDay) return `Saved today at ${time}`;
-    if (isYesterday) return `Saved yesterday at ${time}`;
-
-    const datePart = date.toLocaleDateString([], { month: "short", day: "numeric" });
-    return `Saved ${datePart} at ${time}`;
-  }
-
-  const lastSaved = localStorage.getItem(TIME_KEY);
-  if (lastSaved && saveStatus) {
-    saveStatus.innerText = formatSavedTime(new Date(lastSaved));
-  }
-
-  // -------------------------------
-  // Word & character counters
-  // -------------------------------
-  function updateCount() {
-    const text = notepad.value.trim();
-    const words = text === "" ? 0 : text.split(/\s+/).length;
-    const chars = text.length;
-
-    if (wordCount) wordCount.innerText = words;
-    if (charCount) charCount.innerText = chars;
-  }
-
-  // -------------------------------
-  // Auto-grow
-  // -------------------------------
-  function autogrow() {
-    notepad.style.height = 'auto';
-    const minHeight = window.innerHeight * 0.8;
-    notepad.style.height = Math.max(notepad.scrollHeight, minHeight) + 'px';
-  }
-
-  // -------------------------------
-  // Plain-text paste
-  // -------------------------------
-  notepad.addEventListener("paste", function (e) {
-    e.preventDefault();
-    const text = (e.clipboardData || window.clipboardData).getData("text/plain");
-    const start = notepad.selectionStart;
-    const end = notepad.selectionEnd;
-    notepad.value = notepad.value.slice(0, start) + text + notepad.value.slice(end);
-    notepad.selectionStart = notepad.selectionEnd = start + text.length;
-    updateCount();
-    autogrow();
-  });
-
-  // -------------------------------
-  // Tab key support
-  // -------------------------------
-  notepad.addEventListener("keydown", function (e) {
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const start = notepad.selectionStart;
-      const end = notepad.selectionEnd;
-
-      // Insert 4 spaces at the cursor position
-      const tabSpaces = "    ";
-      notepad.value = notepad.value.slice(0, start) + tabSpaces + notepad.value.slice(end);
-      notepad.selectionStart = notepad.selectionEnd = start + tabSpaces.length;
-
-      // Trigger updateCount and autogrow just like input
-      updateCount();
-      autogrow();
-    }
-  });
-
-  // -------------------------------
-  // Auto-save
-  // -------------------------------
-  notepad.addEventListener("input", function () {
-    updateCount();
-    autogrow();
-    if (saveStatus) saveStatus.innerText = "Saving...";
-
-    localStorage.setItem(STORAGE_KEY, notepad.value);
-
-    const now = new Date();
-    localStorage.setItem(TIME_KEY, now.toISOString());
-    localStorage.setItem(CURSOR_KEY, notepad.selectionStart);
-
-    if (saveStatus) {
-      setTimeout(() => { saveStatus.innerText = formatSavedTime(now); }, 500);
-    }
-  });
-
-  // -------------------------------
-  // Initial setup
-  // -------------------------------
-  updateCount();
-  autogrow();
-  notepad.focus();
-
-  // -------------------------------
-  // Buttons
-  // -------------------------------
-  document.getElementById("copy-btn")?.addEventListener("click", function (e) {
-    e.preventDefault();
-    navigator.clipboard.writeText(notepad.value);
-    const btn = document.getElementById("copy-btn");
-    const original = btn.textContent;
-    btn.textContent = "Copied!";
-    setTimeout(() => { btn.textContent = original; }, 1500);
-    notepad.focus();
-  });
-
-  const clearBtn = document.getElementById("clear-btn");
-  if (clearBtn) {
-    clearBtn.addEventListener("click", function (e) {
-      e.preventDefault();
-      if (!confirm("Are you sure you want to clear everything?")) return;
-      notepad.value = "";
-      localStorage.removeItem(STORAGE_KEY);
-      if (wordCount) wordCount.innerText = 0;
-      if (charCount) charCount.innerText = 0;
-      autogrow();
-      notepad.focus();
-    });
-  }
-
-  function downloadTXT() {
-    const blob = new Blob([notepad.value], { type: "text/plain" });
-    const link = document.createElement("a");
-    const firstLine = notepad.value.split("\n")[0].trim();
-    link.download = (firstLine ? firstLine.substring(0, 30) : "note") + ".txt";
-    link.href = URL.createObjectURL(blob);
-    link.click();
-    notepad.focus();
-  }
-
-  document.getElementById("download-txt")?.addEventListener("click", function (e) {
-    e.preventDefault();
-    downloadTXT();
-  });
-
-  document.getElementById("download-pdf")?.addEventListener("click", function (e) {
-    e.preventDefault();
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ unit: 'pt', format: 'a4', orientation: 'portrait' });
-
-    const margin = 72;
-    const topMargin = 80;
-    const bottomMargin = 80;
-    const lineHeight = 16;
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const usableWidth = pageWidth - margin * 2;
-
-    pdf.setFont("helvetica");
-    pdf.setFontSize(11.6);
-
-    const wrappedText = pdf.splitTextToSize(notepad.value, usableWidth);
-    let y = topMargin;
-    wrappedText.forEach(line => {
-      if (y + lineHeight > pageHeight - bottomMargin) {
-        pdf.addPage();
-        y = topMargin;
-      }
-      pdf.text(margin, y, line);
-      y += lineHeight;
-    });
-
-    pdf.save("note.pdf");
-    notepad.focus();
-  });
-
-  // -------------------------------
-  // Ctrl/Cmd + S shortcut
-  // -------------------------------
-  document.addEventListener("keydown", function (e) {
-    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
-      e.preventDefault();
-      downloadTXT();
-    }
-  });
-}
-
-function initPasswordGenerator() {
-
-  const output = document.getElementById("password-output");
-  const regenerateBtn = document.getElementById("regenerate-password-btn");
-  const copyBtn = document.getElementById("copy-password-btn");
-  const clearBtn = document.getElementById("clear-password-generator");
-
-  const lengthInput = document.getElementById("password-length-input");
-
-  const uppercaseCheckbox = document.getElementById("include-uppercase-checkbox");
-  const lowercaseCheckbox = document.getElementById("include-lowercase-checkbox");
-  const numbersCheckbox = document.getElementById("include-numbers-checkbox");
-  const symbolsCheckbox = document.getElementById("include-symbols-checkbox");
-
-  const minNumbersInput = document.getElementById("min-numbers-input");
-  const minSymbolsInput = document.getElementById("min-symbols-input");
-
-  const strengthText = document.getElementById("password-strength-text");
-
-  if (!output) return;
-
-  // Character sets
-  const UPPERCASE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const LOWERCASE = "abcdefghijklmnopqrstuvwxyz";
-  const NUMBERS = "0123456789";
-  const SYMBOLS = "!@#$%^&*";
-
-  // Utilities
-  function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-  }
-
-  function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
-  }
-
-  function ensureAtLeastOneChecked(changedBox) {
-    const boxes = [
-      uppercaseCheckbox,
-      lowercaseCheckbox,
-      numbersCheckbox,
-      symbolsCheckbox
-    ];
-
-    const anyChecked = boxes.some(box => box.checked);
-
-    if (!anyChecked) {
-      changedBox.checked = true;
-    }
-  }
-
-  function updateStrength(length, typesCount) {
-
-    let strength = "Weak";
-    let className = "strength-weak";
-
-    if (length >= 12 && typesCount >= 2) {
-      strength = "Medium";
-      className = "strength-medium";
-    }
-
-    if (length >= 16 && typesCount >= 3) {
-      strength = "Strong";
-      className = "strength-strong";
-    }
-
-    if (length >= 24 && typesCount === 4) {
-      strength = "Very Strong";
-      className = "strength-very-strong";
-    }
-
-    if (!strengthText) return;
-
-    strengthText.textContent = "Strength: " + strength;
-
-    // Remove old strength classes
-    strengthText.classList.remove(
-      "strength-weak",
-      "strength-medium",
-      "strength-strong",
-      "strength-very-strong"
-    );
-
-    // Add the new one
-    strengthText.classList.add(className);
-
-  }
-
-  function generatePassword() {
-
-    let length = parseInt(lengthInput.value, 10);
-    let minNumbers = parseInt(minNumbersInput.value, 10);
-    let minSymbols = parseInt(minSymbolsInput.value, 10);
-
-    // Allow empty while typing
-    if (isNaN(length) || isNaN(minNumbers) || isNaN(minSymbols)) {
-      return;
-    }
-
-    // Clamp values
-    length = clamp(length, 1, 128);
-    minNumbers = clamp(minNumbers, 0, 5);
-    minSymbols = clamp(minSymbols, 0, 5);
-
-    // Normalize inputs
-    lengthInput.value = length;
-    minNumbersInput.value = minNumbers;
-    minSymbolsInput.value = minSymbols;
-
-    let charset = "";
-    let passwordArray = [];
-    let typesCount = 0;
-
-    if (uppercaseCheckbox.checked) {
-      charset += UPPERCASE;
-      typesCount++;
-    }
-
-    if (lowercaseCheckbox.checked) {
-      charset += LOWERCASE;
-      typesCount++;
-    }
-
-    if (numbersCheckbox.checked) {
-      charset += NUMBERS;
-      typesCount++;
-    }
-
-    if (symbolsCheckbox.checked) {
-      charset += SYMBOLS;
-      typesCount++;
-    }
-
-    if (!charset) return;
-
-    // Minimum numbers
-    if (numbersCheckbox.checked) {
-      for (let i = 0; i < minNumbers; i++) {
-        passwordArray.push(
-          NUMBERS[Math.floor(Math.random() * NUMBERS.length)]
-        );
-      }
-    }
-
-    // Minimum symbols
-    if (symbolsCheckbox.checked) {
-      for (let i = 0; i < minSymbols; i++) {
-        passwordArray.push(
-          SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]
-        );
-      }
-    }
-
-    // Fill remaining characters
-    while (passwordArray.length < length) {
-      passwordArray.push(
-        charset[Math.floor(Math.random() * charset.length)]
-      );
-    }
-
-    // Shuffle and trim
-    passwordArray = shuffle(passwordArray).slice(0, length);
-
-    const password = passwordArray.join("");
-
-    output.textContent = password;
-
-    updateStrength(length, typesCount);
-  }
-
-  // Copy logic
-  const originalCopyText = copyBtn?.textContent || "Copy Password";
-
-  function copyPassword() {
-
-    if (!output.textContent) return;
-
-    navigator.clipboard.writeText(output.textContent);
-
-    if (!copyBtn) return;
-
-    copyBtn.textContent = "Copied!";
-
-    setTimeout(() => {
-      copyBtn.textContent = originalCopyText;
-    }, 1500);
-  }
-
-  // Reset logic
-  function resetGenerator() {
-
-    if (lengthInput) lengthInput.value = 30;
-
-    if (uppercaseCheckbox) uppercaseCheckbox.checked = true;
-    if (lowercaseCheckbox) lowercaseCheckbox.checked = true;
-    if (numbersCheckbox) numbersCheckbox.checked = true;
-    if (symbolsCheckbox) symbolsCheckbox.checked = true;
-
-    if (minNumbersInput) minNumbersInput.value = 1;
-    if (minSymbolsInput) minSymbolsInput.value = 1;
-
-    generatePassword();
-  }
-
-  // Event listeners
-  regenerateBtn?.addEventListener("click", generatePassword);
-  copyBtn?.addEventListener("click", copyPassword);
-  clearBtn?.addEventListener("click", resetGenerator);
-
-  lengthInput?.addEventListener("input", generatePassword);
-  minNumbersInput?.addEventListener("input", generatePassword);
-  minSymbolsInput?.addEventListener("input", generatePassword);
-
-  uppercaseCheckbox?.addEventListener("change", function () {
-    ensureAtLeastOneChecked(this);
-    generatePassword();
-  });
-
-  lowercaseCheckbox?.addEventListener("change", function () {
-    ensureAtLeastOneChecked(this);
-    generatePassword();
-  });
-
-  numbersCheckbox?.addEventListener("change", function () {
-    ensureAtLeastOneChecked(this);
-    generatePassword();
-  });
-
-  symbolsCheckbox?.addEventListener("change", function () {
-    ensureAtLeastOneChecked(this);
-    generatePassword();
-  });
-
-  // Initial generation
-  generatePassword();
-
-}
-
-
-function initPercentageCalculator() {
-
-  const wrapper = document.getElementById("percentage-calculator");
-
-  if (!wrapper) return;
-
-  // -------------------------------
-  // Radio Modes
-  // -------------------------------
-  const percentOfMode = document.getElementById("percent-of-mode");
-
-  const percentTotalMode = document.getElementById("percent-total-mode");
-
-  const percentChangeMode = document.getElementById("percent-change-mode");
-
-  // -------------------------------
-  // Field Wrappers
-  // -------------------------------
-  const percentOfFields = document.getElementById("percent-of-fields");
-
-  const percentTotalFields = document.getElementById("percent-total-fields");
-
-  const percentChangeFields = document.getElementById("percent-change-fields");
-
-  // -------------------------------
-  // Inputs
-  // -------------------------------
-  const percentInput = document.getElementById("percent-input");
-
-  const numberInput = document.getElementById("number-input");
-
-  const valueInput = document.getElementById("value-input");
-
-  const totalInput = document.getElementById("total-input");
-
-  const originalInput = document.getElementById("original-input");
-
-  const newInput = document.getElementById("new-input");
-
-  // -------------------------------
-  // Controls
-  // -------------------------------
-  const calculateBtn = document.getElementById("percent-calculate");
-
-  const copyBtn = document.getElementById("percent-copy");
-
-  const clearBtn = document.getElementById("percent-clear");
-
-  // -------------------------------
-  // Outputs
-  // -------------------------------
-  const result = document.getElementById("percent-result");
-
-  const commentary = document.getElementById("result-commentary");
-
-  // -------------------------------
-  // Show Active Mode
-  // -------------------------------
-  function updateMode() {
-
-    percentOfFields.style.display =
-      percentOfMode.checked
-        ? "grid"
-        : "none";
-
-    percentTotalFields.style.display =
-      percentTotalMode.checked
-        ? "grid"
-        : "none";
-
-    percentChangeFields.style.display =
-      percentChangeMode.checked
-        ? "grid"
-        : "none";
-
-    commentary.style.color = "";
-
-    if (percentChangeMode.checked) {
-
-      commentary.textContent = "-";
-
-    } else {
-
-      commentary.textContent = "";
-
-    }
-
-    // Auto Focus
-    if (percentOfMode.checked) {
-
-      percentInput.focus();
-
-    } else if (percentTotalMode.checked) {
-
-      valueInput.focus();
-
-    } else if (percentChangeMode.checked) {
-
-      originalInput.focus();
-
-    }
-
-  }
-
-  percentOfMode?.addEventListener(
-    "change",
-    updateMode
-  );
-
-  percentTotalMode?.addEventListener(
-    "change",
-    updateMode
-  );
-
-  percentChangeMode?.addEventListener(
-    "change",
-    updateMode
-  );
-
-  // -------------------------------
-  // Calculate
-  // -------------------------------
-  function calculatePercentage() {
-
-    let output = "0";
-    let commentaryText = "";
-    let copyValue = "";
-
-    // -----------------------------
-    // Mode 1
-    // -----------------------------
-    if (percentOfMode.checked) {
-
-      const percent = parseFloat(percentInput.value);
-
-      const number = parseFloat(numberInput.value);
-
-      if (isNaN(percent) ||
-        isNaN(number)) {
-
-        result.textContent = "0";
-        commentary.textContent = "";
-        commentary.style.color = "";
-        result.dataset.copyValue = "";
-
-        return;
-
-      }
-
-      const calculated = (percent / 100) * number;
-
-      const rounded = Number.isInteger(calculated)
-        ? calculated
-        : parseFloat(
-          calculated.toFixed(2)
-        );
-
-      output =
-        rounded.toLocaleString();
-
-      copyValue =
-        rounded.toString();
-
-    }
-
-
-
-
-    // -----------------------------
-    // Mode 2
-    // -----------------------------
-    else if (percentTotalMode.checked) {
-
-      const value = parseFloat(valueInput.value);
-
-      const total = parseFloat(totalInput.value);
-
-      if (isNaN(value) ||
-        isNaN(total) ||
-        total === 0) {
-
-        result.textContent = "0";
-        commentary.textContent = "";
-        commentary.style.color = "";
-        result.dataset.copyValue = "";
-
-        return;
-
-      }
-
-      const calculated = (value / total) * 100;
-
-      const formatted = parseFloat(
-        calculated.toFixed(2)
-      );
-
-      output =
-        formatted + "%";
-
-      copyValue =
-        formatted.toString();
-
-    }
-
-
-
-
-    // -----------------------------
-    // Mode 3
-    // -----------------------------
-    else if (percentChangeMode.checked) {
-
-      const original = parseFloat(originalInput.value);
-
-      const newer = parseFloat(newInput.value);
-
-      if (isNaN(original) ||
-        isNaN(newer) ||
-        original === 0) {
-
-        result.textContent = "0";
-        commentary.textContent = "-";
-        commentary.style.color = "";
-        result.dataset.copyValue = "";
-
-        return;
-
-      }
-
-      const change = ((newer - original) / original) * 100;
-
-      const formatted = parseFloat(
-        Math.abs(change).toFixed(2)
-      );
-
-      output =
-        formatted + "%";
-
-      copyValue =
-        formatted.toString();
-
-      if (change > 0) {
-
-        commentaryText = "Increase";
-        commentary.style.color = "green";
-
-      } else if (change < 0) {
-
-        commentaryText = "Decrease";
-        commentary.style.color = "red";
-
-      } else {
-
-        commentaryText = "No Change";
-        commentary.style.color = "";
-
-      }
-
-    }
-
-    if (!percentChangeMode.checked) {
-
-      commentary.style.color = "";
-
-    }
-
-    result.textContent =
-      output;
-
-    commentary.textContent =
-      commentaryText;
-
-    result.dataset.copyValue =
-      copyValue;
-
-  }
-
-  calculateBtn?.addEventListener(
-    "click",
-    calculatePercentage
-  );
-
-  // -------------------------------
-  // Enter Key Calculates
-  // -------------------------------
-  [
-    percentInput,
-    numberInput,
-    valueInput,
-    totalInput,
-    originalInput,
-    newInput
-  ].forEach(input => {
-
-    if (!input) return;
-
-    input.addEventListener(
-      "keydown",
-      (e) => {
-
-        if (e.key === "Enter") {
-
-          e.preventDefault();
-          calculatePercentage();
-
-        }
-
-      }
-    );
-
-  });
-
-  // -------------------------------
-  // Copy
-  // -------------------------------
-  copyBtn?.addEventListener(
-    "click",
-    async () => {
-
-      const valueToCopy = result.dataset.copyValue;
-
-      if (!valueToCopy) return;
-
-      try {
-
-        await navigator.clipboard.writeText(
-          valueToCopy
-        );
-
-        const originalText = copyBtn.textContent;
-
-        copyBtn.textContent =
-          "Copied!";
-
-        setTimeout(() => {
-
-          copyBtn.textContent =
-            originalText;
-
-        }, 1500);
-
-      } catch (err) {
-
-        console.error(
-          "Copy failed:",
-          err
-        );
-
-      }
-
-    }
-  );
-
-  // -------------------------------
-  // Clear
-  // -------------------------------
-  clearBtn?.addEventListener(
-    "click",
-    () => {
-
-      percentInput.value = "";
-      numberInput.value = "";
-
-      valueInput.value = "";
-      totalInput.value = "";
-
-      originalInput.value = "";
-      newInput.value = "";
-
-      result.textContent = "0";
-
-      commentary.textContent =
-        percentChangeMode.checked
-          ? "-"
-          : "";
-
-      commentary.style.color = "";
-
-      result.dataset.copyValue = "";
-
-      if (percentOfMode.checked) {
-
-        percentInput.focus();
-
-      } else if (percentTotalMode.checked) {
-
-        valueInput.focus();
-
-      } else if (percentChangeMode.checked) {
-
-        originalInput.focus();
-
-      }
-
-    }
-  );
-
-  // -------------------------------
-  // Init
-  // -------------------------------
-  percentOfMode.checked = true;
-  percentTotalMode.checked = false;
-  percentChangeMode.checked = false;
-
-  updateMode();
-
-  result.textContent = "0";
-  commentary.textContent = "";
-  commentary.style.color = "";
-
-  result.dataset.copyValue = "";
-
-  percentInput.focus();
-
-}
-
-
-function initRandomNumberGenerator() {
-
-  const minInput = document.getElementById("min-number");
-  const maxInput = document.getElementById("max-number");
-  const generateBtn = document.getElementById("generate-btn");
-  const resultDisplay = document.getElementById("result-number");
-  const copyBtn = document.getElementById("copy-result");
-  const historyList = document.getElementById("history-list");
-  const clearBtn = document.getElementById("clear-btn");
-
-  if (!minInput || !maxInput || !generateBtn || !resultDisplay) return;
-
-  let lastGeneratedNumber = 0; // store last generated number for copy button
-
-
-  // Default values
-  if (minInput.value === "") minInput.value = 1;
-  if (maxInput.value === "") maxInput.value = 100;
-
-  // -------------------------------
-  // Enforce input digit limit
-  // -------------------------------
-  const maxDigits = 10; // supports numbers up to 1,000,000,000
-
-  [minInput, maxInput].forEach(input => {
-    input.addEventListener("input", () => {
-      if (input.value.length > maxDigits) {
-        input.value = input.value.slice(0, maxDigits);
-      }
-    });
-  });
-
-  // -------------------------------
-  // Generate number
-  // -------------------------------
-  function generateNumber() {
-    let min = parseInt(minInput.value, 10);
-    let max = parseInt(maxInput.value, 10);
-
-    if (isNaN(min) || isNaN(max)) return;
-
-    // Clamp to safe range
-    min = Math.max(-1000000000, Math.min(min, 1000000000));
-    max = Math.max(-1000000000, Math.min(max, 1000000000));
-
-    // Swap if min > max
-    if (min > max) [min, max] = [max, min];
-
-    // Update inputs with clamped values
-    minInput.value = min;
-    maxInput.value = max;
-
-    const finalNumber = Math.floor(Math.random() * (max - min + 1)) + min;
-    animateNumber(finalNumber);
-  }
-
-  // -------------------------------
-  // Animate number
-  // -------------------------------
-  function animateNumber(finalNumber) {
-    lastGeneratedNumber = finalNumber;
-
-    let cycles = 10;
-
-    const interval = setInterval(() => {
-      let min = parseInt(minInput.value, 10);
-      let max = parseInt(maxInput.value, 10);
-
-      const temp = Math.floor(Math.random() * (max - min + 1)) + min;
-
-      resultDisplay.textContent = temp.toLocaleString();
-
-      cycles--;
-      if (cycles <= 0) {
-        clearInterval(interval);
-        resultDisplay.textContent = finalNumber.toLocaleString();
-        updateHistory(finalNumber);
-      }
-    }, 40);
-  }
-
-  // -------------------------------
-  // Update history
-  // -------------------------------
-  function updateHistory(num) {
-    if (!historyList) return;
-
-    const item = document.createElement("div");
-    item.textContent = num.toLocaleString();
-
-    historyList.prepend(item);
-  }
-
-  // -------------------------------
-  // Event listeners
-  // -------------------------------
-  generateBtn.addEventListener("click", e => {
-    e.preventDefault();
-    generateNumber();
-  });
-
-  minInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") generateNumber();
-  });
-
-  maxInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") generateNumber();
-  });
-
-  // Copy button
-  copyBtn?.addEventListener("click", e => {
-    e.preventDefault();
-    if (lastGeneratedNumber !== null) {
-      navigator.clipboard.writeText(lastGeneratedNumber.toString());
-      copyBtn.textContent = "Copied!";
-      setTimeout(() => {
-        copyBtn.textContent = "Copy Result";
-      }, 1500);
-    }
-  });
-
-  // Clear button
-  clearBtn?.addEventListener("click", e => {
-    e.preventDefault();
-
-    if (historyList) historyList.innerHTML = "";
-    if (resultDisplay) resultDisplay.textContent = "0";
-    lastGeneratedNumber = 0;
-
-    // Reset inputs to default
-    if (minInput) minInput.value = 1;
-    if (maxInput) maxInput.value = 100;
-  });
-
-}
-
-
 function initStopwatch() {
 
   const display = document.getElementById("stopwatch-display");
@@ -3370,790 +4154,6 @@ function initStopwatch() {
   });
 
   updateDisplay();
-}
-
-
-function initTextCaseConverter() {
-
-  const input = document.getElementById("text-input");
-  const output = document.getElementById("text-output");
-
-  const upperBtn = document.getElementById("uppercase-btn");
-  const lowerBtn = document.getElementById("lowercase-btn");
-  const capitalizeBtn = document.getElementById("capitalize-btn");
-  const sentenceBtn = document.getElementById("sentencecase-btn");
-  const alternateBtn = document.getElementById("alternate-btn");
-  const spacesBtn = document.getElementById("spaces-btn");
-
-  const copyBtn = document.getElementById("copy-result");
-  const clearBtn = document.getElementById("clear-btn");
-
-  if (!input || !output) return;
-
-  let currentMode = null;
-
-  function updateOutput(text) {
-    output.textContent = text;
-  }
-
-  function getInput() {
-    return input.value || "";
-  }
-
-  // -------------------------
-  // Conversions
-  // -------------------------
-  function toUpper(text) {
-    return text.replace(/[a-z]/g, c => c.toUpperCase());
-  }
-
-  function toLower(text) {
-    return text.replace(/[A-Z]/g, c => c.toLowerCase());
-  }
-
-  function capitalizeWords(text) {
-    return text.replace(/\b[a-zA-Z][a-zA-Z']*/g, word => word[0].toUpperCase() + word.slice(1)
-    );
-  }
-
-  function sentenceCase(text) {
-    let result = "";
-    let capitalizeNext = true;
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-      if (capitalizeNext && /[a-zA-Z]/.test(char)) {
-        result += char.toUpperCase();
-        capitalizeNext = false;
-      } else {
-        result += char;
-      }
-      if (/[.!?]/.test(char)) capitalizeNext = true;
-    }
-    return result;
-  }
-
-  function alternatingCase(text) {
-    let result = "";
-    let useUpper = false;
-    for (let i = 0; i < text.length; i++) {
-      const char = text[i];
-      if (/[a-zA-Z]/.test(char)) {
-        result += useUpper ? char.toUpperCase() : char.toLowerCase();
-        useUpper = !useUpper;
-      } else {
-        result += char;
-      }
-    }
-    return result;
-  }
-
-  function trimSpaces(text) {
-    return text.replace(/\s+/g, " ").trim();
-  }
-
-  // -------------------------
-  // Apply Mode
-  // -------------------------
-  function applyMode() {
-    if (!currentMode) return;
-
-    const text = getInput();
-    let result = text;
-
-    switch (currentMode) {
-      case "upper": result = toUpper(text); break;
-      case "lower": result = toLower(text); break;
-      case "capitalize": result = capitalizeWords(text); break;
-      case "sentence": result = sentenceCase(text); break;
-      case "alternate": result = alternatingCase(text); break;
-      case "spaces": result = trimSpaces(text); break;
-    }
-
-    updateOutput(result);
-  }
-
-  // -------------------------
-  // Button Events
-  // -------------------------
-  upperBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "upper"; applyMode(); });
-  lowerBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "lower"; applyMode(); });
-  capitalizeBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "capitalize"; applyMode(); });
-  sentenceBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "sentence"; applyMode(); });
-  alternateBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "alternate"; applyMode(); });
-  spacesBtn?.addEventListener("click", e => { e.preventDefault(); currentMode = "spaces"; applyMode(); });
-
-  input.addEventListener("input", applyMode);
-
-  // -------------------------
-  // Copy Result
-  // -------------------------
-  copyBtn?.addEventListener("click", function (e) {
-    e.preventDefault();
-    const value = output.textContent;
-    if (!value) return;
-
-    navigator.clipboard.writeText(value);
-
-    const originalText = copyBtn.textContent;
-    copyBtn.textContent = "Copied!";
-
-    setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
-  });
-
-  // -------------------------
-  // Clear
-  // -------------------------
-  clearBtn?.addEventListener("click", function (e) {
-    e.preventDefault();
-    input.value = "";
-    output.textContent = "";
-    currentMode = null;
-    input.focus();
-  });
-
-  input.focus();
-
-}
-
-
-function initTextSorter() {
-  const input = document.getElementById("ts-input");
-  const output = document.getElementById("ts-output");
-  const removeEmpty = document.getElementById("ts-remove-empty");
-  const removeDup = document.getElementById("ts-remove-dup");
-  const azBtn = document.getElementById("ts-az");
-  const zaBtn = document.getElementById("ts-za");
-  const sortBtn = document.getElementById("ts-sort");
-  const copyBtn = document.getElementById("ts-copy");
-  const clearBtn = document.getElementById("ts-clear");
-
-  if (!input) return;
-
-  // Auto-focus
-  input.focus();
-
-  let sortDirection = "asc";
-
-  // -------------------------------
-  // Sort Direction Buttons
-  // -------------------------------
-  azBtn.classList.add("active");
-
-  azBtn.addEventListener("click", () => {
-    sortDirection = "asc";
-    azBtn.classList.add("active");
-    zaBtn.classList.remove("active");
-  });
-
-  zaBtn.addEventListener("click", () => {
-    sortDirection = "desc";
-    zaBtn.classList.add("active");
-    azBtn.classList.remove("active");
-  });
-
-  // -------------------------------
-  // Sort
-  // -------------------------------
-  sortBtn.addEventListener("click", () => {
-    let lines = input.value.split("\n");
-
-    if (removeEmpty.checked) {
-      lines = lines.filter(line => line.trim() !== "");
-    }
-
-    if (removeDup.checked) {
-      lines = [...new Set(lines)];
-    }
-
-    // Sort alphabetically while keeping empty lines at the bottom
-    lines.sort((a, b) => {
-      const aEmpty = a.trim() === "";
-      const bEmpty = b.trim() === "";
-
-      if (aEmpty && !bEmpty) return 1;
-      if (!aEmpty && bEmpty) return -1;
-
-      return a.localeCompare(b);
-    });
-
-    if (sortDirection === "desc") {
-      lines.reverse();
-    }
-
-    output.textContent = lines.join("\n");
-  });
-
-  // -------------------------------
-  // Copy
-  // -------------------------------
-  copyBtn.addEventListener("click", () => {
-    const text = output.textContent.trim();
-
-    if (!text) return;
-
-    navigator.clipboard.writeText(text);
-
-    const originalText = copyBtn.textContent;
-    copyBtn.textContent = "Copied!";
-
-    setTimeout(() => {
-      copyBtn.textContent = originalText;
-    }, 1500);
-  });
-
-  // -------------------------------
-  // Clear
-  // -------------------------------
-  clearBtn.addEventListener("click", () => {
-    input.value = "";
-    output.textContent = "";
-    removeEmpty.checked = false;
-    removeDup.checked = false;
-
-    sortDirection = "asc";
-    azBtn.classList.add("active");
-    zaBtn.classList.remove("active");
-
-    input.focus();
-  });
-
-}
-
-
-function initUnitConverter() {
-
-  const categorySelect = document.getElementById("category-select");
-  const fromUnit = document.getElementById("from-unit");
-  const toUnit = document.getElementById("to-unit");
-  const inputValue = document.getElementById("input-value");
-
-  const resultFrom = document.getElementById("result-from");
-  const resultDisplay = document.getElementById("result-value");
-
-  const resetBtn = document.getElementById("reset-btn");
-  const copyBtn = document.getElementById("copy-result");
-  const swapBtn = document.getElementById("swap-btn");
-
-  if (!categorySelect || !fromUnit || !toUnit || !inputValue) return;
-
-  const unitLabels = {
-    m: { singular: "meter", plural: "meters" },
-    km: { singular: "kilometer", plural: "kilometers" },
-    cm: { singular: "centimeter", plural: "centimeters" },
-    mi: { singular: "mile", plural: "miles" },
-    ft: { singular: "foot", plural: "feet" },
-    in: { singular: "inch", plural: "inches" },
-    g: { singular: "gram", plural: "grams" },
-    kg: { singular: "kilogram", plural: "kilograms" },
-    lb: { singular: "pound", plural: "pounds" },
-    oz: { singular: "ounce", plural: "ounces" },
-    c: { singular: "°C", plural: "°C" },
-    f: { singular: "°F", plural: "°F" },
-    k: { singular: "K", plural: "K" },
-    s: { singular: "second", plural: "seconds" },
-    min: { singular: "minute", plural: "minutes" },
-    hr: { singular: "hour", plural: "hours" },
-    day: { singular: "day", plural: "days" },
-    l: { singular: "liter", plural: "liters" },
-    ml: { singular: "milliliter", plural: "milliliters" },
-    cup: { singular: "cup", plural: "cups" },
-    gal: { singular: "gallon", plural: "gallons" },
-    floz: { singular: "fluid ounce", plural: "fluid ounces" },
-    mps: { singular: "m/s", plural: "m/s" },
-    kmh: { singular: "km/h", plural: "km/h" },
-    mph: { singular: "mph", plural: "mph" },
-    knot: { singular: "knot", plural: "knots" }
-  };
-
-  const units = {
-    length: { units: { m: { name: "Meters", factor: 1 }, km: { name: "Kilometers", factor: 1000 }, cm: { name: "Centimeters", factor: 0.01 }, mi: { name: "Miles", factor: 1609.34 }, ft: { name: "Feet", factor: 0.3048 }, in: { name: "Inches", factor: 0.0254 } } },
-    weight: { units: { g: { name: "Grams", factor: 1 }, kg: { name: "Kilograms", factor: 1000 }, lb: { name: "Pounds", factor: 453.592 }, oz: { name: "Ounces", factor: 28.3495 } } },
-    temperature: { units: { c: { name: "Celsius" }, f: { name: "Fahrenheit" }, k: { name: "Kelvin" } } },
-    time: { units: { s: { name: "Seconds", factor: 1 }, min: { name: "Minutes", factor: 60 }, hr: { name: "Hours", factor: 3600 }, day: { name: "Days", factor: 86400 } } },
-    volume: { units: { l: { name: "Liters", factor: 1 }, ml: { name: "Milliliters", factor: 0.001 }, cup: { name: "Cups", factor: 0.236588 }, gal: { name: "Gallons", factor: 3.78541 }, floz: { name: "Fluid Ounces", factor: 0.0295735 } } },
-    speed: { units: { mps: { name: "Meters/sec", factor: 1 }, kmh: { name: "Kilometers/hour", factor: 0.277778 }, mph: { name: "Miles/hour", factor: 0.44704 }, knot: { name: "Knots", factor: 0.514444 } } }
-  };
-
-  function formatUnit(value, unit) {
-    const abs = Math.abs(value);
-    const label = unitLabels[unit];
-    if (!label) return "";
-    return abs === 1 ? label.singular : label.plural;
-  }
-
-  function populateUnits(category) {
-    fromUnit.innerHTML = "";
-    toUnit.innerHTML = "";
-    const unitSet = units[category].units;
-    for (let key in unitSet) {
-      const option1 = document.createElement("option");
-      option1.value = key;
-      option1.textContent = unitSet[key].name;
-      fromUnit.appendChild(option1);
-
-      const option2 = document.createElement("option");
-      option2.value = key;
-      option2.textContent = unitSet[key].name;
-      toUnit.appendChild(option2);
-    }
-    toUnit.selectedIndex = 1;
-    convert();
-  }
-
-  function convert() {
-    const value = parseFloat(inputValue.value);
-    if (isNaN(value)) {
-      resultFrom.textContent = "-";
-      resultDisplay.textContent = "-";
-      return;
-    }
-
-    const category = categorySelect.value;
-    const from = fromUnit.value;
-    const to = toUnit.value;
-    let result;
-
-    if (category === "temperature") {
-      if (from === "c" && to === "f") result = (value * 9 / 5) + 32;
-      else if (from === "f" && to === "c") result = (value - 32) * 5 / 9;
-      else if (from === "c" && to === "k") result = value + 273.15;
-      else if (from === "k" && to === "c") result = value - 273.15;
-      else if (from === "f" && to === "k") result = (value - 32) * 5 / 9 + 273.15;
-      else if (from === "k" && to === "f") result = (value - 273.15) * 9 / 5 + 32;
-      else result = value;
-    } else {
-      const fromFactor = units[category].units[from].factor;
-      const toFactor = units[category].units[to].factor;
-      const base = value * fromFactor;
-      result = base / toFactor;
-    }
-
-    const formatted = result.toFixed(6).replace(/\.?0+$/, "");
-    const fromLabel = formatUnit(value, from);
-    const toLabel = formatUnit(result, to);
-
-    resultFrom.textContent = value + " " + fromLabel;
-    resultDisplay.textContent = formatted + " " + toLabel;
-  }
-
-  // -------------------------------
-  // Event listeners
-  // -------------------------------
-  categorySelect.addEventListener("change", function () {
-    populateUnits(this.value);
-  });
-  fromUnit.addEventListener("change", convert);
-  toUnit.addEventListener("change", convert);
-  inputValue.addEventListener("input", convert);
-
-  swapBtn?.addEventListener("click", function () {
-    const temp = fromUnit.value;
-    fromUnit.value = toUnit.value;
-    toUnit.value = temp;
-    convert();
-  });
-
-  resetBtn?.addEventListener("click", function (e) {
-    e.preventDefault();
-    inputValue.value = "";
-    resultDisplay.textContent = "-";
-    resultFrom.textContent = "-";
-    categorySelect.value = "length";
-    populateUnits("length");
-    inputValue.focus();
-  });
-
-  copyBtn?.addEventListener("click", function () {
-    navigator.clipboard.writeText(resultDisplay.textContent);
-    copyBtn.textContent = "Copied!";
-    setTimeout(function () {
-      copyBtn.textContent = "Copy Result";
-    }, 1500);
-  });
-
-  // --- PAGE LOAD DEFAULT ---
-  categorySelect.value = "length";
-  populateUnits("length");
-
-  inputValue.focus();
-
-}
-
-
-function initUrlTool() {
-
-  const wrapper = document.getElementById("url-tool");
-
-  if (!wrapper) return;
-
-  // -------------------------------
-  // Elements
-  // -------------------------------
-  const input = document.getElementById("url-input");
-
-  const output = document.getElementById("url-output");
-
-  const encodeMode = document.getElementById("encode-url");
-
-  const decodeMode = document.getElementById("decode-url");
-
-  const convertBtn = document.getElementById("convert-url");
-
-  const copyBtn = document.getElementById("url-copy");
-
-  const clearBtn = document.getElementById("url-clear");
-
-  if (!input ||
-    !output ||
-    !encodeMode ||
-    !decodeMode) return;
-
-  // -------------------------------
-  // Convert
-  // -------------------------------
-  function convertUrl() {
-
-    const value = input.value.trim();
-
-    if (!value) {
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-      return;
-
-    }
-
-    try {
-
-      let result = "";
-
-      if (encodeMode.checked) {
-
-        result = encodeURIComponent(
-          value
-        );
-
-      } else {
-
-        result = decodeURIComponent(
-          value
-        );
-
-      }
-
-      output.textContent = result;
-      output.dataset.copyValue = result;
-
-    } catch (err) {
-
-      output.textContent =
-        "Invalid URL input";
-
-      output.dataset.copyValue = "";
-
-    }
-
-  }
-
-  // -------------------------------
-  // Convert Button
-  // -------------------------------
-  convertBtn?.addEventListener(
-    "click",
-    convertUrl
-  );
-
-  // -------------------------------
-  // Enter Key
-  // -------------------------------
-  input.addEventListener(
-    "keydown",
-    (e) => {
-
-      if (e.key === "Enter" &&
-        !e.shiftKey) {
-
-        e.preventDefault();
-        convertUrl();
-
-      }
-
-    }
-  );
-
-  // -------------------------------
-  // Copy
-  // -------------------------------
-  copyBtn?.addEventListener(
-    "click",
-    async () => {
-
-      const value = output.dataset.copyValue ||
-        output.textContent;
-
-      if (!value) return;
-
-      try {
-
-        await navigator.clipboard.writeText(
-          value
-        );
-
-        const originalText = copyBtn.textContent;
-
-        copyBtn.textContent =
-          "Copied!";
-
-        setTimeout(() => {
-
-          copyBtn.textContent =
-            originalText;
-
-        }, 1500);
-
-      } catch (err) {
-
-        console.error(
-          "Copy failed:",
-          err
-        );
-
-      }
-
-    }
-  );
-
-  // -------------------------------
-  // Clear
-  // -------------------------------
-  clearBtn?.addEventListener(
-    "click",
-    () => {
-
-      input.value = "";
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-      encodeMode.checked = true;
-      decodeMode.checked = false;
-
-      input.focus();
-
-    }
-  );
-
-  // -------------------------------
-  // Mode Change
-  // -------------------------------
-  encodeMode?.addEventListener(
-    "change",
-    () => {
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-    }
-  );
-
-  decodeMode?.addEventListener(
-    "change",
-    () => {
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-    }
-  );
-
-  // -------------------------------
-  // Init
-  // -------------------------------
-  encodeMode.checked = true;
-  decodeMode.checked = false;
-
-  output.dataset.copyValue = "";
-
-  input.focus();
-
-}
-
-
-function initUUIDGenerator() {
-
-  const wrapper = document.getElementById("uuid-generator");
-
-  if (!wrapper) return;
-
-  const quantityInput = document.getElementById("quantity-input");
-  const generateBtn = document.getElementById("uuid-generate");
-  const output = document.getElementById("uuid-output");
-  const copyBtn = document.getElementById("uuid-copy");
-  const clearBtn = document.getElementById("uuid-clear");
-
-  // -------------------------------
-  // Generate UUIDs
-  // -------------------------------
-  function generateUUIDs() {
-
-    let quantity = parseInt(quantityInput.value, 10);
-
-    if (isNaN(quantity)) quantity = 1;
-
-    quantity = Math.max(1, Math.min(quantity, 1000));
-
-    quantityInput.value = quantity;
-
-    const uuids = [];
-
-    for (let i = 0; i < quantity; i++) {
-      uuids.push(crypto.randomUUID());
-    }
-
-    output.textContent = uuids.join("\n");
-
-  }
-
-  // -------------------------------
-  // Generate Button
-  // -------------------------------
-  generateBtn.addEventListener("click", generateUUIDs);
-
-  // -------------------------------
-  // Copy
-  // -------------------------------
-  copyBtn.addEventListener("click", async () => {
-
-    if (!output.textContent.trim()) return;
-
-    try {
-
-      await navigator.clipboard.writeText(output.textContent);
-
-      const originalText = copyBtn.textContent;
-      copyBtn.textContent = "Copied!";
-
-      setTimeout(() => {
-        copyBtn.textContent = originalText;
-      }, 1500);
-
-    } catch (err) {
-      console.error("Copy failed:", err);
-    }
-
-  });
-
-  // -------------------------------
-  // Clear
-  // -------------------------------
-  clearBtn.addEventListener("click", () => {
-
-    output.textContent = "";
-    quantityInput.value = 1;
-    quantityInput.focus();
-    quantityInput.select();
-
-  });
-
-  // -------------------------------
-  // Enter Key Generates
-  // -------------------------------
-  quantityInput.addEventListener("keydown", (e) => {
-
-    if (e.key === "Enter") {
-      e.preventDefault();
-      generateUUIDs();
-    }
-
-  });
-
-  // -------------------------------
-  // Init
-  // -------------------------------
-  quantityInput.value = 1;
-  quantityInput.focus();
-  quantityInput.select();
-
-}
-
-
-function initWordCharCounter() {
-
-  const textInput = document.getElementById("text-input");
-  const wordCount = document.getElementById("word-count");
-  const charCount = document.getElementById("char-count");
-  const charNoSpaces = document.getElementById("char-no-spaces");
-  const readingTime = document.getElementById("reading-time");
-  const clearButton = document.getElementById("clear-text");
-  const copyButton = document.getElementById("copy-text");
-
-  if (!textInput) return;
-
-  let timeout;
-
-  // -------------------------------
-  // Update word, character, reading time counts
-  // -------------------------------
-  function updateCounts() {
-    const text = textInput.value;
-
-    const characters = text.length;
-    const charactersNoSpaces = text.replace(/\s/g, "").length;
-
-    const words = text.trim().split(/\s+/).filter(word => word.length > 0);
-    const wordTotal = text.trim() === "" ? 0 : words.length;
-
-    const readTime = wordTotal === 0 ? 0 : Math.max(1, Math.ceil(wordTotal / 200));
-
-    wordCount.textContent = wordTotal;
-    charCount.textContent = characters;
-    charNoSpaces.textContent = charactersNoSpaces;
-    readingTime.textContent = readTime === 0 ? 0 : readTime + " min";
-  }
-
-  // -------------------------------
-  // Debounce for smooth typing
-  // -------------------------------
-  function debounceUpdate() {
-    clearTimeout(timeout);
-    timeout = setTimeout(updateCounts, 40);
-  }
-
-  textInput.addEventListener("input", debounceUpdate);
-
-  textInput.addEventListener("paste", function () {
-    setTimeout(updateCounts, 0);
-  });
-
-  // -------------------------------
-  // Copy Text
-  // -------------------------------
-  copyButton.addEventListener("click", function () {
-
-    if (!textInput.value.trim()) return;
-
-    navigator.clipboard.writeText(textInput.value);
-
-    const originalText = copyButton.textContent;
-    copyButton.textContent = "Copied!";
-
-    setTimeout(() => {
-      copyButton.textContent = originalText;
-    }, 1500);
-
-  });
-
-  // -------------------------------
-  // Clear
-  // -------------------------------
-  clearButton.addEventListener("click", function () {
-    textInput.value = "";
-    updateCounts();
-    textInput.focus();
-  });
-
-  textInput.focus();
-
 }
 
 
