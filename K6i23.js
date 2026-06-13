@@ -3919,87 +3919,63 @@ function calculateBmr() {
   let heightCmValue;
   let weightKgValue;
 
-// -----------------------------
-// Imperial
-// -----------------------------
-if (imperialMode.checked) {
+  // -----------------------------
+  // Imperial
+  // -----------------------------
+  if (imperialMode.checked) {
 
-  const feet =
-    parseFloat(heightFeet.value);
+    const feet =
+      parseFloat(heightFeet.value);
 
-  const inches =
-    parseFloat(heightInches.value) || 0;
+    const inches =
+      parseFloat(heightInches.value) || 0;
 
-  const pounds =
-    parseFloat(weightPounds.value);
+    const pounds =
+      parseFloat(weightPounds.value);
 
-  if (
-    isNaN(feet) ||
-    isNaN(pounds)
-  ) {
+    if (
+      isNaN(feet) ||
+      isNaN(pounds)
+    ) {
 
-    clearOutputs();
-    return;
+      clearOutputs();
+      return;
 
-  }
+    }
 
-  const totalInches =
-    (feet * 12) + inches;
+    const totalInches =
+      (feet * 12) + inches;
 
-  heightCmValue =
-    totalInches * 2.54;
+    heightCmValue =
+      totalInches * 2.54;
 
-  weightKgValue =
-    pounds * 0.45359237;
-
-}
-
-// -----------------------------
-// Metric
-// -----------------------------
-else if (metricMode.checked) {
-
-  console.log(
-  "Height:",
-  heightCm.value,
-  "Weight:",
-  weightKg.value
-);
-
-console.log(
-  "Parsed Height:",
-  parseFloat(heightCm.value),
-  "Parsed Weight:",
-  parseFloat(weightKg.value)
-);
-  
-  heightCmValue =
-    parseFloat(heightCm.value);
-
-  weightKgValue =
-    parseFloat(weightKg.value);
-
-  if (
-    isNaN(heightCmValue) ||
-    isNaN(weightKgValue)
-  ) {
-
-    clearOutputs();
-    return;
+    weightKgValue =
+      pounds * 0.45359237;
 
   }
 
-}
+  // -----------------------------
+  // Metric
+  // -----------------------------
+  else {
 
-// -----------------------------
-// No Mode Selected
-// -----------------------------
-else {
+    heightCmValue =
+      parseFloat(heightCm.value);
 
-  clearOutputs();
-  return;
+    weightKgValue =
+      parseFloat(weightKg.value);
 
-}
+    if (
+      isNaN(heightCmValue) ||
+      isNaN(weightKgValue)
+    ) {
+
+      clearOutputs();
+      return;
+
+    }
+
+  }
 
   // -----------------------------
   // Mifflin-St Jeor
