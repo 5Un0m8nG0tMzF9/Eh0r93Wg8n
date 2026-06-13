@@ -3894,6 +3894,13 @@ function formatNumber(value) {
 
 }
 
+console.log(
+  "Imperial:",
+  imperialMode.checked,
+  "Metric:",
+  metricMode.checked
+);
+  
 // -------------------------------
 // Calculate
 // -------------------------------
