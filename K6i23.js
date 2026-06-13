@@ -3893,13 +3893,6 @@ function formatNumber(value) {
     .toLocaleString();
 
 }
-
-console.log(
-  "Imperial:",
-  imperialMode.checked,
-  "Metric:",
-  metricMode.checked
-);
   
 // -------------------------------
 // Calculate
@@ -3966,6 +3959,20 @@ if (imperialMode.checked) {
 // -----------------------------
 else if (metricMode.checked) {
 
+  console.log(
+  "Height:",
+  heightCm.value,
+  "Weight:",
+  weightKg.value
+);
+
+console.log(
+  "Parsed Height:",
+  parseFloat(heightCm.value),
+  "Parsed Weight:",
+  parseFloat(weightKg.value)
+);
+  
   heightCmValue =
     parseFloat(heightCm.value);
 
