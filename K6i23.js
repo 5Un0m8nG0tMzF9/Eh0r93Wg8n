@@ -3893,7 +3893,7 @@ function formatNumber(value) {
     .toLocaleString();
 
 }
-  
+
 // -------------------------------
 // Calculate
 // -------------------------------
