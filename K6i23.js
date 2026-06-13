@@ -3836,13 +3836,25 @@ const clearBtn =
   document.getElementById("bmr-clear");
 
 // -------------------------------
-// Results
+// Outputs
 // -------------------------------
 const result =
   document.getElementById("bmr-result");
 
-const commentary =
-  document.getElementById("bmr-commentary");
+const sedentaryOutput =
+  document.getElementById("bmr-sedentary");
+
+const lightlyOutput =
+  document.getElementById("bmr-lightly");
+
+const moderatelyOutput =
+  document.getElementById("bmr-moderately");
+
+const veryOutput =
+  document.getElementById("bmr-very");
+
+const extremelyOutput =
+  document.getElementById("bmr-extremely");
 
 // -------------------------------
 // Helpers
@@ -3858,6 +3870,20 @@ function updateMode() {
     metricMode.checked
       ? "flex"
       : "none";
+
+}
+
+function clearOutputs() {
+
+  result.textContent = "-";
+
+  sedentaryOutput.textContent = "-";
+  lightlyOutput.textContent = "-";
+  moderatelyOutput.textContent = "-";
+  veryOutput.textContent = "-";
+  extremelyOutput.textContent = "-";
+
+  result.dataset.copyValue = "";
 
 }
 
@@ -3885,16 +3911,13 @@ function calculateBmr() {
     !sex
   ) {
 
-    result.textContent = "0";
-    commentary.textContent = "-";
-    result.dataset.copyValue = "";
-
+    clearOutputs();
     return;
 
   }
 
-  let weightKgValue;
   let heightCmValue;
+  let weightKgValue;
 
   // -----------------------------
   // Imperial
@@ -3915,10 +3938,7 @@ function calculateBmr() {
       isNaN(pounds)
     ) {
 
-      result.textContent = "0";
-      commentary.textContent = "-";
-      result.dataset.copyValue = "";
-
+      clearOutputs();
       return;
 
     }
@@ -3950,10 +3970,7 @@ function calculateBmr() {
       isNaN(weightKgValue)
     ) {
 
-      result.textContent = "0";
-      commentary.textContent = "-";
-      result.dataset.copyValue = "";
-
+      clearOutputs();
       return;
 
     }
@@ -3961,7 +3978,7 @@ function calculateBmr() {
   }
 
   // -----------------------------
-  // Mifflin-St Jeor Formula
+  // Mifflin-St Jeor
   // -----------------------------
   let bmr;
 
@@ -4004,17 +4021,23 @@ function calculateBmr() {
   result.textContent =
     formattedBmr;
 
-  commentary.textContent =
-`BMR: ${formattedBmr} Calories / Day
+  sedentaryOutput.textContent =
+    sedentary.toLocaleString();
 
-Sedentary: ${sedentary.toLocaleString()}
-Lightly Active: ${lightlyActive.toLocaleString()}
-Moderately Active: ${moderatelyActive.toLocaleString()}
-Very Active: ${veryActive.toLocaleString()}
-Extremely Active: ${extremelyActive.toLocaleString()}`;
+  lightlyOutput.textContent =
+    lightlyActive.toLocaleString();
+
+  moderatelyOutput.textContent =
+    moderatelyActive.toLocaleString();
+
+  veryOutput.textContent =
+    veryActive.toLocaleString();
+
+  extremelyOutput.textContent =
+    extremelyActive.toLocaleString();
 
   result.dataset.copyValue =
-`BMR: ${formattedBmr} Calories / Day
+`BMR: ${formattedBmr}
 
 Sedentary: ${sedentary.toLocaleString()}
 Lightly Active: ${lightlyActive.toLocaleString()}
@@ -4025,7 +4048,7 @@ Extremely Active: ${extremelyActive.toLocaleString()}`;
 }
 
 // -------------------------------
-// Radio Events
+// Mode Events
 // -------------------------------
 imperialMode?.addEventListener(
   "change",
@@ -4038,7 +4061,7 @@ metricMode?.addEventListener(
 );
 
 // -------------------------------
-// Calculate Button
+// Calculate
 // -------------------------------
 calculateBtn?.addEventListener(
   "click",
@@ -4046,7 +4069,7 @@ calculateBtn?.addEventListener(
 );
 
 // -------------------------------
-// Enter Key Support
+// Enter Key
 // -------------------------------
 [
   ageInput,
@@ -4136,20 +4159,9 @@ clearBtn?.addEventListener(
     heightCm.value = "";
     weightKg.value = "";
 
-    result.textContent = "0";
-    commentary.textContent = "-";
+    clearOutputs();
 
-    result.dataset.copyValue = "";
-
-    if (imperialMode.checked) {
-
-      heightFeet.focus();
-
-    } else {
-
-      heightCm.focus();
-
-    }
+    ageInput.focus();
 
   }
 );
@@ -4162,11 +4174,8 @@ metricMode.checked = false;
 
 updateMode();
 
-result.textContent = "0";
-commentary.textContent = "-";
+clearOutputs();
 
-result.dataset.copyValue = "";
-
-heightFeet.focus();
+ageInput.focus();
 
 }
