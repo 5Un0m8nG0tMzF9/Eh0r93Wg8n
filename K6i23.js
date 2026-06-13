@@ -1447,6 +1447,9 @@ function initLoremGenerator() {
       startCheckbox.disabled = true;
       startWrap.classList.add("disabled");
     }
+
+    amountInput.focus();
+
   }
 
   // -------------------------
@@ -1534,10 +1537,6 @@ function initLoremGenerator() {
 
     amountInput.value = "";
     output.innerHTML = "";
-
-    if (paragraphsRadio) paragraphsRadio.checked = true;
-    if (sentencesRadio) sentencesRadio.checked = false;
-    if (wordsRadio) wordsRadio.checked = false;
 
     if (startCheckbox) startCheckbox.checked = false;
 
