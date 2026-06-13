@@ -1954,9 +1954,22 @@ function initUnixConverter() {
       return;
     }
 
+    const localDate = date.toLocaleString(
+      undefined,
+    {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit"
+    }
+  );
+
     const result =
-      `UTC: ${date.toUTCString()}\n\n` +
-      `Local: ${date.toLocaleString()}`;
+    `UTC: ${date.toUTCString()}\n\n` +
+    `Local: ${localDate}`;
 
     output.textContent = result;
     output.dataset.copyValue = result;
