@@ -1130,7 +1130,7 @@ function convert(){
 const value=parseFloat(inputValue.value);
 if(isNaN(value)){
 resultFrom.textContent="-";
-resultDisplay.textContent=“-“;
+resultDisplay.textContent="-";
 return;
 }
 
