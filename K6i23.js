@@ -1861,6 +1861,189 @@ function initJsonFormatter() {
 }
 
 
+function initUnixConverter() {
+  
+  const timestampField = document.getElementById("unix-timestamp-field");
+  const dateField = document.getElementById("unix-date-field");
+
+  const timestampInput = document.getElementById("unix-timestamp-input");
+  const dateInput = document.getElementById("unix-date-input");
+
+  const timestampRadio = document.getElementById("unix-timestamp");
+  const dateRadio = document.getElementById("unix-date");
+
+  const convertBtn = document.getElementById("unix-convert");
+  const output = document.getElementById("unix-output");
+
+  const copyBtn = document.getElementById("unix-copy");
+  const clearBtn = document.getElementById("unix-clear");
+
+  if (
+    !timestampField ||
+    !dateField ||
+    !timestampInput ||
+    !dateInput ||
+    !timestampRadio ||
+    !dateRadio ||
+    !convertBtn ||
+    !output ||
+    !copyBtn ||
+    !clearBtn
+  ) {
+    return;
+  }
+
+  const originalCopyText = copyBtn.textContent;
+
+  function getMode() {
+    return timestampRadio.checked ? "timestamp" : "date";
+  }
+
+  function resetOutput() {
+    output.textContent = "-";
+    output.dataset.copyValue = "";
+  }
+
+  function focusActiveInput() {
+    if (getMode() === "timestamp") {
+      timestampInput.focus();
+    } else {
+      dateInput.focus();
+    }
+  }
+
+  function updateMode() {
+    if (getMode() === "timestamp") {
+      timestampField.style.display = "flex";
+      dateField.style.display = "none";
+    } else {
+      timestampField.style.display = "none";
+      dateField.style.display = "flex";
+    }
+
+    resetOutput();
+    focusActiveInput();
+  }
+
+  function convertTimestampToDate() {
+    const value = timestampInput.value.trim();
+
+    if (!value) {
+      resetOutput();
+      return;
+    }
+
+    let timestamp = Number(value);
+
+    if (!Number.isFinite(timestamp)) {
+      resetOutput();
+      return;
+    }
+
+    // Treat 10-digit values as seconds.
+    // Treat 13-digit values as milliseconds.
+    if (Math.abs(timestamp) < 1000000000000) {
+      timestamp *= 1000;
+    }
+
+    const date = new Date(timestamp);
+
+    if (isNaN(date.getTime())) {
+      resetOutput();
+      return;
+    }
+
+    const result =
+      `UTC: ${date.toUTCString()}\n\n` +
+      `Local: ${date.toLocaleString()}`;
+
+    output.textContent = result;
+    output.dataset.copyValue = result;
+  }
+
+  function convertDateToTimestamp() {
+    const value = dateInput.value;
+
+    if (!value) {
+      resetOutput();
+      return;
+    }
+
+    const timestamp = Math.floor(
+      new Date(value).getTime() / 1000
+    );
+
+    if (!Number.isFinite(timestamp)) {
+      resetOutput();
+      return;
+    }
+
+    output.textContent = timestamp;
+    output.dataset.copyValue = String(timestamp);
+  }
+
+  function convert() {
+    if (getMode() === "timestamp") {
+      convertTimestampToDate();
+    } else {
+      convertDateToTimestamp();
+    }
+  }
+
+  function clearCurrentMode() {
+    if (getMode() === "timestamp") {
+      timestampInput.value = "";
+    } else {
+      dateInput.value = "";
+    }
+
+    resetOutput();
+    focusActiveInput();
+  }
+
+  convertBtn.addEventListener("click", convert);
+
+  timestampRadio.addEventListener("change", updateMode);
+  dateRadio.addEventListener("change", updateMode);
+
+  copyBtn.addEventListener("click", async () => {
+    const value = output.dataset.copyValue || "";
+
+    if (!value || value === "-") {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(value);
+
+      copyBtn.textContent = "Copied!";
+
+      setTimeout(() => {
+        copyBtn.textContent = originalCopyText;
+      }, 1500);
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  clearBtn.addEventListener("click", clearCurrentMode);
+
+  timestampInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      convert();
+    }
+  });
+
+  dateInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      convert();
+    }
+  });
+
+  resetOutput();
+  updateMode();
+}
+
 function initUrlTool() {
 
   const wrapper = document.getElementById("url-tool");
@@ -4329,6 +4512,10 @@ if (document.getElementById("bmr-calculator")) {
 
 if (document.getElementById("qr-generator")) {
   initQrGenerator();
+}
+
+if (document.getElementById("unix-converter")) {
+  initUnixConverter();
 }
 
 });
