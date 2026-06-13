@@ -2217,16 +2217,45 @@ const originalInput = document.getElementById("original-input"); const newInpu
 // ------------------------------- // Controls // ------------------------------- const calculateBtn = document.getElementById("percent-calculate"); const copyBtn = document.getElementById("percent-copy"); const clearBtn = document.getElementById("percent-clear");
 const result = document.getElementById("percent-result"); const commentary = document.getElementById("result-commentary");
 // ------------------------------- // Show Active Mode // ------------------------------- function updateMode() {
-percentOfFields.style.display = percentOfMode.checked ? "grid" : "none";
-percentTotalFields.style.display = percentTotalMode.checked ? "grid" : "none";
-percentChangeFields.style.display = percentChangeMode.checked ? "grid" : "none";
-commentary.style.color = "";
-if (percentChangeMode.checked) {
-commentary.textContent = "-";
-} else {
-commentary.textContent = "";
+
+  percentOfFields.style.display =
+    percentOfMode.checked ? "grid" : "none";
+
+  percentTotalFields.style.display =
+    percentTotalMode.checked ? "grid" : "none";
+
+  percentChangeFields.style.display =
+    percentChangeMode.checked ? "grid" : "none";
+
+  commentary.style.color = "";
+
+  if (percentChangeMode.checked) {
+
+    commentary.textContent = "-";
+
+  } else {
+
+    commentary.textContent = "";
+
+  }
+
+  // Auto Focus
+  if (percentOfMode.checked) {
+
+    percentInput.focus();
+
+  } else if (percentTotalMode.checked) {
+
+    valueInput.focus();
+
+  } else if (percentChangeMode.checked) {
+
+    originalInput.focus();
+
+  }
+
 }
-}
+
 percentOfMode.addEventListener("change", updateMode); percentTotalMode.addEventListener("change", updateMode); percentChangeMode.addEventListener("change", updateMode);
 // ------------------------------- // Calculate // ------------------------------- function calculatePercentage() {
 let output = "0"; let commentaryText = ""; let copyValue = "";
