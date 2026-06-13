@@ -1862,7 +1862,7 @@ function initJsonFormatter() {
 
 
 function initUnixConverter() {
-  
+
   const timestampField = document.getElementById("unix-timestamp-field");
   const dateField = document.getElementById("unix-date-field");
 
@@ -1900,7 +1900,7 @@ function initUnixConverter() {
   }
 
   function resetOutput() {
-    output.textContent = "-";
+    output.textContent = "";
     output.dataset.copyValue = "";
   }
 
@@ -1913,19 +1913,20 @@ function initUnixConverter() {
   }
 
   function updateMode() {
-    if (getMode() === "timestamp") {
-      timestampField.style.display = "flex";
-      dateField.style.display = "none";
-    } else {
-      timestampField.style.display = "none";
-      dateField.style.display = "flex";
-    }
+
+    timestampField.style.display =
+      timestampRadio.checked ? "flex" : "none";
+
+    dateField.style.display =
+      dateRadio.checked ? "flex" : "none";
 
     resetOutput();
     focusActiveInput();
+
   }
 
   function convertTimestampToDate() {
+
     const value = timestampInput.value.trim();
 
     if (!value) {
@@ -1940,8 +1941,8 @@ function initUnixConverter() {
       return;
     }
 
-    // Treat 10-digit values as seconds.
-    // Treat 13-digit values as milliseconds.
+    // 10 digits = seconds
+    // 13 digits = milliseconds
     if (Math.abs(timestamp) < 1000000000000) {
       timestamp *= 1000;
     }
@@ -1959,9 +1960,11 @@ function initUnixConverter() {
 
     output.textContent = result;
     output.dataset.copyValue = result;
+
   }
 
   function convertDateToTimestamp() {
+
     const value = dateInput.value;
 
     if (!value) {
@@ -1980,17 +1983,21 @@ function initUnixConverter() {
 
     output.textContent = timestamp;
     output.dataset.copyValue = String(timestamp);
+
   }
 
   function convert() {
+
     if (getMode() === "timestamp") {
       convertTimestampToDate();
     } else {
       convertDateToTimestamp();
     }
+
   }
 
   function clearCurrentMode() {
+
     if (getMode() === "timestamp") {
       timestampInput.value = "";
     } else {
@@ -1999,49 +2006,96 @@ function initUnixConverter() {
 
     resetOutput();
     focusActiveInput();
+
   }
 
-  convertBtn.addEventListener("click", convert);
+  convertBtn.addEventListener(
+    "click",
+    convert
+  );
 
-  timestampRadio.addEventListener("change", updateMode);
-  dateRadio.addEventListener("change", updateMode);
+  timestampRadio.addEventListener(
+    "change",
+    updateMode
+  );
 
-  copyBtn.addEventListener("click", async () => {
-    const value = output.dataset.copyValue || "";
+  dateRadio.addEventListener(
+    "change",
+    updateMode
+  );
 
-    if (!value || value === "-") {
-      return;
+  copyBtn.addEventListener(
+    "click",
+    async () => {
+
+      const value =
+        output.dataset.copyValue || "";
+
+      if (!value) {
+        return;
+      }
+
+      try {
+
+        await navigator.clipboard.writeText(
+          value
+        );
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalCopyText;
+
+        }, 1500);
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
     }
+  );
 
-    try {
-      await navigator.clipboard.writeText(value);
+  clearBtn.addEventListener(
+    "click",
+    clearCurrentMode
+  );
 
-      copyBtn.textContent = "Copied!";
+  timestampInput.addEventListener(
+    "keydown",
+    (event) => {
 
-      setTimeout(() => {
-        copyBtn.textContent = originalCopyText;
-      }, 1500);
-    } catch (error) {
-      console.error(error);
+      if (event.key === "Enter") {
+        convert();
+      }
+
     }
-  });
+  );
 
-  clearBtn.addEventListener("click", clearCurrentMode);
+  dateInput.addEventListener(
+    "keydown",
+    (event) => {
 
-  timestampInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      convert();
+      if (event.key === "Enter") {
+        convert();
+      }
+
     }
-  });
+  );
 
-  dateInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") {
-      convert();
-    }
-  });
+  // -------------------------------
+  // Init
+  // -------------------------------
 
-  resetOutput();
+  timestampRadio.checked = true;
+  dateRadio.checked = false;
+
   updateMode();
+
 }
 
 function initUrlTool() {
@@ -4337,7 +4391,6 @@ function initDateCalculator() {
   result.dataset.copyValue = "";
 
 }
-
 
 function initStopwatch() {
 
