@@ -3430,6 +3430,7 @@ input.focus();
 
 }
 
+
 // ==============================
 // BMI CALCULATOR
 // ==============================
@@ -3508,6 +3509,16 @@ imperialFields.style.display =
 metricFields.style.display =
   metricMode.checked ? "flex" : "none";
 
+if (imperialMode.checked) {
+
+  heightFeet.focus();
+
+} else {
+
+  heightCm.focus();
+
+}
+
 }
 
 function getCategory(bmi) {
@@ -3571,7 +3582,7 @@ if (imperialMode.checked) {
     pounds <= 0
   ) {
 
-    result.textContent = "0";
+    result.textContent = "-";
     commentary.textContent = "";
     result.dataset.copyValue = "";
     return;
@@ -3605,7 +3616,7 @@ else {
     kg <= 0
   ) {
 
-    result.textContent = "0";
+    result.textContent = "-";
     commentary.textContent = "";
     result.dataset.copyValue = "";
     return;
@@ -3735,16 +3746,19 @@ clearBtn?.addEventListener(
     heightCm.value = "";
     weightKg.value = "";
 
-    result.textContent = "0";
+    result.textContent = "-";
     commentary.textContent = "-";
     result.dataset.copyValue = "";
 
-    imperialMode.checked = true;
-    metricMode.checked = false;
+    if (imperialMode.checked) {
 
-    updateMode();
+      heightFeet.focus();
 
-    heightFeet.focus();
+    } else {
+
+      heightCm.focus();
+
+    }
 
   }
 );
@@ -3757,13 +3771,14 @@ metricMode.checked = false;
 
 updateMode();
 
-result.textContent = "0";
+result.textContent = "-";
 commentary.textContent = "-";
 result.dataset.copyValue = "";
 
 heightFeet.focus();
 
 }
+
 
 // ==============================
 // BMR CALCULATOR
@@ -3870,6 +3885,8 @@ function updateMode() {
     metricMode.checked
       ? "flex"
       : "none";
+
+  ageInput.focus();
 
 }
 
