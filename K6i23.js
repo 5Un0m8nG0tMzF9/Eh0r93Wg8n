@@ -3914,6 +3914,13 @@ function calculateBmr() {
   let heightCmValue;
   let weightKgValue;
 
+  console.log(
+  "Imperial:",
+  imperialMode.checked,
+  "Metric:",
+  metricMode.checked
+  );
+  
   // -----------------------------
   // Imperial
   // -----------------------------
