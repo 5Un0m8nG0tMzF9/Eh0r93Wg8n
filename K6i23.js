@@ -2401,6 +2401,86 @@ function initPasswordGenerator() {
 }
 
 
+function initQrGenerator() {
+  
+  const input = document.getElementById("qr-input");
+  const generateBtn = document.getElementById("qr-generate");
+  const clearBtn = document.getElementById("qr-clear");
+  const downloadBtn = document.getElementById("qr-download");
+  const output = document.getElementById("qr-output");
+
+  if (
+    !input ||
+    !generateBtn ||
+    !clearBtn ||
+    !downloadBtn ||
+    !output
+  ) {
+    return;
+  }
+
+  let qrCode = null;
+
+  function clearQr() {
+    output.innerHTML = "";
+    qrCode = null;
+  }
+
+  function generateQr() {
+    const text = input.value.trim();
+
+    clearQr();
+
+    if (!text) {
+      return;
+    }
+
+    qrCode = new QRCode(output, {
+      text,
+      width: 500,
+      height: 500,
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  generateBtn.addEventListener("click", generateQr);
+
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+      generateQr();
+    }
+  });
+
+  clearBtn.addEventListener("click", () => {
+    input.value = "";
+    clearQr();
+    input.focus();
+  });
+
+  downloadBtn.addEventListener("click", () => {
+    const canvas = output.querySelector("canvas");
+
+    if (canvas) {
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "qr-code.png";
+      link.click();
+      return;
+    }
+
+    const img = output.querySelector("img");
+
+    if (img && img.src) {
+      const link = document.createElement("a");
+      link.href = img.src;
+      link.download = "qr-code.png";
+      link.click();
+    }
+  });
+
+  input.focus();
+}
+
 function initRandomNumberGenerator() {
 
   const minInput = document.getElementById("min-number");
@@ -4245,6 +4325,10 @@ if (document.getElementById("bmi-calculator")) {
 
 if (document.getElementById("bmr-calculator")) {
   initBmrCalculator();
+}
+
+if (document.getElementById("qr-generator")) {
+  initQrGenerator();
 }
 
 });
