@@ -3851,12 +3851,12 @@ function updateMode() {
 
   imperialFields.style.display =
     imperialMode.checked
-      ? "grid"
+      ? "flex"
       : "none";
 
   metricFields.style.display =
     metricMode.checked
-      ? "grid"
+      ? "flex"
       : "none";
 
 }
