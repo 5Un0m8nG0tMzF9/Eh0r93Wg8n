@@ -3548,26 +3548,32 @@ function calculateBMI() {
 
 let bmi = 0;
 
-// -----------------------------
+// -------------------------------
 // Imperial
-// -----------------------------
+// -------------------------------
 if (imperialMode.checked) {
 
   const feet =
     parseFloat(heightFeet.value);
 
   const inches =
-    parseFloat(heightInches.value) || 0;
+    parseFloat(
+      heightInches.value || 0
+    );
 
   const pounds =
-    parseFloat(weightPounds.value);
+    parseFloat(weightLbs.value);
 
   if (
     isNaN(feet) ||
-    isNaN(pounds)
+    isNaN(pounds) ||
+    feet <= 0 ||
+    pounds <= 0
   ) {
 
-    clearOutputs();
+    result.textContent = "0";
+    commentary.textContent = "";
+    result.dataset.copyValue = "";
     return;
 
   }
@@ -3575,44 +3581,43 @@ if (imperialMode.checked) {
   const totalInches =
     (feet * 12) + inches;
 
-  heightCmValue =
-    totalInches * 2.54;
-
-  weightKgValue =
-    pounds * 0.45359237;
+  bmi =
+    (pounds * 703) /
+    (totalInches * totalInches);
 
 }
 
-// -----------------------------
+// -------------------------------
 // Metric
-// -----------------------------
-else if (metricMode.checked) {
+// -------------------------------
+else {
 
-  heightCmValue =
+  const cm =
     parseFloat(heightCm.value);
 
-  weightKgValue =
+  const kg =
     parseFloat(weightKg.value);
 
   if (
-    isNaN(heightCmValue) ||
-    isNaN(weightKgValue)
+    isNaN(cm) ||
+    isNaN(kg) ||
+    cm <= 0 ||
+    kg <= 0
   ) {
 
-    clearOutputs();
+    result.textContent = "0";
+    commentary.textContent = "";
+    result.dataset.copyValue = "";
     return;
 
   }
 
-}
+  const meters =
+    cm / 100;
 
-// -----------------------------
-// No Mode Selected
-// -----------------------------
-else {
-
-  clearOutputs();
-  return;
+  bmi =
+    kg /
+    (meters * meters);
 
 }
 
@@ -3914,70 +3919,73 @@ function calculateBmr() {
   let heightCmValue;
   let weightKgValue;
 
-  console.log(
-  "Imperial:",
-  imperialMode.checked,
-  "Metric:",
-  metricMode.checked
-  );
-  
-  // -----------------------------
-  // Imperial
-  // -----------------------------
-  if (imperialMode.checked) {
+// -----------------------------
+// Imperial
+// -----------------------------
+if (imperialMode.checked) {
 
-    const feet =
-      parseFloat(heightFeet.value);
+  const feet =
+    parseFloat(heightFeet.value);
 
-    const inches =
-      parseFloat(heightInches.value) || 0;
+  const inches =
+    parseFloat(heightInches.value) || 0;
 
-    const pounds =
-      parseFloat(weightPounds.value);
+  const pounds =
+    parseFloat(weightPounds.value);
 
-    if (
-      isNaN(feet) ||
-      isNaN(pounds)
-    ) {
+  if (
+    isNaN(feet) ||
+    isNaN(pounds)
+  ) {
 
-      clearOutputs();
-      return;
-
-    }
-
-    const totalInches =
-      (feet * 12) + inches;
-
-    heightCmValue =
-      totalInches * 2.54;
-
-    weightKgValue =
-      pounds * 0.45359237;
+    clearOutputs();
+    return;
 
   }
 
-  // -----------------------------
-  // Metric
-  // -----------------------------
-  else {
+  const totalInches =
+    (feet * 12) + inches;
 
-    heightCmValue =
-      parseFloat(heightCm.value);
+  heightCmValue =
+    totalInches * 2.54;
 
-    weightKgValue =
-      parseFloat(weightKg.value);
+  weightKgValue =
+    pounds * 0.45359237;
 
-    if (
-      isNaN(heightCmValue) ||
-      isNaN(weightKgValue)
-    ) {
+}
 
-      clearOutputs();
-      return;
+// -----------------------------
+// Metric
+// -----------------------------
+else if (metricMode.checked) {
 
-    }
+  heightCmValue =
+    parseFloat(heightCm.value);
+
+  weightKgValue =
+    parseFloat(weightKg.value);
+
+  if (
+    isNaN(heightCmValue) ||
+    isNaN(weightKgValue)
+  ) {
+
+    clearOutputs();
+    return;
 
   }
+
+}
+
+// -----------------------------
+// No Mode Selected
+// -----------------------------
+else {
+
+  clearOutputs();
+  return;
+
+}
 
   // -----------------------------
   // Mifflin-St Jeor
