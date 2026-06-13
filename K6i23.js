@@ -4019,22 +4019,22 @@ function calculateBmr() {
     formatNumber(bmr);
 
   result.textContent =
-    formattedBmr;
+  formattedBmr + " Calories";
 
-  sedentaryOutput.textContent =
-    sedentary.toLocaleString();
+sedentaryOutput.textContent =
+  sedentary.toLocaleString() + " Calories";
 
-  lightlyOutput.textContent =
-    lightlyActive.toLocaleString();
+lightlyOutput.textContent =
+  lightlyActive.toLocaleString() + " Calories";
 
-  moderatelyOutput.textContent =
-    moderatelyActive.toLocaleString();
+moderatelyOutput.textContent =
+  moderatelyActive.toLocaleString() + " Calories";
 
-  veryOutput.textContent =
-    veryActive.toLocaleString();
+veryOutput.textContent =
+  veryActive.toLocaleString() + " Calories";
 
-  extremelyOutput.textContent =
-    extremelyActive.toLocaleString();
+extremelyOutput.textContent =
+  extremelyActive.toLocaleString() + " Calories";
 
   result.dataset.copyValue =
 `BMR: ${formattedBmr}
