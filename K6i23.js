@@ -87,6 +87,10 @@ if (document.getElementById("bmi-calculator")) {
   initBmiCalculator();
 }
 
+if (document.getElementById("bmr-calculator")) {
+  initBmrCalculator();
+}
+
 });
 
 
@@ -3755,6 +3759,412 @@ updateMode();
 
 result.textContent = "0";
 commentary.textContent = "-";
+result.dataset.copyValue = "";
+
+heightFeet.focus();
+
+}
+
+// ==============================
+// BMR CALCULATOR
+// ==============================
+function initBmrCalculator() {
+
+const wrapper =
+  document.getElementById("bmr-calculator");
+
+if (!wrapper) return;
+
+// -------------------------------
+// Mode Radios
+// -------------------------------
+const imperialMode =
+  document.getElementById("bmr-imperial-mode");
+
+const metricMode =
+  document.getElementById("bmr-metric-mode");
+
+// -------------------------------
+// Field Wrappers
+// -------------------------------
+const imperialFields =
+  document.getElementById("bmr-imperial-fields");
+
+const metricFields =
+  document.getElementById("bmr-metric-fields");
+
+// -------------------------------
+// Shared Inputs
+// -------------------------------
+const ageInput =
+  document.getElementById("bmr-age");
+
+const sexInput =
+  document.getElementById("bmr-sex");
+
+// -------------------------------
+// Imperial Inputs
+// -------------------------------
+const heightFeet =
+  document.getElementById("bmr-height-feet");
+
+const heightInches =
+  document.getElementById("bmr-height-inches");
+
+const weightPounds =
+  document.getElementById("bmr-weight-pounds");
+
+// -------------------------------
+// Metric Inputs
+// -------------------------------
+const heightCm =
+  document.getElementById("bmr-height-cm");
+
+const weightKg =
+  document.getElementById("bmr-weight-kg");
+
+// -------------------------------
+// Controls
+// -------------------------------
+const calculateBtn =
+  document.getElementById("bmr-calculate");
+
+const copyBtn =
+  document.getElementById("bmr-copy");
+
+const clearBtn =
+  document.getElementById("bmr-clear");
+
+// -------------------------------
+// Results
+// -------------------------------
+const result =
+  document.getElementById("bmr-result");
+
+const commentary =
+  document.getElementById("bmr-commentary");
+
+// -------------------------------
+// Helpers
+// -------------------------------
+function updateMode() {
+
+  imperialFields.style.display =
+    imperialMode.checked
+      ? "grid"
+      : "none";
+
+  metricFields.style.display =
+    metricMode.checked
+      ? "grid"
+      : "none";
+
+}
+
+function formatNumber(value) {
+
+  return Math.round(value)
+    .toLocaleString();
+
+}
+
+// -------------------------------
+// Calculate
+// -------------------------------
+function calculateBmr() {
+
+  const age =
+    parseInt(ageInput.value, 10);
+
+  const sex =
+    sexInput.value;
+
+  if (
+    !age ||
+    age <= 0 ||
+    !sex
+  ) {
+
+    result.textContent = "0";
+    commentary.textContent = "-";
+    result.dataset.copyValue = "";
+
+    return;
+
+  }
+
+  let weightKgValue;
+  let heightCmValue;
+
+  // -----------------------------
+  // Imperial
+  // -----------------------------
+  if (imperialMode.checked) {
+
+    const feet =
+      parseFloat(heightFeet.value);
+
+    const inches =
+      parseFloat(heightInches.value) || 0;
+
+    const pounds =
+      parseFloat(weightPounds.value);
+
+    if (
+      isNaN(feet) ||
+      isNaN(pounds)
+    ) {
+
+      result.textContent = "0";
+      commentary.textContent = "-";
+      result.dataset.copyValue = "";
+
+      return;
+
+    }
+
+    const totalInches =
+      (feet * 12) + inches;
+
+    heightCmValue =
+      totalInches * 2.54;
+
+    weightKgValue =
+      pounds * 0.45359237;
+
+  }
+
+  // -----------------------------
+  // Metric
+  // -----------------------------
+  else {
+
+    heightCmValue =
+      parseFloat(heightCm.value);
+
+    weightKgValue =
+      parseFloat(weightKg.value);
+
+    if (
+      isNaN(heightCmValue) ||
+      isNaN(weightKgValue)
+    ) {
+
+      result.textContent = "0";
+      commentary.textContent = "-";
+      result.dataset.copyValue = "";
+
+      return;
+
+    }
+
+  }
+
+  // -----------------------------
+  // Mifflin-St Jeor Formula
+  // -----------------------------
+  let bmr;
+
+  if (sex === "male") {
+
+    bmr =
+      (10 * weightKgValue) +
+      (6.25 * heightCmValue) -
+      (5 * age) +
+      5;
+
+  } else {
+
+    bmr =
+      (10 * weightKgValue) +
+      (6.25 * heightCmValue) -
+      (5 * age) -
+      161;
+
+  }
+
+  const sedentary =
+    Math.round(bmr * 1.2);
+
+  const lightlyActive =
+    Math.round(bmr * 1.375);
+
+  const moderatelyActive =
+    Math.round(bmr * 1.55);
+
+  const veryActive =
+    Math.round(bmr * 1.725);
+
+  const extremelyActive =
+    Math.round(bmr * 1.9);
+
+  const formattedBmr =
+    formatNumber(bmr);
+
+  result.textContent =
+    formattedBmr;
+
+  commentary.textContent =
+`BMR: ${formattedBmr} Calories / Day
+
+Sedentary: ${sedentary.toLocaleString()}
+Lightly Active: ${lightlyActive.toLocaleString()}
+Moderately Active: ${moderatelyActive.toLocaleString()}
+Very Active: ${veryActive.toLocaleString()}
+Extremely Active: ${extremelyActive.toLocaleString()}`;
+
+  result.dataset.copyValue =
+`BMR: ${formattedBmr} Calories / Day
+
+Sedentary: ${sedentary.toLocaleString()}
+Lightly Active: ${lightlyActive.toLocaleString()}
+Moderately Active: ${moderatelyActive.toLocaleString()}
+Very Active: ${veryActive.toLocaleString()}
+Extremely Active: ${extremelyActive.toLocaleString()}`;
+
+}
+
+// -------------------------------
+// Radio Events
+// -------------------------------
+imperialMode?.addEventListener(
+  "change",
+  updateMode
+);
+
+metricMode?.addEventListener(
+  "change",
+  updateMode
+);
+
+// -------------------------------
+// Calculate Button
+// -------------------------------
+calculateBtn?.addEventListener(
+  "click",
+  calculateBmr
+);
+
+// -------------------------------
+// Enter Key Support
+// -------------------------------
+[
+  ageInput,
+  heightFeet,
+  heightInches,
+  weightPounds,
+  heightCm,
+  weightKg
+].forEach(input => {
+
+  if (!input) return;
+
+  input.addEventListener(
+    "keydown",
+    (e) => {
+
+      if (e.key === "Enter") {
+
+        e.preventDefault();
+        calculateBmr();
+
+      }
+
+    }
+  );
+
+});
+
+// -------------------------------
+// Copy
+// -------------------------------
+copyBtn?.addEventListener(
+  "click",
+  async () => {
+
+    const value =
+      result.dataset.copyValue;
+
+    if (!value) return;
+
+    try {
+
+      await navigator.clipboard.writeText(
+        value
+      );
+
+      const originalText =
+        copyBtn.textContent;
+
+      copyBtn.textContent =
+        "Copied!";
+
+      setTimeout(() => {
+
+        copyBtn.textContent =
+          originalText;
+
+      }, 1500);
+
+    } catch (err) {
+
+      console.error(
+        "Copy failed:",
+        err
+      );
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Clear
+// -------------------------------
+clearBtn?.addEventListener(
+  "click",
+  () => {
+
+    ageInput.value = "";
+
+    sexInput.selectedIndex = 0;
+
+    heightFeet.value = "";
+    heightInches.value = "";
+    weightPounds.value = "";
+
+    heightCm.value = "";
+    weightKg.value = "";
+
+    result.textContent = "0";
+    commentary.textContent = "-";
+
+    result.dataset.copyValue = "";
+
+    if (imperialMode.checked) {
+
+      heightFeet.focus();
+
+    } else {
+
+      heightCm.focus();
+
+    }
+
+  }
+);
+
+// -------------------------------
+// Init
+// -------------------------------
+imperialMode.checked = true;
+metricMode.checked = false;
+
+updateMode();
+
+result.textContent = "0";
+commentary.textContent = "-";
+
 result.dataset.copyValue = "";
 
 heightFeet.focus();
