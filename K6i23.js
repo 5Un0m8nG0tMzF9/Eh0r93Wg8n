@@ -2364,36 +2364,7 @@ function initHashGenerator() {
     focusInput();
   }
 
-  async function generateHash() {
-
-    const value = input.value;
-
-    if (!value) {
-      resetOutput();
-      return;
-    }
-
-    // -------------------------------
-    // MD5
-    // -------------------------------
-    if (md5Radio.checked) {
-
-      const hashHex = md5(value);
-
-      output.textContent = hashHex;
-      output.dataset.copyValue = hashHex;
-
-      return;
-    }
-
-    // -------------------------------
-    // SHA Algorithms
-    // -------------------------------
-    let algorithm = "SHA-256";
-
-    if (sha1Radio.checked) {
-      algorithm = "SHA-1";
-    }
+  async function hashLine(value, algorithm) {
 
     try {
 
@@ -2412,25 +2383,99 @@ function initHashGenerator() {
           new Uint8Array(hashBuffer)
         );
 
-      const hashHex =
-        hashArray
-          .map(byte =>
-            byte
-              .toString(16)
-              .padStart(2, "0")
-          )
-          .join("");
+      return hashArray
+        .map(byte =>
+          byte
+            .toString(16)
+            .padStart(2, "0")
+        )
+        .join("");
 
-      output.textContent = hashHex;
-      output.dataset.copyValue = hashHex;
+    } catch {
 
-    } catch (error) {
-
-      console.error(error);
-
-      resetOutput();
+      return "Invalid Input";
 
     }
+
+  }
+
+  async function generateHash() {
+
+    const lines =
+      input.value.split("\n");
+
+    if (!lines.length) {
+      resetOutput();
+      return;
+    }
+
+    const results = [];
+
+    // -------------------------------
+    // MD5
+    // -------------------------------
+    if (md5Radio.checked) {
+
+      for (const line of lines) {
+
+        const value = line.trim();
+
+        // Preserve blank lines
+        if (!value) {
+          results.push("");
+          continue;
+        }
+
+        results.push(
+          md5(value)
+        );
+
+      }
+
+      const result =
+        results.join("\n");
+
+      output.textContent = result;
+      output.dataset.copyValue = result;
+
+      return;
+
+    }
+
+    // -------------------------------
+    // SHA Algorithms
+    // -------------------------------
+    let algorithm = "SHA-256";
+
+    if (sha1Radio.checked) {
+      algorithm = "SHA-1";
+    }
+
+    for (const line of lines) {
+
+      const value = line.trim();
+
+      // Preserve blank lines
+      if (!value) {
+        results.push("");
+        continue;
+      }
+
+      const hash =
+        await hashLine(
+          value,
+          algorithm
+        );
+
+      results.push(hash);
+
+    }
+
+    const result =
+      results.join("\n");
+
+    output.textContent = result;
+    output.dataset.copyValue = result;
 
   }
 
