@@ -3454,6 +3454,143 @@ function initRandomNumberGenerator() {
 }
 
 
+function initSlugGenerator() {
+
+  const wrapper = document.getElementById("slug-generator");
+
+  if (!wrapper) return;
+
+  const input = document.getElementById("slug-input");
+
+  const generateBtn = document.getElementById("slug-generate");
+
+  const output = document.getElementById("slug-output");
+
+  const copyBtn = document.getElementById("slug-copy");
+  const clearBtn = document.getElementById("slug-clear");
+
+  if (
+    !input ||
+    !generateBtn ||
+    !output ||
+    !copyBtn ||
+    !clearBtn
+  ) {
+    return;
+  }
+
+  const originalCopyText = copyBtn.textContent;
+
+  function resetOutput() {
+    output.textContent = "";
+    output.dataset.copyValue = "";
+  }
+
+  function focusInput() {
+    input.focus();
+  }
+
+  function generateSlug() {
+
+    const value = input.value.trim();
+
+    if (!value) {
+      resetOutput();
+      return;
+    }
+
+    const slug = value
+      .toLowerCase()
+      .trim()
+      .replace(/['"]/g, "")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "");
+
+    output.textContent = slug;
+    output.dataset.copyValue = slug;
+
+  }
+
+  generateBtn.addEventListener(
+    "click",
+    generateSlug
+  );
+
+  input.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+        generateSlug();
+
+      }
+
+    }
+  );
+
+  copyBtn.addEventListener(
+    "click",
+    async () => {
+
+      const value =
+        output.dataset.copyValue || "";
+
+      if (!value) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          value
+        );
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalCopyText;
+
+        }, 1500);
+
+      } catch (error) {
+
+        console.error(
+          "Copy failed:",
+          error
+        );
+
+      }
+
+    }
+  );
+
+  clearBtn.addEventListener(
+    "click",
+    () => {
+
+      input.value = "";
+
+      resetOutput();
+
+      focusInput();
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  resetOutput();
+
+  focusInput();
+
+}
+
 function initDuplicateLineRemover() {
   
   const input = document.getElementById("dlr-input");
@@ -5223,6 +5360,10 @@ if (document.getElementById("color-converter")) {
 
 if (document.getElementById("hash-generator")) {
   initHashGenerator();
+}
+
+if (document.getElementById("slug-generator")) {
+  initSlugGenerator();
 }
 
 });
