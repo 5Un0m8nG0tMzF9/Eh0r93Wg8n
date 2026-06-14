@@ -2150,28 +2150,8 @@ function initHashGenerator() {
   }
 
   function updateMode() {
-
     resetOutput();
-
-    if (sha256Radio.checked) {
-
-      input.placeholder =
-        "Enter text to generate a SHA-256 hash...";
-
-    } else if (sha1Radio.checked) {
-
-      input.placeholder =
-        "Enter text to generate a SHA-1 hash...";
-
-    } else if (md5Radio.checked) {
-
-      input.placeholder =
-        "Enter text to generate an MD5 hash...";
-
-    }
-
     focusInput();
-
   }
 
   async function generateHash() {
@@ -2179,10 +2159,8 @@ function initHashGenerator() {
     const value = input.value;
 
     if (!value) {
-
       resetOutput();
       return;
-
     }
 
     // -------------------------------
@@ -2196,7 +2174,6 @@ function initHashGenerator() {
       output.dataset.copyValue = hashHex;
 
       return;
-
     }
 
     // -------------------------------
