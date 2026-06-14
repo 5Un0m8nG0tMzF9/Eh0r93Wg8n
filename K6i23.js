@@ -3887,6 +3887,17 @@ function initTextSorter() {
   input.focus();
 
   // -------------------------------
+  // Mode Focus
+  // -------------------------------
+  azBtn.addEventListener("change", () => {
+    input.focus();
+  });
+
+  zaBtn.addEventListener("change", () => {
+    input.focus();
+  });
+
+  // -------------------------------
   // Sort
   // -------------------------------
   sortBtn.addEventListener("click", () => {
@@ -3980,8 +3991,7 @@ function initTextSorter() {
       removeEmpty.checked = false;
       removeDup.checked = false;
 
-      azBtn.checked = true;
-      zaBtn.checked = false;
+      // Preserve active sort mode
 
       input.focus();
 
