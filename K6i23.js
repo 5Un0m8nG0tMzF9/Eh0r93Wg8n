@@ -2154,45 +2154,76 @@ function initBdTool() {
 
   function convertValue() {
 
-    const value = input.value.trim();
+  const lines = input.value.split("\n");
 
-    if (!value) {
-      resetOutput();
-      return;
-    }
+  if (!lines.length) {
+    resetOutput();
+    return;
+  }
 
-    let result = "";
+  const results = [];
 
-    // -------------------------------
-    // Binary → Decimal
-    // -------------------------------
-    if (binaryRadio.checked) {
+  // -------------------------------
+  // Binary → Decimal
+  // -------------------------------
+  if (binaryRadio.checked) {
+
+    for (const line of lines) {
+
+      const value = line.trim();
+
+      // Preserve blank lines
+      if (!value) {
+        results.push("");
+        continue;
+      }
 
       if (!/^[01]+$/.test(value)) {
-        resetOutput();
-        return;
+        results.push("Invalid Binary");
+        continue;
       }
 
-      result = parseInt(value, 2).toString();
+      results.push(
+        parseInt(value, 2).toString()
+      );
 
     }
 
-    // -------------------------------
-    // Decimal → Binary
-    // -------------------------------
-    else {
+  }
+
+  // -------------------------------
+  // Decimal → Binary
+  // -------------------------------
+  else {
+
+    for (const line of lines) {
+
+      const value = line.trim();
+
+      // Preserve blank lines
+      if (!value) {
+        results.push("");
+        continue;
+      }
 
       if (!/^\d+$/.test(value)) {
-        resetOutput();
-        return;
+        results.push("Invalid Decimal");
+        continue;
       }
 
-      result = Number(value).toString(2);
+      results.push(
+        Number(value).toString(2)
+      );
 
     }
 
-    output.textContent = result;
-    output.dataset.copyValue = result;
+  }
+
+  const result =
+    results.join("\n");
+
+  output.textContent = result;
+  output.dataset.copyValue = result;
 
   }
 
