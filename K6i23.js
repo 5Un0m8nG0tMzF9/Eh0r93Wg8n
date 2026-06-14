@@ -2106,6 +2106,185 @@ function initBase64Tool() {
 }
 
 
+function initBdTool() {
+
+  const wrapper = document.getElementById("bd-tool");
+
+  if (!wrapper) return;
+
+  const input = document.getElementById("bd-input");
+
+  const binaryRadio = document.getElementById("binary-to-decimal");
+  const decimalRadio = document.getElementById("decimal-to-binary");
+
+  const convertBtn = document.getElementById("bd-convert");
+
+  const output = document.getElementById("bd-output");
+
+  const copyBtn = document.getElementById("bd-copy");
+  const clearBtn = document.getElementById("bd-clear");
+
+  if (
+    !input ||
+    !binaryRadio ||
+    !decimalRadio ||
+    !convertBtn ||
+    !output ||
+    !copyBtn ||
+    !clearBtn
+  ) {
+    return;
+  }
+
+  const originalCopyText = copyBtn.textContent;
+
+  function resetOutput() {
+    output.textContent = "";
+    output.dataset.copyValue = "";
+  }
+
+  function focusInput() {
+    input.focus();
+  }
+
+  function updateMode() {
+    resetOutput();
+    focusInput();
+  }
+
+  function convertValue() {
+
+    const value = input.value.trim();
+
+    if (!value) {
+      resetOutput();
+      return;
+    }
+
+    let result = "";
+
+    // -------------------------------
+    // Binary → Decimal
+    // -------------------------------
+    if (binaryRadio.checked) {
+
+      if (!/^[01]+$/.test(value)) {
+        resetOutput();
+        return;
+      }
+
+      result = parseInt(value, 2).toString();
+
+    }
+
+    // -------------------------------
+    // Decimal → Binary
+    // -------------------------------
+    else {
+
+      if (!/^\d+$/.test(value)) {
+        resetOutput();
+        return;
+      }
+
+      result = Number(value).toString(2);
+
+    }
+
+    output.textContent = result;
+    output.dataset.copyValue = result;
+
+  }
+
+  convertBtn.addEventListener(
+    "click",
+    convertValue
+  );
+
+  input.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+        convertValue();
+
+      }
+
+    }
+  );
+
+  binaryRadio.addEventListener(
+    "change",
+    updateMode
+  );
+
+  decimalRadio.addEventListener(
+    "change",
+    updateMode
+  );
+
+  copyBtn.addEventListener(
+    "click",
+    async () => {
+
+      const value =
+        output.dataset.copyValue || "";
+
+      if (!value) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          value
+        );
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalCopyText;
+
+        }, 1500);
+
+      } catch (error) {
+
+        console.error(
+          "Copy failed:",
+          error
+        );
+
+      }
+
+    }
+  );
+
+  clearBtn.addEventListener(
+    "click",
+    () => {
+
+      input.value = "";
+
+      resetOutput();
+
+      focusInput();
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  binaryRadio.checked = true;
+  decimalRadio.checked = false;
+
+  updateMode();
+
+}
+
 function initHashGenerator() {
 
   const wrapper = document.getElementById("hash-generator");
@@ -5551,6 +5730,10 @@ if (document.getElementById("slug-generator")) {
 
 if (document.getElementById("html-tool")) {
   initHtmlTool();
+}
+
+if (document.getElementById("bd-tool")) {
+  initBdTool();
 }
 
 });
