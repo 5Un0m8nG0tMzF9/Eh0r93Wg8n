@@ -3946,16 +3946,9 @@ function initSlugGenerator() {
     input.focus();
   }
 
-  function generateSlug() {
+  function createSlug(value) {
 
-    const value = input.value.trim();
-
-    if (!value) {
-      resetOutput();
-      return;
-    }
-
-    const slug = value
+    return value
       .toLowerCase()
       .trim()
       .replace(/['"]/g, "")
@@ -3964,8 +3957,41 @@ function initSlugGenerator() {
       .replace(/-+/g, "-")
       .replace(/^-|-$/g, "");
 
-    output.textContent = slug;
-    output.dataset.copyValue = slug;
+  }
+
+  function generateSlug() {
+
+    const lines =
+      input.value.split("\n");
+
+    if (!lines.length) {
+      resetOutput();
+      return;
+    }
+
+    const results = [];
+
+    for (const line of lines) {
+
+      const value = line.trim();
+
+      // Preserve blank lines
+      if (!value) {
+        results.push("");
+        continue;
+      }
+
+      results.push(
+        createSlug(value)
+      );
+
+    }
+
+    const result =
+      results.join("\n");
+
+    output.textContent = result;
+    output.dataset.copyValue = result;
 
   }
 
