@@ -3914,36 +3914,19 @@ function initTextSorter() {
       lines = [...new Set(lines)];
     }
 
-    // Sort alphabetically while
-    // keeping empty lines at bottom
-    lines.sort((a, b) => {
-
-      const aEmpty =
-        a.trim() === "";
-
-      const bEmpty =
-        b.trim() === "";
-
-      if (aEmpty && !bEmpty) {
-        return 1;
-      }
-
-      if (!aEmpty && bEmpty) {
-        return -1;
-      }
-
-      return a.localeCompare(b);
-
+    // Sort alphabetically
+      lines.sort((a, b) => {
+  return a.localeCompare(b);
     });
 
     if (zaBtn.checked) {
       lines.reverse();
     }
 
-    output.textContent =
+        output.textContent =
       lines.join("\n");
 
-  });
+    });
 
   // -------------------------------
   // Copy
