@@ -2906,49 +2906,67 @@ function initUnixConverter() {
 
   function convertTimestampToDate() {
 
-    const value = timestampInput.value.trim();
+    const lines =
+      timestampInput.value.split("\n");
 
-    if (!value) {
+    if (!lines.length) {
       resetOutput();
       return;
     }
 
-    let timestamp = Number(value);
+    const results = [];
 
-    if (!Number.isFinite(timestamp)) {
-      resetOutput();
-      return;
+    for (const line of lines) {
+
+      const value = line.trim();
+
+      // Preserve blank lines
+      if (!value) {
+        results.push("");
+        continue;
+      }
+
+      let timestamp = Number(value);
+
+      if (!Number.isFinite(timestamp)) {
+        results.push("Invalid Timestamp");
+        continue;
+      }
+
+      // 10 digits = seconds
+      // 13 digits = milliseconds
+      if (Math.abs(timestamp) < 1000000000000) {
+        timestamp *= 1000;
+      }
+
+      const date = new Date(timestamp);
+
+      if (isNaN(date.getTime())) {
+        results.push("Invalid Timestamp");
+        continue;
+      }
+
+      const localDate = date.toLocaleString(
+        undefined,
+        {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+          second: "2-digit"
+        }
+      );
+
+      results.push(
+        `UTC: ${date.toUTCString()} | Local: ${localDate}`
+      );
+
     }
-
-    // 10 digits = seconds
-    // 13 digits = milliseconds
-    if (Math.abs(timestamp) < 1000000000000) {
-      timestamp *= 1000;
-    }
-
-    const date = new Date(timestamp);
-
-    if (isNaN(date.getTime())) {
-      resetOutput();
-      return;
-    }
-
-    const localDate = date.toLocaleString(
-      undefined,
-    {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      second: "2-digit"
-    }
-  );
 
     const result =
-    `UTC: ${date.toUTCString()}\n\n` +
-    `Local: ${localDate}`;
+      results.join("\n");
 
     output.textContent = result;
     output.dataset.copyValue = result;
