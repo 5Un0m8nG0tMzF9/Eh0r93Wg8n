@@ -954,384 +954,6 @@ function initCalculator() {
 
 }
 
-function initColorConverter() {
-
-  const wrapper = document.getElementById("color-converter");
-
-  if (!wrapper) return;
-
-  const hexRgbRadio = document.getElementById("color-hex-rgb");
-  const rgbHexRadio = document.getElementById("color-rgb-hex");
-  const hexHslRadio = document.getElementById("color-hex-hsl");
-  const hslHexRadio = document.getElementById("color-hsl-hex");
-
-  const input = document.getElementById("color-input");
-
-  const convertBtn = document.getElementById("color-convert");
-
-  const output = document.getElementById("color-output");
-
-  const copyBtn = document.getElementById("color-copy");
-  const clearBtn = document.getElementById("color-clear");
-
-  if (
-    !hexRgbRadio ||
-    !rgbHexRadio ||
-    !hexHslRadio ||
-    !hslHexRadio ||
-    !input ||
-    !convertBtn ||
-    !output ||
-    !copyBtn ||
-    !clearBtn
-  ) {
-    return;
-  }
-
-  const originalCopyText = copyBtn.textContent;
-
-  function resetOutput() {
-    output.textContent = "";
-    output.dataset.copyValue = "";
-  }
-
-  function focusInput() {
-    input.focus();
-  }
-
-  function updateMode() {
-
-    resetOutput();
-
-    if (hexRgbRadio.checked) {
-      input.placeholder = "#FF0000";
-    } else if (rgbHexRadio.checked) {
-      input.placeholder = "255, 0, 0";
-    } else if (hexHslRadio.checked) {
-      input.placeholder = "#FF0000";
-    } else if (hslHexRadio.checked) {
-      input.placeholder = "0, 100%, 50%";
-    }
-
-    focusInput();
-
-  }
-
-  function hexToRgb(hex) {
-
-    hex = hex.replace("#", "").trim();
-
-    if (hex.length === 3) {
-      hex = hex
-        .split("")
-        .map(char => char + char)
-        .join("");
-    }
-
-    if (!/^[0-9A-Fa-f]{6}$/.test(hex)) {
-      return null;
-    }
-
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-
-    return `${r}, ${g}, ${b}`;
-
-  }
-
-  function rgbToHex(rgb) {
-
-    rgb = rgb.replace(/rgb\s*\(/i, "")
-      .replace(/\)/g, "");
-
-    const parts = rgb
-      .split(",")
-      .map(part => parseInt(part.trim(), 10));
-
-    if (
-      parts.length !== 3 ||
-      parts.some(value =>
-        isNaN(value) ||
-        value < 0 ||
-        value > 255
-      )
-    ) {
-      return null;
-    }
-
-    return (
-      "#" +
-      parts
-        .map(value =>
-          value
-            .toString(16)
-            .padStart(2, "0")
-        )
-        .join("")
-        .toUpperCase()
-    );
-
-  }
-
-  function hexToHsl(hex) {
-
-    hex = hex.replace("#", "");
-
-    if (hex.length === 3) {
-      hex = hex
-        .split("")
-        .map(char => char + char)
-        .join("");
-    }
-
-    if (!/^[0-9A-Fa-f]{6}$/.test(hex)) {
-      return null;
-    }
-
-    let r = parseInt(hex.substring(0, 2), 16) / 255;
-    let g = parseInt(hex.substring(2, 4), 16) / 255;
-    let b = parseInt(hex.substring(4, 6), 16) / 255;
-
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-
-    let h;
-    let s;
-    const l = (max + min) / 2;
-
-    if (max === min) {
-
-      h = 0;
-      s = 0;
-
-    } else {
-
-      const d = max - min;
-
-      s =
-        l > 0.5
-          ? d / (2 - max - min)
-          : d / (max + min);
-
-      switch (max) {
-
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-
-        case g:
-          h = (b - r) / d + 2;
-          break;
-
-        default:
-          h = (r - g) / d + 4;
-
-      }
-
-      h /= 6;
-
-    }
-
-    return `${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%`;
-
-  }
-
-  function hslToHex(hsl) {
-
-    hsl = hsl
-      .replace(/hsl\s*\(/i, "")
-      .replace(/\)/g, "")
-      .replace(/%/g, "");
-
-    const parts = hsl
-      .split(",")
-      .map(part => Number(part.trim()));
-
-    if (
-      parts.length !== 3 ||
-      parts.some(value => isNaN(value))
-    ) {
-      return null;
-    }
-
-    let [h, s, l] = parts;
-
-    h /= 360;
-    s /= 100;
-    l /= 100;
-
-    let r;
-    let g;
-    let b;
-
-    if (s === 0) {
-
-      r = g = b = l;
-
-    } else {
-
-      const hue2rgb = (p, q, t) => {
-
-        if (t < 0) t += 1;
-        if (t > 1) t -= 1;
-
-        if (t < 1 / 6) return p + (q - p) * 6 * t;
-        if (t < 1 / 2) return q;
-        if (t < 2 / 3) {
-          return p + (q - p) * (2 / 3 - t) * 6;
-        }
-
-        return p;
-
-      };
-
-      const q =
-        l < 0.5
-          ? l * (1 + s)
-          : l + s - l * s;
-
-      const p = 2 * l - q;
-
-      r = hue2rgb(p, q, h + 1 / 3);
-      g = hue2rgb(p, q, h);
-      b = hue2rgb(p, q, h - 1 / 3);
-
-    }
-
-    return (
-      "#" +
-      [r, g, b]
-        .map(value =>
-          Math.round(value * 255)
-            .toString(16)
-            .padStart(2, "0")
-        )
-        .join("")
-        .toUpperCase()
-    );
-
-  }
-
-  function convert() {
-
-    const value = input.value.trim();
-
-    if (!value) {
-      resetOutput();
-      return;
-    }
-
-    let result = null;
-
-    if (hexRgbRadio.checked) {
-      result = hexToRgb(value);
-    } else if (rgbHexRadio.checked) {
-      result = rgbToHex(value);
-    } else if (hexHslRadio.checked) {
-      result = hexToHsl(value);
-    } else if (hslHexRadio.checked) {
-      result = hslToHex(value);
-    }
-
-    if (!result) {
-      resetOutput();
-      return;
-    }
-
-    output.textContent = result;
-    output.dataset.copyValue = result;
-
-  }
-
-  convertBtn.addEventListener(
-    "click",
-    convert
-  );
-
-  [
-    hexRgbRadio,
-    rgbHexRadio,
-    hexHslRadio,
-    hslHexRadio
-  ].forEach(radio => {
-
-    radio.addEventListener(
-      "change",
-      updateMode
-    );
-
-  });
-
-  input.addEventListener(
-    "keydown",
-    (event) => {
-
-      if (event.key === "Enter") {
-        convert();
-      }
-
-    }
-  );
-
-  copyBtn.addEventListener(
-    "click",
-    async () => {
-
-      const value =
-        output.dataset.copyValue || "";
-
-      if (!value) return;
-
-      try {
-
-        await navigator.clipboard.writeText(
-          value
-        );
-
-        copyBtn.textContent = "Copied!";
-
-        setTimeout(() => {
-
-          copyBtn.textContent =
-            originalCopyText;
-
-        }, 1500);
-
-      } catch (error) {
-
-        console.error(error);
-
-      }
-
-    }
-  );
-
-  clearBtn.addEventListener(
-    "click",
-    () => {
-
-      input.value = "";
-
-      resetOutput();
-      focusInput();
-
-    }
-  );
-
-  // -------------------------------
-  // Init
-  // -------------------------------
-
-  hexRgbRadio.checked = true;
-  rgbHexRadio.checked = false;
-  hexHslRadio.checked = false;
-  hslHexRadio.checked = false;
-
-  updateMode();
-
-}
-
 function initPercentageCalculator() {
 
   const wrapper = document.getElementById("percentage-calculator");
@@ -2311,6 +1933,400 @@ function initBdTool() {
   // -------------------------------
   binaryRadio.checked = true;
   decimalRadio.checked = false;
+
+  updateMode();
+
+}
+
+function initColorConverter() {
+
+  const wrapper = document.getElementById("color-converter");
+
+  if (!wrapper) return;
+
+  const hexRgbRadio = document.getElementById("color-hex-rgb");
+  const rgbHexRadio = document.getElementById("color-rgb-hex");
+  const hexHslRadio = document.getElementById("color-hex-hsl");
+  const hslHexRadio = document.getElementById("color-hsl-hex");
+
+  const input = document.getElementById("color-input");
+
+  const convertBtn = document.getElementById("color-convert");
+
+  const output = document.getElementById("color-output");
+
+  const copyBtn = document.getElementById("color-copy");
+  const clearBtn = document.getElementById("color-clear");
+
+  if (
+    !hexRgbRadio ||
+    !rgbHexRadio ||
+    !hexHslRadio ||
+    !hslHexRadio ||
+    !input ||
+    !convertBtn ||
+    !output ||
+    !copyBtn ||
+    !clearBtn
+  ) {
+    return;
+  }
+
+  const originalCopyText = copyBtn.textContent;
+
+  function resetOutput() {
+    output.textContent = "";
+    output.dataset.copyValue = "";
+  }
+
+  function focusInput() {
+    input.focus();
+  }
+
+  function updateMode() {
+
+    resetOutput();
+
+    if (hexRgbRadio.checked) {
+      input.placeholder = "#FF0000";
+    } else if (rgbHexRadio.checked) {
+      input.placeholder = "255, 0, 0";
+    } else if (hexHslRadio.checked) {
+      input.placeholder = "#FF0000";
+    } else if (hslHexRadio.checked) {
+      input.placeholder = "0, 100%, 50%";
+    }
+
+    focusInput();
+
+  }
+
+  function hexToRgb(hex) {
+
+    hex = hex.replace("#", "").trim();
+
+    if (hex.length === 3) {
+      hex = hex
+        .split("")
+        .map(char => char + char)
+        .join("");
+    }
+
+    if (!/^[0-9A-Fa-f]{6}$/.test(hex)) {
+      return null;
+    }
+
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+
+    return `${r}, ${g}, ${b}`;
+
+  }
+
+  function rgbToHex(rgb) {
+
+    rgb = rgb.replace(/rgb\s*\(/i, "")
+      .replace(/\)/g, "");
+
+    const parts = rgb
+      .split(",")
+      .map(part => parseInt(part.trim(), 10));
+
+    if (
+      parts.length !== 3 ||
+      parts.some(value =>
+        isNaN(value) ||
+        value < 0 ||
+        value > 255
+      )
+    ) {
+      return null;
+    }
+
+    return (
+      "#" +
+      parts
+        .map(value =>
+          value
+            .toString(16)
+            .padStart(2, "0")
+        )
+        .join("")
+        .toUpperCase()
+    );
+
+  }
+
+  function hexToHsl(hex) {
+
+    hex = hex.replace("#", "");
+
+    if (hex.length === 3) {
+      hex = hex
+        .split("")
+        .map(char => char + char)
+        .join("");
+    }
+
+    if (!/^[0-9A-Fa-f]{6}$/.test(hex)) {
+      return null;
+    }
+
+    let r = parseInt(hex.substring(0, 2), 16) / 255;
+    let g = parseInt(hex.substring(2, 4), 16) / 255;
+    let b = parseInt(hex.substring(4, 6), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+
+    let h;
+    let s;
+    const l = (max + min) / 2;
+
+    if (max === min) {
+
+      h = 0;
+      s = 0;
+
+    } else {
+
+      const d = max - min;
+
+      s =
+        l > 0.5
+          ? d / (2 - max - min)
+          : d / (max + min);
+
+      switch (max) {
+
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+
+        case g:
+          h = (b - r) / d + 2;
+          break;
+
+        default:
+          h = (r - g) / d + 4;
+
+      }
+
+      h /= 6;
+
+    }
+
+    return `${Math.round(h * 360)}, ${Math.round(s * 100)}%, ${Math.round(l * 100)}%`;
+
+  }
+
+  function hslToHex(hsl) {
+
+    hsl = hsl
+      .replace(/hsl\s*\(/i, "")
+      .replace(/\)/g, "")
+      .replace(/%/g, "");
+
+    const parts = hsl
+      .split(",")
+      .map(part => Number(part.trim()));
+
+    if (
+      parts.length !== 3 ||
+      parts.some(value => isNaN(value))
+    ) {
+      return null;
+    }
+
+    let [h, s, l] = parts;
+
+    h /= 360;
+    s /= 100;
+    l /= 100;
+
+    let r;
+    let g;
+    let b;
+
+    if (s === 0) {
+
+      r = g = b = l;
+
+    } else {
+
+      const hue2rgb = (p, q, t) => {
+
+        if (t < 0) t += 1;
+        if (t > 1) t -= 1;
+
+        if (t < 1 / 6) return p + (q - p) * 6 * t;
+        if (t < 1 / 2) return q;
+        if (t < 2 / 3) {
+          return p + (q - p) * (2 / 3 - t) * 6;
+        }
+
+        return p;
+
+      };
+
+      const q =
+        l < 0.5
+          ? l * (1 + s)
+          : l + s - l * s;
+
+      const p = 2 * l - q;
+
+      r = hue2rgb(p, q, h + 1 / 3);
+      g = hue2rgb(p, q, h);
+      b = hue2rgb(p, q, h - 1 / 3);
+
+    }
+
+    return (
+      "#" +
+      [r, g, b]
+        .map(value =>
+          Math.round(value * 255)
+            .toString(16)
+            .padStart(2, "0")
+        )
+        .join("")
+        .toUpperCase()
+    );
+
+  }
+
+  function convert() {
+
+    const lines =
+      input.value.split("\n");
+
+    if (!lines.length) {
+      resetOutput();
+      return;
+    }
+
+    const results = [];
+
+    for (const line of lines) {
+
+      const value = line.trim();
+
+      if (!value) {
+        results.push("");
+        continue;
+      }
+
+      let result = null;
+
+      if (hexRgbRadio.checked) {
+        result = hexToRgb(value);
+      } else if (rgbHexRadio.checked) {
+        result = rgbToHex(value);
+      } else if (hexHslRadio.checked) {
+        result = hexToHsl(value);
+      } else if (hslHexRadio.checked) {
+        result = hslToHex(value);
+      }
+
+      results.push(
+        result || "Invalid Color"
+      );
+
+    }
+
+    const finalResult =
+      results.join("\n");
+
+    output.textContent = finalResult;
+    output.dataset.copyValue = finalResult;
+
+  }
+
+  convertBtn.addEventListener(
+    "click",
+    convert
+  );
+
+  [
+    hexRgbRadio,
+    rgbHexRadio,
+    hexHslRadio,
+    hslHexRadio
+  ].forEach(radio => {
+
+    radio.addEventListener(
+      "change",
+      updateMode
+    );
+
+  });
+
+  input.addEventListener(
+    "keydown",
+    (event) => {
+
+      if (event.key === "Enter") {
+        convert();
+      }
+
+    }
+  );
+
+  copyBtn.addEventListener(
+    "click",
+    async () => {
+
+      const value =
+        output.dataset.copyValue || "";
+
+      if (!value) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          value
+        );
+
+        copyBtn.textContent = "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalCopyText;
+
+        }, 1500);
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+  );
+
+  clearBtn.addEventListener(
+    "click",
+    () => {
+
+      input.value = "";
+
+      resetOutput();
+      focusInput();
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+
+  hexRgbRadio.checked = true;
+  rgbHexRadio.checked = false;
+  hexHslRadio.checked = false;
+  hslHexRadio.checked = false;
 
   updateMode();
 
