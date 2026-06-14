@@ -2314,6 +2314,189 @@ function initHashGenerator() {
 
 }
 
+function initHtmlTool() {
+
+  const wrapper = document.getElementById("html-tool");
+
+  if (!wrapper) return;
+
+  const input = document.getElementById("html-input");
+
+  const encodeRadio = document.getElementById("html-encode");
+  const decodeRadio = document.getElementById("html-decode");
+
+  const convertBtn = document.getElementById("html-convert");
+
+  const output = document.getElementById("html-output");
+
+  const copyBtn = document.getElementById("html-copy");
+  const clearBtn = document.getElementById("html-clear");
+
+  if (
+    !input ||
+    !encodeRadio ||
+    !decodeRadio ||
+    !convertBtn ||
+    !output ||
+    !copyBtn ||
+    !clearBtn
+  ) {
+    return;
+  }
+
+  const originalCopyText = copyBtn.textContent;
+
+  function resetOutput() {
+    output.textContent = "";
+    output.dataset.copyValue = "";
+  }
+
+  function focusInput() {
+    input.focus();
+  }
+
+  function updateMode() {
+    resetOutput();
+    focusInput();
+  }
+
+  function encodeHtml(text) {
+
+    const div = document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+  }
+
+  function decodeHtml(text) {
+
+    const textarea = document.createElement("textarea");
+
+    textarea.innerHTML = text;
+
+    return textarea.value;
+
+  }
+
+  function convertHtml() {
+
+    const value = input.value;
+
+    if (!value) {
+
+      resetOutput();
+      return;
+
+    }
+
+    let result = "";
+
+    if (encodeRadio.checked) {
+
+      result = encodeHtml(value);
+
+    } else {
+
+      result = decodeHtml(value);
+
+    }
+
+    output.textContent = result;
+    output.dataset.copyValue = result;
+
+  }
+
+  convertBtn.addEventListener(
+    "click",
+    convertHtml
+  );
+
+  input.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter" && !event.shiftKey) {
+
+        event.preventDefault();
+        convertHtml();
+
+      }
+
+    }
+  );
+
+  encodeRadio.addEventListener(
+    "change",
+    updateMode
+  );
+
+  decodeRadio.addEventListener(
+    "change",
+    updateMode
+  );
+
+  copyBtn.addEventListener(
+    "click",
+    async () => {
+
+      const value =
+        output.dataset.copyValue || "";
+
+      if (!value) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          value
+        );
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalCopyText;
+
+        }, 1500);
+
+      } catch (error) {
+
+        console.error(
+          "Copy failed:",
+          error
+        );
+
+      }
+
+    }
+  );
+
+  clearBtn.addEventListener(
+    "click",
+    () => {
+
+      input.value = "";
+
+      resetOutput();
+
+      focusInput();
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  encodeRadio.checked = true;
+  decodeRadio.checked = false;
+
+  updateMode();
+
+}
+
 function initJsonFormatter() {
 
   const input = document.getElementById("paste-json");
@@ -5364,6 +5547,10 @@ if (document.getElementById("hash-generator")) {
 
 if (document.getElementById("slug-generator")) {
   initSlugGenerator();
+}
+
+if (document.getElementById("html-tool")) {
+  initHtmlTool();
 }
 
 });
