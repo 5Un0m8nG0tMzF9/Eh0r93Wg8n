@@ -2106,6 +2106,237 @@ function initBase64Tool() {
 }
 
 
+function initHashGenerator() {
+
+  const wrapper = document.getElementById("hash-generator");
+
+  if (!wrapper) return;
+
+  const sha256Radio = document.getElementById("sha-256");
+  const sha1Radio = document.getElementById("sha-1");
+  const md5Radio = document.getElementById("md5");
+
+  const input = document.getElementById("hash-input");
+
+  const generateBtn = document.getElementById("hash-generate");
+
+  const output = document.getElementById("hash-output");
+
+  const copyBtn = document.getElementById("hash-copy");
+  const clearBtn = document.getElementById("hash-clear");
+
+  if (
+    !sha256Radio ||
+    !sha1Radio ||
+    !md5Radio ||
+    !input ||
+    !generateBtn ||
+    !output ||
+    !copyBtn ||
+    !clearBtn
+  ) {
+    return;
+  }
+
+  const originalCopyText = copyBtn.textContent;
+
+  function resetOutput() {
+    output.textContent = "";
+    output.dataset.copyValue = "";
+  }
+
+  function focusInput() {
+    input.focus();
+  }
+
+  function updateMode() {
+
+    resetOutput();
+
+    if (sha256Radio.checked) {
+
+      input.placeholder =
+        "Enter text to generate a SHA-256 hash...";
+
+    } else if (sha1Radio.checked) {
+
+      input.placeholder =
+        "Enter text to generate a SHA-1 hash...";
+
+    } else if (md5Radio.checked) {
+
+      input.placeholder =
+        "Enter text to generate an MD5 hash...";
+
+    }
+
+    focusInput();
+
+  }
+
+  async function generateHash() {
+
+    const value = input.value;
+
+    if (!value) {
+
+      resetOutput();
+      return;
+
+    }
+
+    // -------------------------------
+    // MD5
+    // -------------------------------
+    if (md5Radio.checked) {
+
+      const hashHex = md5(value);
+
+      output.textContent = hashHex;
+      output.dataset.copyValue = hashHex;
+
+      return;
+
+    }
+
+    // -------------------------------
+    // SHA Algorithms
+    // -------------------------------
+    let algorithm = "SHA-256";
+
+    if (sha1Radio.checked) {
+      algorithm = "SHA-1";
+    }
+
+    try {
+
+      const encoder = new TextEncoder();
+
+      const data = encoder.encode(value);
+
+      const hashBuffer =
+        await crypto.subtle.digest(
+          algorithm,
+          data
+        );
+
+      const hashArray =
+        Array.from(
+          new Uint8Array(hashBuffer)
+        );
+
+      const hashHex =
+        hashArray
+          .map(byte =>
+            byte
+              .toString(16)
+              .padStart(2, "0")
+          )
+          .join("");
+
+      output.textContent = hashHex;
+      output.dataset.copyValue = hashHex;
+
+    } catch (error) {
+
+      console.error(error);
+
+      resetOutput();
+
+    }
+
+  }
+
+  generateBtn.addEventListener(
+    "click",
+    generateHash
+  );
+
+  [
+    sha256Radio,
+    sha1Radio,
+    md5Radio
+  ].forEach(radio => {
+
+    radio.addEventListener(
+      "change",
+      updateMode
+    );
+
+  });
+
+  input.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Enter") {
+
+        event.preventDefault();
+        generateHash();
+
+      }
+
+    }
+  );
+
+  copyBtn.addEventListener(
+    "click",
+    async () => {
+
+      const value =
+        output.dataset.copyValue || "";
+
+      if (!value) return;
+
+      try {
+
+        await navigator.clipboard.writeText(
+          value
+        );
+
+        copyBtn.textContent =
+          "Copied!";
+
+        setTimeout(() => {
+
+          copyBtn.textContent =
+            originalCopyText;
+
+        }, 1500);
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
+
+    }
+  );
+
+  clearBtn.addEventListener(
+    "click",
+    () => {
+
+      input.value = "";
+
+      resetOutput();
+
+      focusInput();
+
+    }
+  );
+
+  // -------------------------------
+  // Init
+  // -------------------------------
+  sha256Radio.checked = true;
+  sha1Radio.checked = false;
+  md5Radio.checked = false;
+
+  updateMode();
+
+}
+
 function initJsonFormatter() {
 
   const input = document.getElementById("paste-json");
@@ -5011,6 +5242,10 @@ if (document.getElementById("unix-converter")) {
 
 if (document.getElementById("color-converter")) {
   initColorConverter();
+}
+
+if (document.getElementById("hash-generator")) {
+  initHashGenerator();
 }
 
 });
