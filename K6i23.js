@@ -770,6 +770,55 @@ function initCalculator() {
   }
 
   // -------------------------
+  // Calculator Percent Logic
+  // -------------------------
+  function processPercentages(expr) {
+
+    // Standalone percentage
+    // 50% -> (50/100)
+    expr = expr.replace(
+      /(^|[+\-*/(])(\d+(\.\d+)?)%/g,
+      "$1($2/100)"
+    );
+
+    // Addition
+    // 200+10% -> 200+(200*10/100)
+    expr = expr.replace(
+      /(\d+(\.\d+)?)\+(\d+(\.\d+)?)%/g,
+      "$1+($1*$3/100)"
+    );
+
+    // Subtraction
+    // 200-10% -> 200-($1*10/100)
+    expr = expr.replace(
+      /(\d+(\.\d+)?)\-(\d+(\.\d+)?)%/g,
+      "$1-($1*$3/100)"
+    );
+
+    // Multiplication
+    // 200*10% -> 200*(10/100)
+    expr = expr.replace(
+      /(\d+(\.\d+)?)\*(\d+(\.\d+)?)%/g,
+      "$1*($3/100)"
+    );
+
+    // Division
+    // 200/10% -> 200/(10/100)
+    expr = expr.replace(
+      /(\d+(\.\d+)?)\/(\d+(\.\d+)?)%/g,
+      "$1/($3/100)"
+    );
+
+    // Remaining standalone percentages
+    expr = expr.replace(
+      /(\d+(\.\d+)?)%/g,
+      "($1/100)"
+    );
+
+    return expr;
+  }
+
+  // -------------------------
   // Validation
   // -------------------------
   function canAppend(value) {
@@ -777,13 +826,26 @@ function initCalculator() {
     if (!expression) {
       if (isOperator(value) && value !== "-") return false;
       if (value === ")") return false;
+      if (value === "%") return false;
     }
 
     const lastChar = expression.slice(-1);
 
-    if (isOperator(value) && lastChar === "(" && value !== "-") return false;
+    if (isOperator(value) && isOperator(lastChar)) {
+      return false;
+    }
 
-    if (value === "(" && /[0-9)]/.test(lastChar)) return false;
+    if (isOperator(value) && lastChar === "(" && value !== "-") {
+      return false;
+    }
+
+    if (value === "(" && /[0-9)%]/.test(lastChar)) {
+      return false;
+    }
+
+    if (value === "%") {
+      if (!/[0-9)]/.test(lastChar)) return false;
+    }
 
     if (value === ".") {
       const parts = expression.split(/[\+\-\*\/\(\)]/);
@@ -800,12 +862,16 @@ function initCalculator() {
   buttons.forEach(btn => {
     btn.addEventListener("click", function (e) {
       e.preventDefault();
+
       const value = btn.getAttribute("data-value");
       if (!value) return;
 
       const lastChar = expression.slice(-1);
 
-      if (isOperator(value) && isOperator(lastChar)) {
+      if (
+        isOperator(value) &&
+        isOperator(lastChar)
+      ) {
         expression = expression.slice(0, -1) + value;
         updateDisplay();
         return;
@@ -822,26 +888,38 @@ function initCalculator() {
   // Evaluate
   // -------------------------
   function evaluateExpression() {
+
     if (!expression) return;
 
     try {
+
       let evalExpression = balanceParentheses(expression);
+
       evalExpression = formatForEval(evalExpression);
 
-      if (!/^[0-9+\-*/().\s]+$/.test(evalExpression)) {
+      evalExpression = processPercentages(evalExpression);
+
+      if (!/^[0-9+\-*/().%\s]+$/.test(evalExpression)) {
         throw new Error("Invalid characters");
       }
 
-      let result = Function('"use strict"; return (' + evalExpression + ')')();
+      let result = Function(
+        '"use strict"; return (' + evalExpression + ')'
+      )();
 
-      if (!isFinite(result)) throw new Error("Math error");
+      if (!isFinite(result)) {
+        throw new Error("Math error");
+      }
 
       expression = formatResult(result);
+
       updateDisplay();
 
     } catch {
+
       display.textContent = "Error";
       expression = "";
+
     }
   }
 
@@ -882,16 +960,21 @@ function initCalculator() {
   // -------------------------
   if (copyBtn) {
     copyBtn.addEventListener("click", function (e) {
+
       e.preventDefault();
+
       if (!expression) return;
 
       navigator.clipboard.writeText(expression);
 
       const originalText = copyBtn.textContent;
+
       copyBtn.textContent = "Copied!";
+
       setTimeout(function () {
         copyBtn.textContent = originalText;
       }, 1500);
+
     });
   }
 
@@ -903,7 +986,9 @@ function initCalculator() {
     const key = e.key;
 
     if ((key >= "0" && key <= "9") || key === ".") {
+
       e.preventDefault();
+
       if (canAppend(key)) {
         expression += key;
         updateDisplay();
@@ -911,7 +996,9 @@ function initCalculator() {
     }
 
     if (["+", "-", "*", "/"].includes(key)) {
+
       e.preventDefault();
+
       const lastChar = expression.slice(-1);
 
       if (isOperator(lastChar)) {
@@ -923,8 +1010,20 @@ function initCalculator() {
       updateDisplay();
     }
 
-    if (key === "(" || key === ")") {
+    if (key === "%") {
+
       e.preventDefault();
+
+      if (canAppend("%")) {
+        expression += "%";
+        updateDisplay();
+      }
+    }
+
+    if (key === "(" || key === ")") {
+
+      e.preventDefault();
+
       if (canAppend(key)) {
         expression += key;
         updateDisplay();
