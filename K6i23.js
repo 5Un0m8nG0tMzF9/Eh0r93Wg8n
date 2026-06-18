@@ -774,49 +774,43 @@ function initCalculator() {
   // -------------------------
   function processPercentages(expr) {
 
-    // Standalone percentage
-    // 50% -> (50/100)
-    expr = expr.replace(
-      /(^|[+\-*/(])(\d+(\.\d+)?)%/g,
-      "$1($2/100)"
-    );
+  // Addition
+  // 200+10% -> 200+(200*10/100)
+  expr = expr.replace(
+    /(\d+(\.\d+)?)\+(\d+(\.\d+)?)%/g,
+    "$1+($1*$3/100)"
+  );
 
-    // Addition
-    // 200+10% -> 200+(200*10/100)
-    expr = expr.replace(
-      /(\d+(\.\d+)?)\+(\d+(\.\d+)?)%/g,
-      "$1+($1*$3/100)"
-    );
+  // Subtraction
+  // 200-10% -> 200-(200*10/100)
+  expr = expr.replace(
+    /(\d+(\.\d+)?)\-(\d+(\.\d+)?)%/g,
+    "$1-($1*$3/100)"
+  );
 
-    // Subtraction
-    // 200-10% -> 200-($1*10/100)
-    expr = expr.replace(
-      /(\d+(\.\d+)?)\-(\d+(\.\d+)?)%/g,
-      "$1-($1*$3/100)"
-    );
+  // Multiplication
+  // 200*10% -> 200*(10/100)
+  expr = expr.replace(
+    /(\d+(\.\d+)?)\*(\d+(\.\d+)?)%/g,
+    "$1*($3/100)"
+  );
 
-    // Multiplication
-    // 200*10% -> 200*(10/100)
-    expr = expr.replace(
-      /(\d+(\.\d+)?)\*(\d+(\.\d+)?)%/g,
-      "$1*($3/100)"
-    );
+  // Division
+  // 200/10% -> 200/(10/100)
+  expr = expr.replace(
+    /(\d+(\.\d+)?)\/(\d+(\.\d+)?)%/g,
+    "$1/($3/100)"
+  );
 
-    // Division
-    // 200/10% -> 200/(10/100)
-    expr = expr.replace(
-      /(\d+(\.\d+)?)\/(\d+(\.\d+)?)%/g,
-      "$1/($3/100)"
-    );
+  // Standalone percentages LAST
+  // 50% -> (50/100)
+  expr = expr.replace(
+    /(\d+(\.\d+)?)%/g,
+    "($1/100)"
+  );
 
-    // Remaining standalone percentages
-    expr = expr.replace(
-      /(\d+(\.\d+)?)%/g,
-      "($1/100)"
-    );
-
-    return expr;
-  }
+  return expr;
+}
 
   // -------------------------
   // Validation
