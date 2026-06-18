@@ -963,7 +963,7 @@ function initCalculator() {
 
       const originalText = copyBtn.textContent;
 
-      copyBtn.textContent = "Copied!";
+      copyBtn.textContent = "✔";
 
       setTimeout(function () {
         copyBtn.textContent = originalText;
