@@ -4566,7 +4566,7 @@ function initNotepad() {
     navigator.clipboard.writeText(notepad.value);
     const btn = document.getElementById("copy-btn");
     const original = btn.textContent;
-    btn.textContent = "Copied!";
+    btn.textContent = "✓";
     setTimeout(() => { btn.textContent = original; }, 1500);
     notepad.focus();
   });
