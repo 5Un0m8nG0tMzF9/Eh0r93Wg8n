@@ -3838,8 +3838,8 @@ function initQrGenerator() {
 
     qrCode = new QRCode(output, {
       text,
-      width: 300,
-      height: 300,
+      width: 250,
+      height: 250,
       correctLevel: QRCode.CorrectLevel.M
     });
   }
