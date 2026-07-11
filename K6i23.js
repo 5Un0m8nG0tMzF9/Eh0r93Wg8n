@@ -62,11 +62,11 @@ function initBmiCalculator() {
 
     if (imperialMode.checked) {
 
-      heightFeet.focus();
+      focusIfDesktop(heightFeet);
 
     } else {
 
-      heightCm.focus();
+      focusIfDesktop(heightCm);
 
     }
 
@@ -142,15 +142,6 @@ function initBmiCalculator() {
         (totalInches * totalInches);
 
     }
-
-
-
-
-
-
-
-
-
 
     // -------------------------------
     // Metric
@@ -256,7 +247,7 @@ function initBmiCalculator() {
         const originalText = copyBtn.textContent;
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -295,16 +286,6 @@ function initBmiCalculator() {
       commentary.textContent = "-";
       result.dataset.copyValue = "";
 
-      if (imperialMode.checked) {
-
-        heightFeet.focus();
-
-      } else {
-
-        heightCm.focus();
-
-      }
-
     }
   );
 
@@ -320,7 +301,7 @@ function initBmiCalculator() {
   commentary.textContent = "-";
   result.dataset.copyValue = "";
 
-  heightFeet.focus();
+  focusIfDesktop(heightFeet);
 
 }
 
@@ -407,7 +388,7 @@ function initBmrCalculator() {
         ? "flex"
         : "none";
 
-    ageInput.focus();
+    focusIfDesktop(ageInput);
 
   }
 
@@ -481,15 +462,6 @@ function initBmrCalculator() {
         pounds * 0.45359237;
 
     }
-
-
-
-
-
-
-
-
-
 
     // -----------------------------
     // Metric
@@ -647,7 +619,7 @@ Extremely Active: ${extremelyActive.toLocaleString()}`;
         const originalText = copyBtn.textContent;
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -688,8 +660,6 @@ Extremely Active: ${extremelyActive.toLocaleString()}`;
 
       clearOutputs();
 
-      ageInput.focus();
-
     }
   );
 
@@ -703,7 +673,7 @@ Extremely Active: ${extremelyActive.toLocaleString()}`;
 
   clearOutputs();
 
-  ageInput.focus();
+  focusIfDesktop(ageInput);
 
 }
 
@@ -963,7 +933,7 @@ function initCalculator() {
 
       const originalText = copyBtn.textContent;
 
-      copyBtn.textContent = "✔";
+      copyBtn.textContent = "✓";
 
       setTimeout(function () {
         copyBtn.textContent = originalText;
@@ -1137,15 +1107,15 @@ function initPercentageCalculator() {
     // Auto Focus
     if (percentOfMode.checked) {
 
-      percentInput.focus();
+      focusIfDesktop(percentInput);
 
     } else if (percentTotalMode.checked) {
 
-      valueInput.focus();
+      focusIfDesktop(valueInput);
 
     } else if (percentChangeMode.checked) {
 
-      originalInput.focus();
+      focusIfDesktop(originalInput);
 
     }
 
@@ -1171,7 +1141,7 @@ function initPercentageCalculator() {
   // -------------------------------
   function calculatePercentage() {
 
-    let output = "0";
+    let output = "-";
     let commentaryText = "";
     let copyValue = "";
 
@@ -1187,7 +1157,7 @@ function initPercentageCalculator() {
       if (isNaN(percent) ||
         isNaN(number)) {
 
-        result.textContent = "0";
+        result.textContent = "-";
         commentary.textContent = "";
         commentary.style.color = "";
         result.dataset.copyValue = "";
@@ -1228,7 +1198,7 @@ function initPercentageCalculator() {
         isNaN(total) ||
         total === 0) {
 
-        result.textContent = "0";
+        result.textContent = "-";
         commentary.textContent = "";
         commentary.style.color = "";
         result.dataset.copyValue = "";
@@ -1267,7 +1237,7 @@ function initPercentageCalculator() {
         isNaN(newer) ||
         original === 0) {
 
-        result.textContent = "0";
+        result.textContent = "-";
         commentary.textContent = "-";
         commentary.style.color = "";
         result.dataset.copyValue = "";
@@ -1379,7 +1349,7 @@ function initPercentageCalculator() {
         const originalText = copyBtn.textContent;
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -1429,15 +1399,15 @@ function initPercentageCalculator() {
 
       if (percentOfMode.checked) {
 
-        percentInput.focus();
+        focusIfDesktop(percentInput);
 
       } else if (percentTotalMode.checked) {
 
-        valueInput.focus();
+        focusIfDesktop(valueInput);
 
       } else if (percentChangeMode.checked) {
 
-        originalInput.focus();
+        focusIfDesktop(originalInput);
 
       }
 
@@ -1458,8 +1428,6 @@ function initPercentageCalculator() {
   commentary.style.color = "";
 
   result.dataset.copyValue = "";
-
-  percentInput.focus();
 
 }
 
@@ -1604,14 +1572,13 @@ function initUnitConverter() {
     resultFrom.textContent = "-";
     categorySelect.value = "length";
     populateUnits("length");
-    inputValue.focus();
   });
 
   copyBtn?.addEventListener("click", function () {
     navigator.clipboard.writeText(resultDisplay.textContent);
-    copyBtn.textContent = "Copied!";
+    copyBtn.textContent = "✓";
     setTimeout(function () {
-      copyBtn.textContent = "Copy Result";
+      copyBtn.textContent = originalText;
     }, 1500);
   });
 
@@ -1619,7 +1586,7 @@ function initUnitConverter() {
   categorySelect.value = "length";
   populateUnits("length");
 
-  inputValue.focus();
+  focusIfDesktop(inputValue);
 
 }
 
@@ -1745,7 +1712,7 @@ function initBase64Tool() {
         const originalText = copyBtn.textContent;
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -1780,7 +1747,7 @@ function initBase64Tool() {
       encodeMode.checked = true;
       decodeMode.checked = false;
 
-      input.focus();
+      FocusIfDesktop(input);
 
     }
   );
@@ -1792,7 +1759,7 @@ function initBase64Tool() {
     "change",
     () => {
 
-      output.textcontent = "";
+      output.textContent = "";
       output.dataset.copyValue = "";
 
     }
@@ -1816,7 +1783,7 @@ function initBase64Tool() {
 
   output.dataset.copyValue = "";
 
-  input.focus();
+  FocusIfDesktop(input);
 
 }
 
@@ -1858,13 +1825,9 @@ function initBdTool() {
     output.dataset.copyValue = "";
   }
 
-  function focusInput() {
-    input.focus();
-  }
-
   function updateMode() {
     resetOutput();
-    focusInput();
+    FocusIfDesktop("bd-input");
   }
 
   function convertValue() {
@@ -1948,13 +1911,17 @@ function initBdTool() {
   );
 
   input.addEventListener(
-    "keydown",
-    event => {
+  "keydown",
+  event => {
 
-      if (event.key === "Enter") {
+    if (
+      event.key === "Enter" &&
+      (event.ctrlKey || event.metaKey)
+    ) {
 
-        event.preventDefault();
-        convertValue();
+      event.preventDefault();
+
+      convertValue();
 
       }
 
@@ -1987,7 +1954,7 @@ function initBdTool() {
         );
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -2016,7 +1983,7 @@ function initBdTool() {
 
       resetOutput();
 
-      focusInput();
+      FocusIfDesktop("bd-input");
 
     }
   );
@@ -2072,10 +2039,6 @@ function initColorConverter() {
     output.dataset.copyValue = "";
   }
 
-  function focusInput() {
-    input.focus();
-  }
-
   function updateMode() {
 
     resetOutput();
@@ -2090,7 +2053,7 @@ function initColorConverter() {
       input.placeholder = "0, 100%, 50%";
     }
 
-    focusInput();
+    FocusIfDesktop("color-input");
 
   }
 
@@ -2357,11 +2320,18 @@ function initColorConverter() {
   });
 
   input.addEventListener(
-    "keydown",
-    (event) => {
+  "keydown",
+  (event) => {
 
-      if (event.key === "Enter") {
-        convert();
+    if (
+      event.key === "Enter" &&
+      (event.ctrlKey || event.metaKey)
+    ) {
+
+      event.preventDefault();
+
+      convert();
+
       }
 
     }
@@ -2382,7 +2352,7 @@ function initColorConverter() {
           value
         );
 
-        copyBtn.textContent = "Copied!";
+        copyBtn.textContent = "✓";
 
         setTimeout(() => {
 
@@ -2464,13 +2434,9 @@ function initHashGenerator() {
     output.dataset.copyValue = "";
   }
 
-  function focusInput() {
-    input.focus();
-  }
-
   function updateMode() {
     resetOutput();
-    focusInput();
+    FocusIfDesktop("hash-input");
   }
 
   async function hashLine(value, algorithm) {
@@ -2607,13 +2573,17 @@ function initHashGenerator() {
   });
 
   input.addEventListener(
-    "keydown",
-    event => {
+  "keydown",
+  event => {
 
-      if (event.key === "Enter") {
+    if (
+      event.key === "Enter" &&
+      (event.ctrlKey || event.metaKey)
+    ) {
 
-        event.preventDefault();
-        generateHash();
+      event.preventDefault();
+
+      generateHash();
 
       }
 
@@ -2636,7 +2606,7 @@ function initHashGenerator() {
         );
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -2662,7 +2632,7 @@ function initHashGenerator() {
 
       resetOutput();
 
-      focusInput();
+      FocusIfDesktop("hash-input");
 
     }
   );
@@ -2715,13 +2685,9 @@ function initHtmlTool() {
     output.dataset.copyValue = "";
   }
 
-  function focusInput() {
-    input.focus();
-  }
-
   function updateMode() {
     resetOutput();
-    focusInput();
+    FocusIfDesktop(input);
   }
 
   function encodeHtml(text) {
@@ -2817,7 +2783,7 @@ function initHtmlTool() {
         );
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -2846,7 +2812,7 @@ function initHtmlTool() {
 
       resetOutput();
 
-      focusInput();
+      FocusIfDesktop(input);
 
     }
   );
@@ -2909,7 +2875,7 @@ function initJsonFormatter() {
   }
 
   // -------------------------
-  // Copy Result (Nogstack Standard)
+  // Copy Result
   // -------------------------
   function copyJSON(e) {
     e.preventDefault();
@@ -2922,7 +2888,7 @@ function initJsonFormatter() {
 
     const originalText = copyBtn.textContent;
 
-    copyBtn.textContent = "Copied!";
+    copyBtn.textContent = "✓";
 
     setTimeout(() => {
       copyBtn.textContent = originalText;
@@ -2965,7 +2931,7 @@ function initJsonFormatter() {
     input.value = "";
     updateOutput("");
 
-    input.focus();
+    FocusIfDesktop(input);
   }
 
   // -------------------------
@@ -2989,7 +2955,7 @@ function initJsonFormatter() {
   // -------------------------
   // Auto-focus
   // -------------------------
-  input.focus();
+  FocusIfDesktop(input);
 
 }
 
@@ -3039,9 +3005,9 @@ function initUnixConverter() {
 
   function focusActiveInput() {
     if (getMode() === "timestamp") {
-      timestampInput.focus();
+      FocusIfDesktop(timestampInput);
     } else {
-      dateInput.focus();
+      FocusIfDesktop(dateInput);
     }
   }
 
@@ -3206,7 +3172,7 @@ function initUnixConverter() {
         );
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -3384,7 +3350,7 @@ function initUrlTool() {
         const originalText = copyBtn.textContent;
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -3420,7 +3386,7 @@ function initUrlTool() {
       encodeMode.checked = true;
       decodeMode.checked = false;
 
-      input.focus();
+      FocusIfDesktop(input);
 
     }
   );
@@ -3456,7 +3422,7 @@ function initUrlTool() {
 
   output.dataset.copyValue = "";
 
-  input.focus();
+  FocusIfDesktop(input);
 
 }
 
@@ -3513,7 +3479,7 @@ function initUUIDGenerator() {
       await navigator.clipboard.writeText(output.textContent);
 
       const originalText = copyBtn.textContent;
-      copyBtn.textContent = "Copied!";
+      copyBtn.textContent = "✓";
 
       setTimeout(() => {
         copyBtn.textContent = originalText;
@@ -3532,7 +3498,7 @@ function initUUIDGenerator() {
 
     output.textContent = "";
     quantityInput.value = 1;
-    quantityInput.focus();
+    FocusIfDesktop("quantity-input");
     quantityInput.select();
 
   });
@@ -3553,7 +3519,7 @@ function initUUIDGenerator() {
   // Init
   // -------------------------------
   quantityInput.value = 1;
-  quantityInput.focus();
+  FocusIfDesktop("quantity-input");
   quantityInput.select();
 
 }
@@ -3564,7 +3530,7 @@ function initPasswordGenerator() {
   const output = document.getElementById("password-output");
   const regenerateBtn = document.getElementById("regenerate-password-btn");
   const copyBtn = document.getElementById("copy-password-btn");
-  const clearBtn = document.getElementById("clear-password-generator");
+  const resetBtn = document.getElementById("reset-password-generator");
 
   const lengthInput = document.getElementById("password-length-input");
 
@@ -3744,7 +3710,7 @@ function initPasswordGenerator() {
 
     if (!copyBtn) return;
 
-    copyBtn.textContent = "Copied!";
+    copyBtn.textContent = "✓";
 
     setTimeout(() => {
       copyBtn.textContent = originalCopyText;
@@ -3855,7 +3821,7 @@ function initQrGenerator() {
   clearBtn.addEventListener("click", () => {
     input.value = "";
     clearQr();
-    input.focus();
+    FocusIfDesktop(input);
   });
 
   downloadBtn.addEventListener("click", () => {
@@ -3879,7 +3845,7 @@ function initQrGenerator() {
     }
   });
 
-  input.focus();
+  FocusIfDesktop(input);
 }
 
 function initRandomNumberGenerator() {
@@ -3894,7 +3860,7 @@ function initRandomNumberGenerator() {
 
   if (!minInput || !maxInput || !generateBtn || !resultDisplay) return;
 
-  let lastGeneratedNumber = 0; // store last generated number for copy button
+  let lastGeneratedNumber = null; // store last generated number for copy button
 
 
   // Default values
@@ -3996,9 +3962,9 @@ function initRandomNumberGenerator() {
     e.preventDefault();
     if (lastGeneratedNumber !== null) {
       navigator.clipboard.writeText(lastGeneratedNumber.toString());
-      copyBtn.textContent = "Copied!";
+      copyBtn.textContent = "✓";
       setTimeout(() => {
-        copyBtn.textContent = "Copy Result";
+        copyBtn.textContent = originalText;
       }, 1500);
     }
   });
@@ -4049,10 +4015,6 @@ function initSlugGenerator() {
   function resetOutput() {
     output.textContent = "";
     output.dataset.copyValue = "";
-  }
-
-  function focusInput() {
-    input.focus();
   }
 
   function createSlug(value) {
@@ -4139,7 +4101,7 @@ function initSlugGenerator() {
         );
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -4168,7 +4130,7 @@ function initSlugGenerator() {
 
       resetOutput();
 
-      focusInput();
+      FocusIfDesktop(input);
 
     }
   );
@@ -4178,7 +4140,7 @@ function initSlugGenerator() {
   // -------------------------------
   resetOutput();
 
-  focusInput();
+  FocusIfDesktop(input);
 
 }
 
@@ -4208,7 +4170,7 @@ function initDuplicateLineRemover() {
     await navigator.clipboard.writeText(output.textContent);
 
     const originalText = copyBtn.textContent;
-    copyBtn.textContent = "Copied!";
+    copyBtn.textContent = "✓";
 
     setTimeout(() => {
       copyBtn.textContent = originalText;
@@ -4218,10 +4180,10 @@ function initDuplicateLineRemover() {
   clearBtn.addEventListener("click", () => {
     input.value = "";
     output.textContent = "";
-    input.focus();
+    focusIfDesktop(input);
   });
 
-  input.focus();
+  focusIfDesktop(input);
 
 }
 
@@ -4309,8 +4271,6 @@ function initLoremGenerator() {
       startWrap.classList.add("disabled");
     }
 
-    amountInput.focus();
-
   }
 
   // -------------------------
@@ -4385,7 +4345,7 @@ function initLoremGenerator() {
     navigator.clipboard.writeText(value);
 
     const originalText = copyBtn.textContent;
-    copyBtn.textContent = "Copied!";
+    copyBtn.textContent = "✓";
 
     setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
   });
@@ -4403,7 +4363,7 @@ function initLoremGenerator() {
 
     updateStartToggle();
 
-    amountInput.focus();
+    focusIfDesktop(amountInput);
   });
 
   // -------------------------
@@ -4420,7 +4380,7 @@ function initLoremGenerator() {
 
   updateStartToggle();
 
-  amountInput.focus();
+  focusIfDesktop(amountInput);
 
 }
 
@@ -4556,7 +4516,7 @@ function initNotepad() {
   // -------------------------------
   updateCount();
   autogrow();
-  notepad.focus();
+  focusIfDesktop(notepad);
 
   // -------------------------------
   // Buttons
@@ -4764,7 +4724,7 @@ function initTextCaseConverter() {
     navigator.clipboard.writeText(value);
 
     const originalText = copyBtn.textContent;
-    copyBtn.textContent = "Copied!";
+    copyBtn.textContent = "✓";
 
     setTimeout(() => { copyBtn.textContent = originalText; }, 1500);
   });
@@ -4777,10 +4737,10 @@ function initTextCaseConverter() {
     input.value = "";
     output.textContent = "";
     currentMode = null;
-    input.focus();
+    focusIfDesktop(input);
   });
 
-  input.focus();
+  focusIfDesktop(input);
 
 }
 
@@ -4820,17 +4780,17 @@ function initTextSorter() {
   azBtn.checked = true;
   zaBtn.checked = false;
 
-  input.focus();
+  focusIfDesktop(input);
 
   // -------------------------------
   // Mode Focus
   // -------------------------------
   azBtn.addEventListener("change", () => {
-    input.focus();
+    focusIfDesktop(input);
   });
 
   zaBtn.addEventListener("change", () => {
-    input.focus();
+    focusIfDesktop(input);
   });
 
   // -------------------------------
@@ -4901,7 +4861,7 @@ function initTextSorter() {
         copyBtn.textContent;
 
       copyBtn.textContent =
-        "Copied!";
+        "✓";
 
       setTimeout(() => {
 
@@ -4929,7 +4889,7 @@ function initTextSorter() {
 
       // Preserve active sort mode
 
-      input.focus();
+      focusIfDesktop(input);
 
     }
   );
@@ -4994,7 +4954,7 @@ function initWordCharCounter() {
     navigator.clipboard.writeText(textInput.value);
 
     const originalText = copyButton.textContent;
-    copyButton.textContent = "Copied!";
+    copyButton.textContent = "✓";
 
     setTimeout(() => {
       copyButton.textContent = originalText;
@@ -5008,10 +4968,10 @@ function initWordCharCounter() {
   clearButton.addEventListener("click", function () {
     textInput.value = "";
     updateCounts();
-    textInput.focus();
+    focusIfDesktop(textInput);
   });
 
-  textInput.focus();
+  focusIfDesktop(textInput);
 
 }
 
@@ -5164,7 +5124,7 @@ function initAgeCalculator() {
         const originalText = copyBtn.textContent;
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -5195,11 +5155,11 @@ function initAgeCalculator() {
       birthDateInput.value = "";
 
       result.textContent =
-        "0 Years";
+        "-";
 
       result.dataset.copyValue = "";
 
-      birthDateInput.focus();
+      focusIfDesktop(birthDateInput);
 
     }
   );
@@ -5209,8 +5169,6 @@ function initAgeCalculator() {
   // -------------------------------
   result.textContent = "-";
   result.dataset.copyValue = "";
-
-  birthDateInput.focus();
 
 }
 
@@ -5688,7 +5646,7 @@ function initDateCalculator() {
         const originalText = copyBtn.textContent;
 
         copyBtn.textContent =
-          "Copied!";
+          "✓";
 
         setTimeout(() => {
 
@@ -5736,11 +5694,11 @@ function initDateCalculator() {
 
       if (daysBetweenMode.checked) {
 
-        startDate.focus();
+        focusIfDesktop(startDate);
 
       } else if (dateFromMode.checked) {
 
-        baseDate.focus();
+        focusIfDesktop(baseDate);
 
       }
 
@@ -5846,6 +5804,12 @@ function initStopwatch() {
   updateDisplay();
 }
 
+
+function focusIfDesktop(element) {
+  if (element && window.matchMedia("(min-width: 992px)").matches) {
+    element.focus();
+  }
+}
 
 document.addEventListener("DOMContentLoaded", function() {
 
