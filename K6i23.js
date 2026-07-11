@@ -1829,7 +1829,7 @@ function initBdTool() {
 
   function updateMode() {
     resetOutput();
-    focusIfDesktop("bd-input");
+    focusIfDesktop(input);
   }
 
   function convertValue() {
@@ -1985,7 +1985,7 @@ function initBdTool() {
 
       resetOutput();
 
-      focusIfDesktop("bd-input");
+      focusIfDesktop(input);
 
     }
   );
@@ -2055,7 +2055,7 @@ function initColorConverter() {
       input.placeholder = "0, 100%, 50%";
     }
 
-    focusIfDesktop("color-input");
+    focusIfDesktop(input);
 
   }
 
@@ -2379,7 +2379,7 @@ function initColorConverter() {
       input.value = "";
 
       resetOutput();
-      focusInput();
+      focusIfDesktop(input);
 
     }
   );
@@ -2438,7 +2438,7 @@ function initHashGenerator() {
 
   function updateMode() {
     resetOutput();
-    focusIfDesktop("hash-input");
+    focusIfDesktop(input);
   }
 
   async function hashLine(value, algorithm) {
@@ -2634,7 +2634,7 @@ function initHashGenerator() {
 
       resetOutput();
 
-      focusIfDesktop("hash-input");
+      focusIfDesktop(input);
 
     }
   );
@@ -3498,12 +3498,14 @@ function initUUIDGenerator() {
   // -------------------------------
   clearBtn.addEventListener("click", () => {
 
-    output.textContent = "";
-    quantityInput.value = 1;
-    focusIfDesktop("quantity-input");
-    quantityInput.select();
+  output.textContent = "";
+  quantityInput.value = 1;
 
-  });
+  focusIfDesktop(quantityInput);
+
+  quantityInput.select();
+
+});
 
   // -------------------------------
   // Enter Key Generates
@@ -3521,7 +3523,7 @@ function initUUIDGenerator() {
   // Init
   // -------------------------------
   quantityInput.value = 1;
-  focusIfDesktop("quantity-input");
+  focusIfDesktop(quantityInput);
   quantityInput.select();
 
 }
