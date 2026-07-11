@@ -1386,7 +1386,7 @@ function initPercentageCalculator() {
       originalInput.value = "";
       newInput.value = "";
 
-      result.textContent = "0";
+      result.textContent = "-";
 
       commentary.textContent =
         percentChangeMode.checked
@@ -1423,7 +1423,7 @@ function initPercentageCalculator() {
 
   updateMode();
 
-  result.textContent = "0";
+  result.textContent = "-";
   commentary.textContent = "";
   commentary.style.color = "";
 
@@ -1446,8 +1446,8 @@ function initUnitConverter() {
   const copyBtn = document.getElementById("copy-result");
   const swapBtn = document.getElementById("swap-btn");
 
-  const originalCopyText = copyBtn?.textContent;
-  
+  const originalText = copyBtn?.textContent || "Copy";
+
   if (!categorySelect || !fromUnit || !toUnit || !inputValue) return;
 
   const unitLabels = {
@@ -1580,7 +1580,7 @@ function initUnitConverter() {
     navigator.clipboard.writeText(resultDisplay.textContent);
     copyBtn.textContent = "✓";
     setTimeout(function () {
-      copyBtn.textContent = originalCopyText;
+      copyBtn.textContent = originalText;
     }, 1500);
   });
 
@@ -3859,6 +3859,7 @@ function initRandomNumberGenerator() {
   const copyBtn = document.getElementById("copy-result");
   const historyList = document.getElementById("history-list");
   const clearBtn = document.getElementById("clear-btn");
+  const originalText = copyBtn?.textContent || "Copy";
 
   if (!minInput || !maxInput || !generateBtn || !resultDisplay) return;
 
@@ -5690,7 +5691,7 @@ function initDateCalculator() {
         dateDirection.selectedIndex = 0;
       }
 
-      result.textContent = "0";
+      result.textContent = "-";
       commentary.textContent = "-";
       result.dataset.copyValue = "";
 
