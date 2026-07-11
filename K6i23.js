@@ -1749,7 +1749,7 @@ function initBase64Tool() {
       encodeMode.checked = true;
       decodeMode.checked = false;
 
-      FocusIfDesktop(input);
+      focusIfDesktop(input);
 
     }
   );
@@ -1785,7 +1785,7 @@ function initBase64Tool() {
 
   output.dataset.copyValue = "";
 
-  FocusIfDesktop(input);
+  focusIfDesktop(input);
 
 }
 
@@ -1829,7 +1829,7 @@ function initBdTool() {
 
   function updateMode() {
     resetOutput();
-    FocusIfDesktop("bd-input");
+    focusIfDesktop("bd-input");
   }
 
   function convertValue() {
@@ -1985,7 +1985,7 @@ function initBdTool() {
 
       resetOutput();
 
-      FocusIfDesktop("bd-input");
+      focusIfDesktop("bd-input");
 
     }
   );
@@ -2055,7 +2055,7 @@ function initColorConverter() {
       input.placeholder = "0, 100%, 50%";
     }
 
-    FocusIfDesktop("color-input");
+    focusIfDesktop("color-input");
 
   }
 
@@ -2438,7 +2438,7 @@ function initHashGenerator() {
 
   function updateMode() {
     resetOutput();
-    FocusIfDesktop("hash-input");
+    focusIfDesktop("hash-input");
   }
 
   async function hashLine(value, algorithm) {
@@ -2634,7 +2634,7 @@ function initHashGenerator() {
 
       resetOutput();
 
-      FocusIfDesktop("hash-input");
+      focusIfDesktop("hash-input");
 
     }
   );
@@ -2689,7 +2689,7 @@ function initHtmlTool() {
 
   function updateMode() {
     resetOutput();
-    FocusIfDesktop(input);
+    focusIfDesktop(input);
   }
 
   function encodeHtml(text) {
@@ -2814,7 +2814,7 @@ function initHtmlTool() {
 
       resetOutput();
 
-      FocusIfDesktop(input);
+      focusIfDesktop(input);
 
     }
   );
@@ -2933,7 +2933,7 @@ function initJsonFormatter() {
     input.value = "";
     updateOutput("");
 
-    FocusIfDesktop(input);
+    focusIfDesktop(input);
   }
 
   // -------------------------
@@ -2957,7 +2957,7 @@ function initJsonFormatter() {
   // -------------------------
   // Auto-focus
   // -------------------------
-  FocusIfDesktop(input);
+  focusIfDesktop(input);
 
 }
 
@@ -3007,9 +3007,9 @@ function initUnixConverter() {
 
   function focusActiveInput() {
     if (getMode() === "timestamp") {
-      FocusIfDesktop(timestampInput);
+      focusIfDesktop(timestampInput);
     } else {
-      FocusIfDesktop(dateInput);
+      focusIfDesktop(dateInput);
     }
   }
 
@@ -3388,7 +3388,7 @@ function initUrlTool() {
       encodeMode.checked = true;
       decodeMode.checked = false;
 
-      FocusIfDesktop(input);
+      focusIfDesktop(input);
 
     }
   );
@@ -3424,7 +3424,7 @@ function initUrlTool() {
 
   output.dataset.copyValue = "";
 
-  FocusIfDesktop(input);
+  focusIfDesktop(input);
 
 }
 
@@ -3500,7 +3500,7 @@ function initUUIDGenerator() {
 
     output.textContent = "";
     quantityInput.value = 1;
-    FocusIfDesktop("quantity-input");
+    focusIfDesktop("quantity-input");
     quantityInput.select();
 
   });
@@ -3521,7 +3521,7 @@ function initUUIDGenerator() {
   // Init
   // -------------------------------
   quantityInput.value = 1;
-  FocusIfDesktop("quantity-input");
+  focusIfDesktop("quantity-input");
   quantityInput.select();
 
 }
@@ -3738,7 +3738,7 @@ function initPasswordGenerator() {
   // Event listeners
   regenerateBtn?.addEventListener("click", generatePassword);
   copyBtn?.addEventListener("click", copyPassword);
-  clearBtn?.addEventListener("click", resetGenerator);
+  resetBtn?.addEventListener("click", resetGenerator);
 
   lengthInput?.addEventListener("input", generatePassword);
   minNumbersInput?.addEventListener("input", generatePassword);
@@ -3765,7 +3765,7 @@ function initPasswordGenerator() {
   });
 
   // Initial generation
-  generatePassword();
+  resetGenerator();
 
 }
 
@@ -3823,7 +3823,7 @@ function initQrGenerator() {
   clearBtn.addEventListener("click", () => {
     input.value = "";
     clearQr();
-    FocusIfDesktop(input);
+    focusIfDesktop(input);
   });
 
   downloadBtn.addEventListener("click", () => {
@@ -3847,7 +3847,7 @@ function initQrGenerator() {
     }
   });
 
-  FocusIfDesktop(input);
+  focusIfDesktop(input);
 }
 
 function initRandomNumberGenerator() {
@@ -4133,7 +4133,7 @@ function initSlugGenerator() {
 
       resetOutput();
 
-      FocusIfDesktop(input);
+      focusIfDesktop(input);
 
     }
   );
@@ -4143,7 +4143,7 @@ function initSlugGenerator() {
   // -------------------------------
   resetOutput();
 
-  FocusIfDesktop(input);
+  focusIfDesktop(input);
 
 }
 
