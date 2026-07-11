@@ -1769,9 +1769,6 @@ function initBase64Tool() {
 
       resetOutput();
 
-      encodeMode.checked = true;
-      decodeMode.checked = false;
-
       focusIfDesktop(input);
 
     }
@@ -3410,9 +3407,6 @@ function initUrlTool() {
       input.value = "";
 
       resetOutput();
-
-      encodeMode.checked = true;
-      decodeMode.checked = false;
 
       focusIfDesktop(input);
 
