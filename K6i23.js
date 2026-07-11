@@ -286,6 +286,12 @@ function initBmiCalculator() {
       commentary.textContent = "-";
       result.dataset.copyValue = "";
 
+      if (imperialMode.checked) {
+      focusIfDesktop(heightFeet);
+      } else {
+      focusIfDesktop(heightCm);
+      }
+
     }
   );
 
@@ -659,6 +665,8 @@ Extremely Active: ${extremelyActive.toLocaleString()}`;
       weightKg.value = "";
 
       clearOutputs();
+
+      focusIfDesktop(ageInput);
 
     }
   );
@@ -1574,6 +1582,7 @@ function initUnitConverter() {
     resultFrom.textContent = "-";
     categorySelect.value = "length";
     populateUnits("length");
+    focusIfDesktop(inputValue);
   });
 
   copyBtn?.addEventListener("click", function () {
@@ -5175,6 +5184,8 @@ function initAgeCalculator() {
   result.textContent = "-";
   result.dataset.copyValue = "";
 
+  focusIfDesktop(birthDateInput);
+  
 }
 
 
@@ -5454,7 +5465,7 @@ function initDateCalculator() {
     if (daysBetweenMode.checked) {
 
       if (!startDate.value || !endDate.value) {
-        result.textContent = "0";
+        result.textContent = "-";
         commentary.textContent = "";
         return;
       }
@@ -5516,7 +5527,7 @@ function initDateCalculator() {
         dateAmount.value === "" ||
         !dateUnit.value) {
 
-        result.textContent = "0";
+        result.textContent = "-";
         commentary.textContent = "";
         return;
 
@@ -5703,7 +5714,7 @@ function initDateCalculator() {
 
       } else if (dateFromMode.checked) {
 
-        focusIfDesktop(baseDate);
+        focusIfDesktop(dateAmount);
 
       }
 
@@ -5723,9 +5734,11 @@ function initDateCalculator() {
 
   updateMode();
 
-  result.textContent = "0";
+  result.textContent = "-";
   commentary.textContent = "-";
   result.dataset.copyValue = "";
+
+  focusIfDesktop(startDate);
 
 }
 
