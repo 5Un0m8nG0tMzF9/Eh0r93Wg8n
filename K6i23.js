@@ -1446,6 +1446,8 @@ function initUnitConverter() {
   const copyBtn = document.getElementById("copy-result");
   const swapBtn = document.getElementById("swap-btn");
 
+  const originalCopyText = copyBtn?.textContent;
+  
   if (!categorySelect || !fromUnit || !toUnit || !inputValue) return;
 
   const unitLabels = {
@@ -1578,7 +1580,7 @@ function initUnitConverter() {
     navigator.clipboard.writeText(resultDisplay.textContent);
     copyBtn.textContent = "✓";
     setTimeout(function () {
-      copyBtn.textContent = originalText;
+      copyBtn.textContent = originalCopyText;
     }, 1500);
   });
 
