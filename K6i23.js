@@ -1627,6 +1627,20 @@ function initBase64Tool() {
     !encodeMode ||
     !decodeMode) return;
 
+    function resetOutput() {
+
+    output.textContent = "";
+    output.dataset.copyValue = "";
+
+  }
+
+    function updateMode() {
+
+    resetOutput();
+    focusIfDesktop(input);
+
+  }
+
   // -------------------------------
   // Convert
   // -------------------------------
@@ -1752,8 +1766,8 @@ function initBase64Tool() {
     () => {
 
       input.value = "";
-      output.textContent = "";
-      output.dataset.copyValue = "";
+
+      resetOutput();
 
       encodeMode.checked = true;
       decodeMode.checked = false;
@@ -1768,22 +1782,12 @@ function initBase64Tool() {
   // -------------------------------
   encodeMode?.addEventListener(
     "change",
-    () => {
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-    }
+    updateMode
   );
 
   decodeMode?.addEventListener(
     "change",
-    () => {
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-    }
+    updateMode
   );
 
   // -------------------------------
@@ -3267,6 +3271,20 @@ function initUrlTool() {
     !encodeMode ||
     !decodeMode) return;
 
+    function resetOutput() {
+
+    output.textContent = "";
+    output.dataset.copyValue = "";
+
+  }
+
+    function updateMode() {
+
+    resetOutput();
+    focusIfDesktop(input);
+
+  }
+
   // -------------------------------
   // Convert
   // -------------------------------
@@ -3391,8 +3409,7 @@ function initUrlTool() {
 
       input.value = "";
 
-      output.textContent = "";
-      output.dataset.copyValue = "";
+      resetOutput();
 
       encodeMode.checked = true;
       decodeMode.checked = false;
@@ -3405,24 +3422,14 @@ function initUrlTool() {
   // -------------------------------
   // Mode Change
   // -------------------------------
-  encodeMode?.addEventListener(
-    "change",
-    () => {
+    encodeMode?.addEventListener(
+      "change",
+      updateMode
+    );
 
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-    }
-  );
-
-  decodeMode?.addEventListener(
-    "change",
-    () => {
-
-      output.textContent = "";
-      output.dataset.copyValue = "";
-
-    }
+    decodeMode?.addEventListener(
+      "change",
+    updateMode
   );
 
   // -------------------------------
@@ -3431,7 +3438,7 @@ function initUrlTool() {
   encodeMode.checked = true;
   decodeMode.checked = false;
 
-  output.dataset.copyValue = "";
+  resetOutput();
 
   focusIfDesktop(input);
 
