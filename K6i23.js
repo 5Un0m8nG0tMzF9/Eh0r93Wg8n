@@ -1,5 +1,3 @@
-
-
 function initBmiCalculator() {
 
   const wrapper = document.getElementById("bmi-calculator");
@@ -3452,6 +3450,59 @@ function initUUIDGenerator() {
   const clearBtn = document.getElementById("uuid-clear");
 
   // -------------------------------
+  // Get Selected UUID Version
+  // -------------------------------
+  function getSelectedVersion() {
+
+    const selectedVersion = wrapper.querySelector(
+      'input[name="uuid-version"]:checked'
+    );
+
+    return selectedVersion ? selectedVersion.value : "v4";
+
+  }
+
+  // -------------------------------
+  // Generate UUID v7
+  // -------------------------------
+  function generateUUIDv7() {
+
+    const bytes = new Uint8Array(16);
+
+    crypto.getRandomValues(bytes);
+
+    const timestamp = Date.now();
+
+    // Store the 48-bit Unix timestamp in the first 6 bytes.
+    bytes[0] = Math.floor(timestamp / 0x10000000000) & 0xff;
+    bytes[1] = Math.floor(timestamp / 0x100000000) & 0xff;
+    bytes[2] = Math.floor(timestamp / 0x1000000) & 0xff;
+    bytes[3] = Math.floor(timestamp / 0x10000) & 0xff;
+    bytes[4] = Math.floor(timestamp / 0x100) & 0xff;
+    bytes[5] = timestamp & 0xff;
+
+    // Set UUID version to 7.
+    bytes[6] = (bytes[6] & 0x0f) | 0x70;
+
+    // Set UUID variant to RFC 9562.
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    const hex = Array.from(
+      bytes,
+      byte => byte.toString(16).padStart(2, "0")
+    );
+
+    return [
+      hex.slice(0, 4).join(""),
+      hex.slice(4, 6).join(""),
+      hex.slice(6, 8).join(""),
+      hex.slice(8, 10).join(""),
+      hex.slice(10, 16).join("")
+    ].join("-");
+
+  }
+
+  // -------------------------------
   // Generate UUIDs
   // -------------------------------
   function generateUUIDs() {
@@ -3464,10 +3515,17 @@ function initUUIDGenerator() {
 
     quantityInput.value = quantity;
 
+    const version = getSelectedVersion();
     const uuids = [];
 
     for (let i = 0; i < quantity; i++) {
-      uuids.push(crypto.randomUUID());
+
+      if (version === "v7") {
+        uuids.push(generateUUIDv7());
+      } else {
+        uuids.push(crypto.randomUUID());
+      }
+
     }
 
     output.textContent = uuids.join("\n");
@@ -3508,14 +3566,13 @@ function initUUIDGenerator() {
   // -------------------------------
   clearBtn.addEventListener("click", () => {
 
-  output.textContent = "";
-  quantityInput.value = 1;
+    output.textContent = "";
+    quantityInput.value = 1;
 
-  focusIfDesktop(quantityInput);
+    focusIfDesktop(quantityInput);
+    quantityInput.select();
 
-  quantityInput.select();
-
-});
+  });
 
   // -------------------------------
   // Enter Key Generates
@@ -3537,7 +3594,6 @@ function initUUIDGenerator() {
   quantityInput.select();
 
 }
-
 
 function initPasswordGenerator() {
 
