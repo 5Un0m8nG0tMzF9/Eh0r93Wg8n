@@ -1,3 +1,5 @@
+
+
 function initBmiCalculator() {
 
   const wrapper = document.getElementById("bmi-calculator");
@@ -3589,6 +3591,11 @@ function initUUIDGenerator() {
   // -------------------------------
   // Init
   // -------------------------------
+  const versionV4 = wrapper.querySelector(
+  'input[name="uuid-version"][value="v4"]'
+  );
+
+  versionV4.checked = true;
   quantityInput.value = 1;
   focusIfDesktop(quantityInput);
   quantityInput.select();
